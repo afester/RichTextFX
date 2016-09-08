@@ -5,8 +5,6 @@ import java.io.IOException;
 
 /**
  * An interface to segment types, like StyledText or LinkedImage.
- *
- * @param <S>
  */
 public interface Segment<S> {
 

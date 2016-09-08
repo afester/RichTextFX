@@ -5,8 +5,6 @@ package org.fxmisc.richtext.model;
  * This is the base class for custom objects in the model layer.
  * Its String representation is always one character long and contains
  * the "object replacement character" (\ufffc). 
- *
- * @param <S>
  */
 public abstract class CustomObject<S> implements Segment<S> {
 

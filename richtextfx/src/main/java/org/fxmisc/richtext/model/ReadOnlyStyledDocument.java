@@ -99,7 +99,7 @@ public final class ReadOnlyStyledDocument<PS, S> implements StyledDocument<PS, S
     /**
      * Creates a new ReadOnlyStyledDocument with a custom object.
      *
-     * @param data
+     * @param obj   The custom object which shall be contained in the document.
      * @param paragraphStyle The paragraph style to use for the custom object.
      * @param style The text style to use for the custom object.
      *

@@ -7,8 +7,6 @@ import java.util.Objects;
 
 /**
  * The default segment type which is a styled text string. 
- *
- * @param <S>
  */
 public class StyledText<S> implements Segment<S> {
     private final String text;
