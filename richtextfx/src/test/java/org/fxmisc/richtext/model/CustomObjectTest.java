@@ -11,8 +11,8 @@ public class CustomObjectTest {
     public void testLinkedImageCreation() {
         SimpleEditableStyledDocument<Boolean, String> doc = 
                 new SimpleEditableStyledDocument<>(true, "");
-        ReadOnlyStyledDocument<Boolean, String> customObj = 
-                ReadOnlyStyledDocument.createObject(new LinkedImage<String>("", "sample.png"), true, "");
+        StyledDocument<Boolean, String> customObj = 
+                ReadOnlyStyledDocument.createObject(new LinkedImage<String>("sample.png", ""), true, "");
         doc.replace(0, 0, customObj);
         assertEquals(1, doc.getLength());
 
