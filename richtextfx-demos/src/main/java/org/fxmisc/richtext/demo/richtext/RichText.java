@@ -15,7 +15,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -409,16 +408,11 @@ public class RichText extends Application {
         fileChooser.setInitialDirectory(new File(initialDir));
         File selectedFile = fileChooser.showOpenDialog(mainStage);
         if (selectedFile != null) {
-
-            try {
-                String imageUrl = selectedFile.toURI().toURL().toExternalForm();
-                ReadOnlyStyledDocument<ParStyle, TextStyle> ros = 
-                        ReadOnlyStyledDocument.createObject(new LinkedImage<>(imageUrl, TextStyle.EMPTY), 
-                                                          ParStyle.EMPTY, TextStyle.EMPTY); 
-                area.replaceSelection(ros);
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            }
+            String imagePath = selectedFile.getAbsolutePath();
+            ReadOnlyStyledDocument<ParStyle, TextStyle> ros = 
+                    ReadOnlyStyledDocument.createObject(new LinkedImage<>(imagePath, TextStyle.EMPTY), 
+                                                      ParStyle.EMPTY, TextStyle.EMPTY); 
+            area.replaceSelection(ros);
         }
     }
 
