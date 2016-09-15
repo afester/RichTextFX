@@ -24,7 +24,7 @@ import org.reactfx.util.Tuple2;
 /**
  * Clipboard actions for {@link TextEditingArea}.
  */
-public interface ClipboardActions<PS, S> extends EditActions<PS, S> {
+public interface ClipboardActions<PS, SEG, S> extends EditActions<PS, SEG, S> {
 
     Optional<Tuple2<Codec<PS>, Codec<S>>> getStyleCodecs();
 
@@ -50,9 +50,9 @@ public interface ClipboardActions<PS, S> extends EditActions<PS, S> {
             content.putString(getSelectedText());
 
             getStyleCodecs().ifPresent(codecs -> {
-                Codec<StyledDocument<PS, S>> codec = ReadOnlyStyledDocument.codec(codecs._1, codecs._2);
+                Codec<StyledDocument<PS, SEG, S>> codec = ReadOnlyStyledDocument.codec(codecs._1, codecs._2);
                 DataFormat format = dataFormat(codec.getName());
-                StyledDocument<PS, S> doc = subDocument(selection.getStart(), selection.getEnd());
+                StyledDocument<PS, SEG, S> doc = subDocument(selection.getStart(), selection.getEnd());
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
                 DataOutputStream dos = new DataOutputStream(os);
                 try {
@@ -78,13 +78,13 @@ public interface ClipboardActions<PS, S> extends EditActions<PS, S> {
 
         if(getStyleCodecs().isPresent()) {
             Tuple2<Codec<PS>, Codec<S>> codecs = getStyleCodecs().get();
-            Codec<StyledDocument<PS, S>> codec = ReadOnlyStyledDocument.codec(codecs._1, codecs._2);
+            Codec<StyledDocument<PS, SEG, S>> codec = ReadOnlyStyledDocument.codec(codecs._1, codecs._2);
             DataFormat format = dataFormat(codec.getName());
             if(clipboard.hasContent(format)) {
                 byte[] bytes = (byte[]) clipboard.getContent(format);
                 ByteArrayInputStream is = new ByteArrayInputStream(bytes);
                 DataInputStream dis = new DataInputStream(is);
-                StyledDocument<PS, S> doc = null;
+                StyledDocument<PS, SEG, S> doc = null;
                 try {
                     doc = codec.decode(dis);
                 } catch (IOException e) {

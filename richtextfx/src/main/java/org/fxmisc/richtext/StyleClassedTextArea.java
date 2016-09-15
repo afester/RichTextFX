@@ -10,9 +10,9 @@ import org.fxmisc.richtext.model.SimpleEditableStyledDocument;
 /**
  * Text area that uses style classes to define style of text segments and paragraph segments.
  */
-public class StyleClassedTextArea extends StyledTextArea<Collection<String>, Collection<String>> {
+public class StyleClassedTextArea extends StyledTextArea<Collection<String>, String, Collection<String>> {
 
-    public StyleClassedTextArea(EditableStyledDocument<Collection<String>, Collection<String>> document, boolean preserveStyle) {
+    public StyleClassedTextArea(EditableStyledDocument<Collection<String>, String, Collection<String>> document, boolean preserveStyle) {
         super(Collections.<String>emptyList(),
                 (paragraph, styleClasses) -> paragraph.getStyleClass().addAll(styleClasses),
                 Collections.<String>emptyList(),

@@ -207,7 +207,7 @@ class StyledTextAreaBehavior {
 
     private final StyledTextArea<?, ?> view;
 
-    private final StyledTextAreaModel<?, ?> model;
+    private final StyledTextAreaModel<?, ?, ?> model;
 
     /**
      * Indicates whether selection is being dragged by the user.
@@ -233,7 +233,7 @@ class StyledTextAreaBehavior {
      * Constructors                                                           *
      * ********************************************************************** */
 
-    StyledTextAreaBehavior(StyledTextArea<?, ?> area) {
+    StyledTextAreaBehavior(StyledTextArea<?, ?, ?> area) {
         this.view = area;
         this.model = area.getModel();
 

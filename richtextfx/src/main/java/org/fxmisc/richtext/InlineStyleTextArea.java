@@ -10,7 +10,7 @@ import java.util.function.Function;
  * @deprecated
  */
 @Deprecated
-public class InlineStyleTextArea<PS, S> extends StyledTextArea<PS, S> {
+public class InlineStyleTextArea<PS, SEG, S> extends StyledTextArea<PS, SEG, S> {
 
     /**
      *

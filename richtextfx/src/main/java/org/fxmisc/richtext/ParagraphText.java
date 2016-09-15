@@ -20,11 +20,11 @@ import javafx.scene.shape.PathElement;
 import javafx.scene.shape.StrokeLineCap;
 
 import org.fxmisc.richtext.model.Paragraph;
-import org.fxmisc.richtext.model.StyledText;
+//import org.fxmisc.richtext.model.StyledText;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
-class ParagraphText<PS, S> extends TextFlowExt {
+class ParagraphText<PS, SEG, S> extends TextFlowExt {
 
     // FIXME: changing it currently has not effect, because
     // Text.impl_selectionFillProperty().set(newFill) doesn't work
@@ -43,7 +43,7 @@ class ParagraphText<PS, S> extends TextFlowExt {
     public ObjectProperty<IndexRange> selectionProperty() { return selection; }
     public void setSelection(IndexRange sel) { selection.set(sel); }
 
-    private final Paragraph<PS, S> paragraph;
+    private final Paragraph<PS, SEG, S> paragraph;
 
     private final Path caretShape = new Path();
     private final Path selectionShape = new Path();
@@ -58,7 +58,7 @@ class ParagraphText<PS, S> extends TextFlowExt {
         caretShape.visibleProperty().bind(caretVisible);
     }
 
-    public ParagraphText(Paragraph<PS, S> par, BiConsumer<? super TextExt, S> applyStyle) {
+    public ParagraphText(Paragraph<PS, SEG, S> par, BiConsumer<? super TextExt, S> applyStyle) {
         this.paragraph = par;
 
         getStyleClass().add("paragraph-text");
@@ -99,7 +99,7 @@ class ParagraphText<PS, S> extends TextFlowExt {
 //        });
 
         // populate with text nodes
-        for(StyledText<S> segment: par.getSegments()) {
+        for(SEG segment: par.getSegments()) {
             TextExt t = new TextExt(segment.getText());
             t.setTextOrigin(VPos.TOP);
             t.getStyleClass().add("text");
@@ -131,7 +131,7 @@ class ParagraphText<PS, S> extends TextFlowExt {
         }
     }
 
-    public Paragraph<PS, S> getParagraph() {
+    public Paragraph<PS, SEG, S> getParagraph() {
         return paragraph;
     }
 
