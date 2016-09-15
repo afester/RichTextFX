@@ -1,8 +1,12 @@
 package org.fxmisc.richtext.model;
 
-import java.util.Objects;
-
-public interface StyledTextOps<SEG> {
+/**
+ * Defines the operations which are supported on a specific segment type.
+ *
+ * @param <SEG>
+ * @param <S>
+ */
+public interface StyledTextOps<SEG, S> {
     public int length(SEG seg);
 
     public char charAt(SEG seg, int index);

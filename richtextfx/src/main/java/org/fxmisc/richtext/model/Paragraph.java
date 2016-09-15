@@ -81,7 +81,7 @@ public final class Paragraph<PS, SEG, S> {
      * unless this paragraph is empty and {@code p} is non-empty, in which
      * case the paragraph style of the result will be that of {@code p}.
      */
-    public Paragraph<PS, S> concat(Paragraph<PS, SEG, S> p) {
+    public Paragraph<PS, SEG, S> concat(Paragraph<PS, SEG, S> p) {
         if(p.length() == 0) {
             return this;
         }
