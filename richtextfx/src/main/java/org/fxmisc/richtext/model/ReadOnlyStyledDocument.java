@@ -77,20 +77,20 @@ public final class ReadOnlyStyledDocument<PS, SEG, S> implements StyledDocument<
         m.reset();
         while(m.find()) {
             String s = str.substring(start, m.start());
-            res.add(new Paragraph<>(paragraphStyle, s, style));
+            res.add(new Paragraph<>(paragraphStyle, segmentOps, s, style));
             start = m.end();
         }
         String last = str.substring(start);
-        res.add(new Paragraph<>(paragraphStyle, last, style));
+        res.add(new Paragraph<>(paragraphStyle, segmentOps, last, style));
 
-        return new ReadOnlyStyledDocument<>(res);
+        return new ReadOnlyStyledDocument<>(res, segmentOps);
     }
 
     public static <PS, SEG, S> ReadOnlyStyledDocument<PS, SEG, S> from(StyledDocument<PS, SEG, S> doc) {
         if(doc instanceof ReadOnlyStyledDocument) {
             return (ReadOnlyStyledDocument<PS, SEG, S>) doc;
         } else {
-            return new ReadOnlyStyledDocument<>(doc.getParagraphs());
+            return new ReadOnlyStyledDocument<>(doc.getParagraphs(), segmentOps);
         }
     }
 
@@ -110,7 +110,7 @@ public final class ReadOnlyStyledDocument<PS, SEG, S> implements StyledDocument<
 
             @Override
             public StyledDocument<PS, SEG, S> decode(DataInputStream is) throws IOException {
-                return new ReadOnlyStyledDocument<>(codec.decode(is));
+                return new ReadOnlyStyledDocument<>(codec.decode(is), segmentOps);
             }
 
         };
@@ -135,7 +135,7 @@ public final class ReadOnlyStyledDocument<PS, SEG, S> implements StyledDocument<
             public Paragraph<PS, SEG, S> decode(DataInputStream is) throws IOException {
                 PS paragraphStyle = pCodec.decode(is);
                 List<SEG> segments = segmentsCodec.decode(is);
-                return new Paragraph<>(paragraphStyle, segments);
+                return new Paragraph<>(paragraphStyle, segmentOps, segments);
             }
         };
     }
@@ -150,15 +150,15 @@ public final class ReadOnlyStyledDocument<PS, SEG, S> implements StyledDocument<
 
             @Override
             public void encode(DataOutputStream os, SEG t) throws IOException {
-                STRING_CODEC.encode(os, t.getText());
-                styleCodec.encode(os, t.getStyle());
+                STRING_CODEC.encode(os, segmentOps.getText(t));
+                styleCodec.encode(os, segmentOps.getStyle(t));
             }
 
             @Override
             public SEG decode(DataInputStream is) throws IOException {
                 String text = STRING_CODEC.decode(is);
                 S style = styleCodec.decode(is);
-                return new StyledText<>(text, style);
+                return segmentOps.create(text, style); // new StyledText<>(text, style);
             }
 
         };
@@ -170,15 +170,19 @@ public final class ReadOnlyStyledDocument<PS, SEG, S> implements StyledDocument<
     private String text = null;
     private List<Paragraph<PS, SEG, S>> paragraphs = null;
 
-    private ReadOnlyStyledDocument(NonEmptyFingerTree<Paragraph<PS, SEG, S>, Summary> tree) {
+    private final SegmentOps<SEG, S> segmentOps;
+
+    private ReadOnlyStyledDocument(NonEmptyFingerTree<Paragraph<PS, SEG, S>, Summary> tree, SegmentOps<SEG, S> segmentOps) {
         this.tree = tree;
+        this.segmentOps = segmentOps;
     }
 
-    ReadOnlyStyledDocument(List<Paragraph<PS, SEG, S>> paragraphs) {
+    ReadOnlyStyledDocument(List<Paragraph<PS, SEG, S>> paragraphs, SegmentOps<SEG, S> segmentOps) {
         this.tree =
                 FingerTree.mkTree(paragraphs, summaryProvider()).caseEmpty().unify(
                         emptyTree -> { throw new AssertionError("Unreachable code"); },
                         neTree -> neTree);
+        this.segmentOps = segmentOps;
     }
 
     @Override
@@ -232,8 +236,8 @@ public final class ReadOnlyStyledDocument<PS, SEG, S> implements StyledDocument<
         return tree.splitAt(row).map((l, p, r) -> {
             Paragraph<PS, SEG, S> p1 = p.trim(col);
             Paragraph<PS, SEG, S> p2 = p.subSequence(col);
-            ReadOnlyStyledDocument<PS, SEG, S> doc1 = new ReadOnlyStyledDocument<>(l.append(p1));
-            ReadOnlyStyledDocument<PS, SEG, S> doc2 = new ReadOnlyStyledDocument<>(r.prepend(p2));
+            ReadOnlyStyledDocument<PS, SEG, S> doc1 = new ReadOnlyStyledDocument<>(l.append(p1), segmentOps);
+            ReadOnlyStyledDocument<PS, SEG, S> doc2 = new ReadOnlyStyledDocument<>(r.prepend(p2), segmentOps);
             return t(doc1, doc2);
         });
     }
@@ -256,7 +260,7 @@ public final class ReadOnlyStyledDocument<PS, SEG, S> implements StyledDocument<
         FingerTree<Paragraph<PS, SEG, S>, Summary> tree2 = (other instanceof ReadOnlyStyledDocument)
                 ? ((ReadOnlyStyledDocument<PS, SEG, S>) other).tree.split(1)._2
                 : FingerTree.mkTree(other.getParagraphs().subList(1, other.getParagraphs().size()), summaryProvider());
-        return new ReadOnlyStyledDocument<>(tree1.join(tree2));
+        return new ReadOnlyStyledDocument<>(tree1.join(tree2), segmentOps);
     }
 
     @Override
@@ -310,7 +314,7 @@ public final class ReadOnlyStyledDocument<PS, SEG, S> implements StyledDocument<
         for(int i = 0; i < n; ++i) {
             pars.add(f.apply(tree.getLeaf(i)));
         }
-        return new ReadOnlyStyledDocument<>(pars);
+        return new ReadOnlyStyledDocument<>(pars, segmentOps);
     }
 
     @Override

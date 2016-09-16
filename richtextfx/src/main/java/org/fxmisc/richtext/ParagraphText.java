@@ -20,6 +20,7 @@ import javafx.scene.shape.PathElement;
 import javafx.scene.shape.StrokeLineCap;
 
 import org.fxmisc.richtext.model.Paragraph;
+import org.fxmisc.richtext.model.SegmentOps;
 //import org.fxmisc.richtext.model.StyledText;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
@@ -49,6 +50,8 @@ class ParagraphText<PS, SEG, S> extends TextFlowExt {
     private final Path selectionShape = new Path();
     private final List<Path> backgroundShapes = new ArrayList<>();
     private final List<Path> underlineShapes = new ArrayList<>();
+
+    private final SegmentOps<SEG, S> segmentOps = null;
 
     // proxy for caretShape.visibleProperty() that implements unbind() correctly.
     // This is necessary due to a bug in BooleanPropertyBase#unbind().
@@ -100,10 +103,10 @@ class ParagraphText<PS, SEG, S> extends TextFlowExt {
 
         // populate with text nodes
         for(SEG segment: par.getSegments()) {
-            TextExt t = new TextExt(segment.getText());
+            TextExt t = new TextExt(segmentOps.getText(segment));
             t.setTextOrigin(VPos.TOP);
             t.getStyleClass().add("text");
-            applyStyle.accept(t, segment.getStyle());
+            applyStyle.accept(t, segmentOps.getStyle(segment));
 
             // XXX: binding selectionFill to textFill,
             // see the note at highlightTextFill

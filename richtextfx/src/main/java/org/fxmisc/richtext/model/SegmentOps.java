@@ -1,12 +1,13 @@
 package org.fxmisc.richtext.model;
 
+
 /**
  * Defines the operations which are supported on a specific segment type.
  *
  * @param <SEG>
  * @param <S>
  */
-public interface StyledTextOps<SEG, S> {
+public interface SegmentOps<SEG, S> {
     public int length(SEG seg);
 
     public char charAt(SEG seg, int index);
@@ -21,11 +22,12 @@ public interface StyledTextOps<SEG, S> {
 
     public SEG spliced(SEG seg, int from, int to, CharSequence replacement);
 
-    public S getStyle();
+    public S getStyle(SEG seg);
 
-//    @Override
-//    public String toString();
-//
+    public SEG create(String text, S style);
+
+    public String toString(SEG seg);
+
 //    @Override
 //    public boolean equals(Object obj);
 //

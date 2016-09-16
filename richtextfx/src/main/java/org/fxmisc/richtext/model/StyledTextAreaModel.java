@@ -225,14 +225,14 @@ public class StyledTextAreaModel<PS, SEG, S>
      * @param initialParagraphStyle style to use in places where no other style is
      * specified (yet).
      */
-    public StyledTextAreaModel(PS initialParagraphStyle, S initialTextStyle) {
-        this(initialParagraphStyle, initialTextStyle, true);
+    public StyledTextAreaModel(PS initialParagraphStyle, S initialTextStyle, SegmentOps<SEG, S> segmentOps) {
+        this(initialParagraphStyle, initialTextStyle, segmentOps, true);
     }
 
-    public StyledTextAreaModel(PS initialParagraphStyle, S initialTextStyle, boolean preserveStyle
+    public StyledTextAreaModel(PS initialParagraphStyle, S initialTextStyle, SegmentOps<SEG, S> segmentOps, boolean preserveStyle
     ) {
         this(initialParagraphStyle, initialTextStyle,
-                new SimpleEditableStyledDocument<>(initialParagraphStyle, initialTextStyle), preserveStyle);
+                new SimpleEditableStyledDocument<>(initialParagraphStyle, initialTextStyle, segmentOps), preserveStyle);
     }
 
     /**

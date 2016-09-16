@@ -83,16 +83,18 @@ public final class SimpleEditableStyledDocument<PS, SEG, S> implements EditableS
     @Override public final SuspendableNo beingUpdatedProperty() { return beingUpdated; }
     @Override public final boolean isBeingUpdated() { return beingUpdated.get(); }
 
+    private final SegmentOps<SEG, S> segmentOps;
 
-    SimpleEditableStyledDocument(Paragraph<PS, SEG, S> initialParagraph) {
-        this.doc = new ReadOnlyStyledDocument<>(Collections.singletonList(initialParagraph));
+    SimpleEditableStyledDocument(Paragraph<PS, SEG, S> initialParagraph, SegmentOps<SEG, S> segmentOps) {
+        this.doc = new ReadOnlyStyledDocument<>(Collections.singletonList(initialParagraph), segmentOps);
+        this.segmentOps = segmentOps;
     }
 
     /**
      * Creates an empty {@link EditableStyledDocument}
      */
-    public SimpleEditableStyledDocument(PS initialParagraphStyle, S initialStyle) {
-        this(new Paragraph<>(initialParagraphStyle, "", initialStyle));
+    public SimpleEditableStyledDocument(PS initialParagraphStyle, S initialStyle, SegmentOps<SEG, S> segmentOps) {
+        this(new Paragraph<>(initialParagraphStyle, segmentOps, "", initialStyle), segmentOps);
     }
 
 
@@ -147,7 +149,7 @@ public final class SimpleEditableStyledDocument<PS, SEG, S> implements EditableS
                 pars.add(p.restyle(0, spans));
                 i = j.offsetBy(1, Forward); // skip the newline
             }
-            return new ReadOnlyStyledDocument<>(pars);
+            return new ReadOnlyStyledDocument<>(pars, segmentOps);
         }).exec(this::update);
     }
 

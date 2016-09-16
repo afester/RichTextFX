@@ -60,6 +60,7 @@ import org.fxmisc.richtext.model.NavigationActions;
 import org.fxmisc.richtext.model.Paragraph;
 import org.fxmisc.richtext.model.PlainTextChange;
 import org.fxmisc.richtext.model.RichTextChange;
+import org.fxmisc.richtext.model.SegmentOps;
 import org.fxmisc.richtext.model.SimpleEditableStyledDocument;
 import org.fxmisc.richtext.model.StyleSpans;
 import org.fxmisc.richtext.model.StyledDocument;
@@ -533,17 +534,17 @@ public class StyledTextArea<PS, SEG, S> extends Region
      * used by the default skin to apply style to paragraph nodes.
      */
     public StyledTextArea(PS initialParagraphStyle, BiConsumer<TextFlow, PS> applyParagraphStyle,
-                          S initialTextStyle, BiConsumer<? super TextExt, S> applyStyle
+                          S initialTextStyle, SegmentOps<SEG, S> segmentOps, BiConsumer<? super TextExt, S> applyStyle
     ) {
-        this(initialParagraphStyle, applyParagraphStyle, initialTextStyle, applyStyle, true);
+        this(initialParagraphStyle, applyParagraphStyle, initialTextStyle, segmentOps, applyStyle, true);
     }
 
     public StyledTextArea(PS initialParagraphStyle, BiConsumer<TextFlow, PS> applyParagraphStyle,
-                              S initialTextStyle, BiConsumer<? super TextExt, S> applyStyle,
+                              S initialTextStyle, SegmentOps<SEG, S> segmentOps, BiConsumer<? super TextExt, S> applyStyle,
                               boolean preserveStyle
     ) {
-        this(initialParagraphStyle, applyParagraphStyle, initialTextStyle, applyStyle,
-                new SimpleEditableStyledDocument<>(initialParagraphStyle, initialTextStyle), preserveStyle);
+        this(initialParagraphStyle, applyParagraphStyle, initialTextStyle, segmentOps, applyStyle,
+                new SimpleEditableStyledDocument<>(initialParagraphStyle, initialTextStyle, segmentOps), preserveStyle);
     }
 
     /**
@@ -552,15 +553,20 @@ public class StyledTextArea<PS, SEG, S> extends Region
      * shares the same {@link EditableStyledDocument}.
      */
     public StyledTextArea(PS initialParagraphStyle, BiConsumer<TextFlow, PS> applyParagraphStyle,
-                          S initialTextStyle, BiConsumer<? super TextExt, S> applyStyle,
+                          S initialTextStyle, 
+                          SegmentOps<SEG, S> segmentOps, BiConsumer<? super TextExt, S> applyStyle,
                           EditableStyledDocument<PS, SEG, S> document
     ) {
-        this(initialParagraphStyle, applyParagraphStyle, initialTextStyle, applyStyle, document, true);
+        this(initialParagraphStyle, applyParagraphStyle, initialTextStyle, segmentOps, applyStyle, document, true);
 
     }
 
     public StyledTextArea(PS initialParagraphStyle, BiConsumer<TextFlow, PS> applyParagraphStyle,
-                          S initialTextStyle, BiConsumer<? super TextExt, S> applyStyle,
+                          S initialTextStyle,
+                          
+                          SegmentOps<SEG, S> segmentOps,
+                          
+                          BiConsumer<? super TextExt, S> applyStyle,
                           EditableStyledDocument<PS, SEG, S> document, boolean preserveStyle
     ) {
         this.model = new StyledTextAreaModel<>(initialParagraphStyle, initialTextStyle, document, preserveStyle);

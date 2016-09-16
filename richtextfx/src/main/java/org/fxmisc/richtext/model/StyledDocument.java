@@ -34,7 +34,7 @@ public interface StyledDocument<PS, SEG, S> extends TwoDimensional {
     }
 
     default StyledDocument<PS, SEG, S> subDocument(int paragraphIndex) {
-        return new ReadOnlyStyledDocument<>(Collections.singletonList(getParagraphs().get(paragraphIndex)));
+        return new ReadOnlyStyledDocument<>(Collections.singletonList(getParagraphs().get(paragraphIndex)), segmentOps);
     }
 
     default char charAt(int index) {
