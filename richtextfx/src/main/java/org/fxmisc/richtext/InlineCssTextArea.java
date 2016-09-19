@@ -13,13 +13,17 @@ import javafx.scene.text.TextFlow;
 public class InlineCssTextArea extends StyledTextArea<String, Object, String> {
 
     public InlineCssTextArea() {
-        this(new SimpleEditableStyledDocument<>("", ""));
+        this(new SimpleEditableStyledDocument<>("", "", 
+                null    // TODO: SegmentOpsImpl
+                ));
     }
 
     public InlineCssTextArea(EditableStyledDocument<String, Object, String> document) {
         super(
                 "", TextFlow::setStyle,
-                "", TextExt::setStyle,
+                "", 
+                null,   // TODO: SegmentOpsImpl
+                TextExt::setStyle,
                 document,
                 true
         );

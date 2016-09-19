@@ -33,9 +33,10 @@ public interface StyledDocument<PS, SEG, S> extends TwoDimensional {
         return subSequence(range.getStart(), range.getEnd());
     }
 
-    default StyledDocument<PS, SEG, S> subDocument(int paragraphIndex) {
-        return new ReadOnlyStyledDocument<>(Collections.singletonList(getParagraphs().get(paragraphIndex)), segmentOps);
-    }
+    StyledDocument<PS, SEG, S> subDocument(int paragraphIndex);
+//    default StyledDocument<PS, SEG, S> subDocument(int paragraphIndex) {
+//        return new ReadOnlyStyledDocument<>(Collections.singletonList(getParagraphs().get(paragraphIndex)), segmentOps);
+//    }
 
     default char charAt(int index) {
         Position pos = offsetToPosition(index, Forward);

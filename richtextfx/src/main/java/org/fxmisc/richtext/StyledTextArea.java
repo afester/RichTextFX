@@ -513,6 +513,10 @@ public class StyledTextArea<PS, SEG, S> extends Region
      */
     public final boolean isPreserveStyle() { return model.isPreserveStyle(); }
 
+    private final SegmentOps<SEG, S> segmentOps;
+    public final SegmentOps<SEG, S> getSegmentOps() { return segmentOps; }
+
+    
     /* ********************************************************************** *
      *                                                                        *
      * Constructors                                                           *
@@ -555,23 +559,19 @@ public class StyledTextArea<PS, SEG, S> extends Region
     public StyledTextArea(PS initialParagraphStyle, BiConsumer<TextFlow, PS> applyParagraphStyle,
                           S initialTextStyle, 
                           SegmentOps<SEG, S> segmentOps, BiConsumer<? super TextExt, S> applyStyle,
-                          EditableStyledDocument<PS, SEG, S> document
-    ) {
+                          EditableStyledDocument<PS, SEG, S> document) {
         this(initialParagraphStyle, applyParagraphStyle, initialTextStyle, segmentOps, applyStyle, document, true);
-
     }
 
     public StyledTextArea(PS initialParagraphStyle, BiConsumer<TextFlow, PS> applyParagraphStyle,
                           S initialTextStyle,
-                          
                           SegmentOps<SEG, S> segmentOps,
-                          
                           BiConsumer<? super TextExt, S> applyStyle,
-                          EditableStyledDocument<PS, SEG, S> document, boolean preserveStyle
-    ) {
-        this.model = new StyledTextAreaModel<>(initialParagraphStyle, initialTextStyle, document, preserveStyle);
+                          EditableStyledDocument<PS, SEG, S> document, boolean preserveStyle) {
+        this.model = new StyledTextAreaModel<>(initialParagraphStyle, initialTextStyle, segmentOps, document, preserveStyle);
         this.applyStyle = applyStyle;
         this.applyParagraphStyle = applyParagraphStyle;
+        this.segmentOps = segmentOps;
 
         // allow tab traversal into area
         setFocusTraversable(true);

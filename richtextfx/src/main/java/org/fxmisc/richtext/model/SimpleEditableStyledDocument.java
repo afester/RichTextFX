@@ -111,7 +111,7 @@ public final class SimpleEditableStyledDocument<PS, SEG, S> implements EditableS
     @Override
     public void replace(int start, int end, StyledDocument<PS, SEG, S> replacement) {
         ensureValidRange(start, end);
-        doc.replace(start, end, ReadOnlyStyledDocument.from(replacement)).exec(this::update);
+        doc.replace(start, end, ReadOnlyStyledDocument.from(replacement, segmentOps)).exec(this::update);
     }
 
     @Override
@@ -174,6 +174,10 @@ public final class SimpleEditableStyledDocument<PS, SEG, S> implements EditableS
         return doc.subSequence(start, end);
     }
 
+    @Override
+    public StyledDocument<PS, SEG, S> subDocument(int paragraphIndex) {
+        return new ReadOnlyStyledDocument<>(Collections.singletonList(getParagraphs().get(paragraphIndex)), segmentOps);
+    }
 
     /* ********************************************************************** *
      *                                                                        *

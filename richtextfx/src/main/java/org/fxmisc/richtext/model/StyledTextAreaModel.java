@@ -178,6 +178,8 @@ public class StyledTextAreaModel<PS, SEG, S>
     private Position selectionStart2D;
     private Position selectionEnd2D;
 
+    private final SegmentOps<SEG, S> segmentOps;
+
     /**
      * content model
      */
@@ -231,7 +233,7 @@ public class StyledTextAreaModel<PS, SEG, S>
 
     public StyledTextAreaModel(PS initialParagraphStyle, S initialTextStyle, SegmentOps<SEG, S> segmentOps, boolean preserveStyle
     ) {
-        this(initialParagraphStyle, initialTextStyle,
+        this(initialParagraphStyle, initialTextStyle, segmentOps,
                 new SimpleEditableStyledDocument<>(initialParagraphStyle, initialTextStyle, segmentOps), preserveStyle);
     }
 
@@ -240,18 +242,19 @@ public class StyledTextAreaModel<PS, SEG, S>
      * this constructor can be used to create another {@code StyledTextArea} object that
      * shares the same {@link EditableStyledDocument}.
      */
-    public StyledTextAreaModel(PS initialParagraphStyle, S initialTextStyle,
+    public StyledTextAreaModel(PS initialParagraphStyle, S initialTextStyle, SegmentOps<SEG, S> segmentOps,
                                EditableStyledDocument<PS, SEG, S> document
     ) {
-        this(initialParagraphStyle, initialTextStyle, document, true);
+        this(initialParagraphStyle, initialTextStyle, segmentOps, document, true);
     }
 
-    public StyledTextAreaModel(PS initialParagraphStyle, S initialTextStyle,
+    public StyledTextAreaModel(PS initialParagraphStyle, S initialTextStyle, SegmentOps<SEG, S> segmentOps,
                                EditableStyledDocument<PS, SEG, S> document, boolean preserveStyle
     ) {
         this.initialTextStyle = initialTextStyle;
         this.initialParagraphStyle = initialParagraphStyle;
         this.preserveStyle = preserveStyle;
+        this.segmentOps = segmentOps;
 
         content = document;
         paragraphs = LiveList.suspendable(content.getParagraphs());
@@ -619,7 +622,7 @@ public class StyledTextAreaModel<PS, SEG, S>
     @Override
     public void replaceText(int start, int end, String text) {
         StyledDocument<PS, SEG, S> doc = ReadOnlyStyledDocument.fromString(
-                text, getParagraphStyleForInsertionAt(start), getStyleForInsertionAt(start));
+                text, getParagraphStyleForInsertionAt(start), getStyleForInsertionAt(start), segmentOps);
         replace(start, end, doc);
     }
 

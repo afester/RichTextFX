@@ -21,7 +21,9 @@ public class InlineStyleTextArea<PS, SEG, S> extends StyledTextArea<PS, SEG, S> 
      */
     public InlineStyleTextArea(PS initialParagraphStyle, Function<PS, String> paragraphStyleToCss, S initialStyle, Function<S, String> styleToCss) {
         super(initialParagraphStyle, (paragraph, style) -> paragraph.setStyle(paragraphStyleToCss.apply(style)),
-                initialStyle, (text, style) -> text.setStyle(styleToCss.apply(style))
+                initialStyle,
+                null,   // TODO: SegmentOpsImpl!!!!!
+                (text, style) -> text.setStyle(styleToCss.apply(style))
         );
     }
 

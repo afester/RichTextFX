@@ -12,10 +12,12 @@ import org.fxmisc.richtext.model.SimpleEditableStyledDocument;
  */
 public class StyleClassedTextArea extends StyledTextArea<Collection<String>, String, Collection<String>> {
 
-    public StyleClassedTextArea(EditableStyledDocument<Collection<String>, String, Collection<String>> document, boolean preserveStyle) {
+    public StyleClassedTextArea(EditableStyledDocument<Collection<String>, String, Collection<String>> document, 
+                                boolean preserveStyle) {
         super(Collections.<String>emptyList(),
                 (paragraph, styleClasses) -> paragraph.getStyleClass().addAll(styleClasses),
                 Collections.<String>emptyList(),
+                null,   // TODO: SegmentOpsImpl!!!!!!!!!!!
                 (text, styleClasses) -> text.getStyleClass().addAll(styleClasses),
                 document, preserveStyle
         );
@@ -25,10 +27,12 @@ public class StyleClassedTextArea extends StyledTextArea<Collection<String>, Str
                 Codec.collectionCodec(Codec.STRING_CODEC)
         );
     }
+
     public StyleClassedTextArea(boolean preserveStyle) {
         this(
                 new SimpleEditableStyledDocument<>(
-                    Collections.<String>emptyList(), Collections.<String>emptyList()
+                    Collections.<String>emptyList(), Collections.<String>emptyList(), 
+                    null    // TODO: SegmentOpsImpl!
                 ), preserveStyle);
     }
 
