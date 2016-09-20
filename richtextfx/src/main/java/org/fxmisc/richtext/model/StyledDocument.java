@@ -3,7 +3,6 @@ package org.fxmisc.richtext.model;
 import static org.fxmisc.richtext.model.TwoDimensional.Bias.*;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javafx.scene.control.IndexRange;

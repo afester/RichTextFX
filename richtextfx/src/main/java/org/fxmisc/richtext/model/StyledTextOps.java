@@ -1,7 +1,5 @@
 package org.fxmisc.richtext.model;
 
-import java.util.Objects;
-
 public class StyledTextOps<S> implements SegmentOps<StyledText<S>, S> {
 
     @Override

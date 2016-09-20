@@ -4,6 +4,7 @@ package org.fxmisc.richtext;
 import org.fxmisc.richtext.model.Codec;
 import org.fxmisc.richtext.model.EditableStyledDocument;
 import org.fxmisc.richtext.model.SimpleEditableStyledDocument;
+import org.fxmisc.richtext.model.StyledText;
 import org.fxmisc.richtext.model.StyledTextOps;
 
 import javafx.scene.text.TextFlow;
@@ -11,20 +12,16 @@ import javafx.scene.text.TextFlow;
 /**
  * Text area that uses inline css to define style of text segments and paragraph segments.
  */
-public class InlineCssTextArea extends GenericRichtextArea<String, Object, String> {
+public class InlineCssTextArea extends StyledTextArea<String, String> {
 
     public InlineCssTextArea() {
-        this(new SimpleEditableStyledDocument<>("", "", 
-                new StyledTextOps()
-                ));
+        this(new SimpleEditableStyledDocument<>("", "", new StyledTextOps<>()));
     }
 
-    public InlineCssTextArea(EditableStyledDocument<String, Object, String> document) {
+    public InlineCssTextArea(EditableStyledDocument<String, StyledText<String>, String> document) {
         super(
                 "", TextFlow::setStyle,
-                "", 
-                new StyledTextOps(),
-                TextExt::setStyle,
+                "", TextExt::setStyle,
                 document,
                 true
         );

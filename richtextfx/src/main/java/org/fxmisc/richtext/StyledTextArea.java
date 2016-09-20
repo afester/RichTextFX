@@ -1,10 +1,11 @@
 package org.fxmisc.richtext;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.function.BiConsumer;
 
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.model.EditableStyledDocument;
-import org.fxmisc.richtext.model.SegmentOps;
 import org.fxmisc.richtext.model.StyledText;
 import org.fxmisc.richtext.model.StyledTextOps;
 
