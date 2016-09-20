@@ -40,7 +40,7 @@ class ParagraphText<PS, SEG, S> extends TextFlowExt {
     public void setCaretPosition(int pos) { caretPosition.setValue(pos); }
     private final Val<Integer> clampedCaretPosition;
 
-    private final ObjectProperty<IndexRange> selection = new SimpleObjectProperty<>(StyledTextArea.EMPTY_RANGE);
+    private final ObjectProperty<IndexRange> selection = new SimpleObjectProperty<>(GenericRichtextArea.EMPTY_RANGE);
     public ObjectProperty<IndexRange> selectionProperty() { return selection; }
     public void setSelection(IndexRange sel) { selection.set(sel); }
 
@@ -51,7 +51,7 @@ class ParagraphText<PS, SEG, S> extends TextFlowExt {
     private final List<Path> backgroundShapes = new ArrayList<>();
     private final List<Path> underlineShapes = new ArrayList<>();
 
-    private final SegmentOps<SEG, S> segmentOps = null;
+    private final SegmentOps<SEG, S> segmentOps;
 
     // proxy for caretShape.visibleProperty() that implements unbind() correctly.
     // This is necessary due to a bug in BooleanPropertyBase#unbind().
@@ -61,8 +61,9 @@ class ParagraphText<PS, SEG, S> extends TextFlowExt {
         caretShape.visibleProperty().bind(caretVisible);
     }
 
-    public ParagraphText(Paragraph<PS, SEG, S> par, BiConsumer<? super TextExt, S> applyStyle) {
+    public ParagraphText(Paragraph<PS, SEG, S> par, BiConsumer<? super TextExt, S> applyStyle, SegmentOps<SEG, S> segmentOps) {
         this.paragraph = par;
+        this.segmentOps = segmentOps;
 
         getStyleClass().add("paragraph-text");
 

@@ -8,16 +8,19 @@ public class SimpleEditableStyledDocumentTest {
     /**
      * The style of the inserted text will be the style at position
      * {@code start} in the current document.
+     * @param ops 
      */
-    private <PS, S> void replaceText(EditableStyledDocument<PS, S> doc, int start, int end, String text) {
-        StyledDocument<PS, S> styledDoc = ReadOnlyStyledDocument.fromString(
-                text, doc.getParagraphStyleAtPosition(start), doc.getStyleAtPosition(start));
+    private <PS, SEG, S> void replaceText(EditableStyledDocument<PS, SEG, S> doc, int start, int end, String text, SegmentOps<SEG, S> ops) {
+        StyledDocument<PS, SEG, S> styledDoc = ReadOnlyStyledDocument.fromString(
+                text, doc.getParagraphStyleAtPosition(start), doc.getStyleAtPosition(start), ops);
         doc.replace(start, end, styledDoc);
     }
 
     @Test
     public void testConsistencyOfTextWithLength() {
-        SimpleEditableStyledDocument<String, String> document = new SimpleEditableStyledDocument<>("", "");
+        final StyledTextOps<String> ops = new StyledTextOps<>();
+
+        SimpleEditableStyledDocument<String, StyledText<String>, String> document = new SimpleEditableStyledDocument<>("", "", ops);
         document.getText(); // enforce evaluation of text property
         document.getLength(); // enforce evaluation of length property
 
@@ -27,12 +30,14 @@ public class SimpleEditableStyledDocumentTest {
             assertEquals(length, textLength);
         });
 
-        replaceText(document, 0, 0, "A");
+        replaceText(document, 0, 0, "A", ops);
     }
 
     @Test
     public void testConsistencyOfLengthWithText() {
-        SimpleEditableStyledDocument<String, String> document = new SimpleEditableStyledDocument<>("", "");
+        final StyledTextOps<String> ops = new StyledTextOps<>();
+
+        SimpleEditableStyledDocument<String, StyledText<String>, String> document = new SimpleEditableStyledDocument<>("", "", ops);
         document.getText(); // enforce evaluation of text property
         document.getLength(); // enforce evaluation of length property
 
@@ -42,54 +47,64 @@ public class SimpleEditableStyledDocumentTest {
             assertEquals(textLength, length);
         });
 
-        replaceText(document, 0, 0, "A");
+        replaceText(document, 0, 0, "A", ops);
     }
 
     @Test
     public void testUnixParagraphCount() {
-        SimpleEditableStyledDocument<String, String> document = new SimpleEditableStyledDocument<>("", "");
+        final StyledTextOps<String> ops = new StyledTextOps<>();
+
+        SimpleEditableStyledDocument<String, StyledText<String>, String> document = new SimpleEditableStyledDocument<>("", "", ops);
         String text = "X\nY";
-        replaceText(document, 0, 0, text);
+        replaceText(document, 0, 0, text, ops);
         assertEquals(2, document.getParagraphs().size());
     }
 
     @Test
     public void testMacParagraphCount() {
-        SimpleEditableStyledDocument<String, String> document = new SimpleEditableStyledDocument<>("", "");
+        final StyledTextOps<String> ops = new StyledTextOps<>();
+
+        SimpleEditableStyledDocument<String, StyledText<String>, String> document = new SimpleEditableStyledDocument<>("", "", ops);
         String text = "X\rY";
-        replaceText(document, 0, 0, text);
+        replaceText(document, 0, 0, text, ops);
         assertEquals(2, document.getParagraphs().size());
     }
 
     @Test
     public void testWinParagraphCount() {
-        SimpleEditableStyledDocument<String, String> document = new SimpleEditableStyledDocument<>("", "");
+        final StyledTextOps<String> ops = new StyledTextOps<>();
+
+        SimpleEditableStyledDocument<String, StyledText<String>, String> document = new SimpleEditableStyledDocument<>("", "", ops);
         String text = "X\r\nY";
-        replaceText(document, 0, 0, text);
+        replaceText(document, 0, 0, text, ops);
         assertEquals(2, document.getParagraphs().size());
     }
 
     @Test
     public void testGetTextWithEndAfterNewline() {
-        SimpleEditableStyledDocument<Boolean, String> doc = new SimpleEditableStyledDocument<>(true, "");
+        final StyledTextOps<String> ops = new StyledTextOps<>();
 
-        replaceText(doc, 0, 0, "123\n");
+        SimpleEditableStyledDocument<Boolean, StyledText<String>, String> doc = new SimpleEditableStyledDocument<>(true, "", ops);
+
+        replaceText(doc, 0, 0, "123\n", ops);
         String txt1 = doc.getText(0, 4);
         assertEquals(4, txt1.length());
 
-        replaceText(doc, 4, 4, "567");
+        replaceText(doc, 4, 4, "567", ops);
         String txt2 = doc.getText(2, 4);
         assertEquals(2, txt2.length());
 
-        replaceText(doc, 4, 4, "\n");
+        replaceText(doc, 4, 4, "\n", ops);
         String txt3 = doc.getText(2, 4);
         assertEquals(2, txt3.length());
     }
 
     @Test
     public void testWinDocumentLength() {
-        SimpleEditableStyledDocument<String, String> document = new SimpleEditableStyledDocument<>("", "");
-        replaceText(document, 0, 0, "X\r\nY");
+        final StyledTextOps<String> ops = new StyledTextOps<>();
+
+        SimpleEditableStyledDocument<String, StyledText<String>, String> document = new SimpleEditableStyledDocument<>("", "", ops);
+        replaceText(document, 0, 0, "X\r\nY", ops);
         assertEquals(document.getText().length(), document.getLength());
     }
 }

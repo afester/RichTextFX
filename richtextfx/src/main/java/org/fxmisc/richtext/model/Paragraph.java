@@ -334,7 +334,7 @@ public final class Paragraph<PS, SEG, S> {
     public String toString() {
         return
                 "Par[" + paragraphStyle  + "; " +
-                segments.stream().map(seg -> segmentOps.toString(seg) /*StyledText::toString*/)
+                segments.stream().map(seg -> seg.toString())
                         .reduce((s1, s2) -> s1 + "," + s2).orElse("") +
                 "]";
     }
