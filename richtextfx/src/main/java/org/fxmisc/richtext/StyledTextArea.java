@@ -61,10 +61,10 @@ import org.fxmisc.richtext.model.EditActions;
 import org.fxmisc.richtext.model.EditableStyledDocument;
 import org.fxmisc.richtext.model.LinkedImage;
 import org.fxmisc.richtext.model.NavigationActions;
-import org.fxmisc.richtext.model.SimpleEditableStyledDocument;
 import org.fxmisc.richtext.model.Paragraph;
 import org.fxmisc.richtext.model.PlainTextChange;
 import org.fxmisc.richtext.model.RichTextChange;
+import org.fxmisc.richtext.model.SimpleEditableStyledDocument;
 import org.fxmisc.richtext.model.StyleSpans;
 import org.fxmisc.richtext.model.StyledDocument;
 import org.fxmisc.richtext.model.StyledText;
@@ -83,7 +83,6 @@ import org.reactfx.collection.LiveList;
 import org.reactfx.util.Tuple2;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
-
 
 /**
  * Text editing control. Accepts user input (keyboard, mouse) and
@@ -576,17 +575,17 @@ public class StyledTextArea<PS, S> extends Region
         // Inject node factories into model layer
         StyledText.nodeFactory =
               segment -> {
-              TextExt t = new TextExt(segment.getText());
-              t.setTextOrigin(VPos.TOP);
-              t.getStyleClass().add("text");
-//!!!!!!              this.applyStyle.accept(t, segment.getStyle());
-
-              // XXX: binding selectionFill to textFill,
-              // see the note at highlightTextFill
-              t.impl_selectionFillProperty().bind(t.fillProperty());
-  
-              return t;
-          };
+                  TextExt t = new TextExt(segment.getText());
+                  t.setTextOrigin(VPos.TOP);
+                  t.getStyleClass().add("text");
+                  this.applyStyle.accept(t, (S) segment.getStyle());    // TODO: bogus cast
+    
+                  // XXX: binding selectionFill to textFill,
+                  // see the note at highlightTextFill
+                  t.impl_selectionFillProperty().bind(t.fillProperty());
+      
+                  return t;
+              };
 
         LinkedImage.nodeFactory = 
               segment -> {
@@ -597,59 +596,6 @@ public class StyledTextArea<PS, S> extends Region
               ImageView result = new ImageView(image);
               return result;
           };
-
-        // register factories for default segment types
-//
-//        registerFactory(DefaultSegmentTypes.STYLED_TEXT,
-//
-//                segment -> {
-//                    StyledText<S> styledText = (StyledText<S>) segment;
-//        
-//                    TextExt t = new TextExt(styledText.getText());
-//                    t.setTextOrigin(VPos.TOP);
-//                    t.getStyleClass().add("text");
-//                    this.applyStyle.accept(t, segment.getStyle());
-//        
-//                    // XXX: binding selectionFill to textFill,
-//                    // see the note at highlightTextFill
-//                    t.impl_selectionFillProperty().bind(t.fillProperty());
-//        
-//                    return t;
-//                },
-//
-//                (is, styleCodec) -> {
-//                    Segment<S> result = null;
-//                    try {
-//                        result = StyledText.decode(is, styleCodec);
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
-//                    return result;
-//                }
-//        );
-//
-//        registerFactory(DefaultSegmentTypes.LINKED_IMAGE, 
-//            segment -> {
-//                LinkedImage<S> inlineImage = (LinkedImage<S>) segment;
-//    
-//                String imagePath = inlineImage.getImagePath();
-//                Image image = new Image("file:" + imagePath); // XXX: No need to create new Image objects each time -
-//                                                              // could be cached in the model layer
-//    
-//                ImageView result = new ImageView(image);
-//                return result;
-//            },
-//
-//            (is, styleCodec) -> {
-//                Segment<S> result = null;
-//                try {
-//                    result = LinkedImage.decode(is, styleCodec);
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//                return result;
-//            }
-//        );
 
         // allow tab traversal into area
         setFocusTraversable(true);
@@ -1167,21 +1113,6 @@ public class StyledTextArea<PS, S> extends Region
         virtualFlow.dispose();
     }
 
-//    /**
-//     * Registers a Node factory for a specific segment type.
-//     * 
-//     * @param typeId  The segment type 
-//     * @param nodeFactory The factory which creates a Node for the given segment type
-//     * @param modelFactory The factory which creates a model object for the given segment type
-//     */
-//    public void registerFactory(SegmentType typeId, 
-//                                Function<Segment<S>, Node> nodeFactory,
-//                                BiFunction<DataInputStream, Codec<S>, Segment<S>> modelFactory) {
-//        nodeFactories.put(typeId, nodeFactory);
-//        SegmentFactory.registerFactory(typeId.getName(), modelFactory);
-//    }
-//
-
     /* ********************************************************************** *
      *                                                                        *
      * Layout                                                                 *
@@ -1211,22 +1142,12 @@ public class StyledTextArea<PS, S> extends Region
      *                                                                        *
      * ********************************************************************** */
 
-//    private Map<SegmentType, Function<Segment<S>, Node>> nodeFactories = new HashMap<>();
-
     private Cell<Paragraph<PS, S>, ParagraphBox<PS, S>> createCell(
             Paragraph<PS, S> paragraph,
             BiConsumer<? super TextExt, S> applyStyle,
             BiConsumer<TextFlow, PS> applyParagraphStyle) {
 
-        ParagraphBox<PS, S> box = new ParagraphBox<>(paragraph, applyParagraphStyle, 
-                                                     seg -> {
-                                                         //Function<Segment<S>, Node> factory = nodeFactories.get(seg.getTypeId());
-                                                         //if (factory == null) {
-                                                         //    throw new RuntimeException("No factory for segment type " + seg.getTypeId());
-                                                         //}
-                                                         return seg.createNode();
-                                                         // return null; // factory.apply(seg);
-                                                     } );
+        ParagraphBox<PS, S> box = new ParagraphBox<>(paragraph, applyParagraphStyle, applyStyle);
 
         box.highlightFillProperty().bind(highlightFill);
         box.highlightTextFillProperty().bind(highlightTextFill);

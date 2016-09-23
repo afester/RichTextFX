@@ -3,7 +3,7 @@ package org.fxmisc.richtext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
+import java.util.function.BiConsumer;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -57,9 +57,7 @@ class ParagraphText<PS, S> extends TextFlowExt {
         caretShape.visibleProperty().bind(caretVisible);
     }
 
-    
-    ParagraphText(Paragraph<PS, S> par,
-                  Function <? super Segment<S>, Node> nodeFactory) {
+    public ParagraphText(Paragraph<PS, S> par, BiConsumer<? super TextExt, S> applyStyle) {
         this.paragraph = par;
 
         getStyleClass().add("paragraph-text");
@@ -103,7 +101,7 @@ class ParagraphText<PS, S> extends TextFlowExt {
         for(Segment<S> segment: par.getSegments()) {
 
             // Create the object node
-            Node t = nodeFactory.apply(segment);
+            Node t = segment.createNode();
             getChildren().add(t);
 
             // add corresponding background node (empty)

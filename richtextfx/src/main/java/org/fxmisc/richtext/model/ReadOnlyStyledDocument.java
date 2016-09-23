@@ -1,8 +1,7 @@
 package org.fxmisc.richtext.model;
 
-import static org.reactfx.util.Either.left;
-import static org.reactfx.util.Either.right;
-import static org.reactfx.util.Tuples.t;
+import static org.reactfx.util.Either.*;
+import static org.reactfx.util.Tuples.*;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -22,7 +21,6 @@ import org.reactfx.util.BiIndex;
 import org.reactfx.util.Either;
 import org.reactfx.util.FingerTree;
 import org.reactfx.util.FingerTree.NonEmptyFingerTree;
-
 import org.reactfx.util.ToSemigroup;
 import org.reactfx.util.Tuple2;
 import org.reactfx.util.Tuple3;
