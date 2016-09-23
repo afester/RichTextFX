@@ -63,13 +63,13 @@ class RectangleObject extends CustomObject<Collection<String>> {
     }
 
     @Override
-    public void encode(DataOutputStream os) throws IOException {
+    public void encode(DataOutputStream os, Codec<Collection<String>> styleCodec) throws IOException {
         Codec.STRING_CODEC.encode(os, Double.toString(width));
         Codec.STRING_CODEC.encode(os, Double.toString(height));
     }
 
     @Override
-    public void decode(DataInputStream is) throws IOException {
+    public void decode(DataInputStream is, Codec<Collection<String>> styleCodec) throws IOException {
         try {
             width = Double.parseDouble(Codec.STRING_CODEC.decode(is));
             height = Double.parseDouble(Codec.STRING_CODEC.decode(is));
@@ -111,7 +111,7 @@ class CircleObject extends CustomObject<Collection<String>> {
     }
 
     @Override
-    public void encode(DataOutputStream os) throws IOException {
+    public void encode(DataOutputStream os, Codec<Collection<String>> styleCodec) throws IOException {
         Codec.STRING_CODEC.encode(os, Double.toString(radius));
     }
 
@@ -131,7 +131,7 @@ class CircleObject extends CustomObject<Collection<String>> {
 //    
 
     @Override
-    public void decode(DataInputStream is) throws IOException {
+    public void decode(DataInputStream is, Codec<Collection<String>> styleCodec) throws IOException {
         try {
             radius = Double.parseDouble(Codec.STRING_CODEC.decode(is));
             //Collection<String> style = styleCodec.decode(is);   // Should be encapsulated by CustomObject!

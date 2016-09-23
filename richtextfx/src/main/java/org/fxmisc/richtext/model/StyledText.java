@@ -85,25 +85,17 @@ public class StyledText<S> implements Segment<S> {
         return Objects.hash(text, style);
     }
 
-//    @Override
-//    public SegmentType getTypeId() {
-//        return DefaultSegmentTypes.STYLED_TEXT;
-//    }
-
     @Override
-    public void encode(DataOutputStream os) throws IOException {
+    public void encode(DataOutputStream os, Codec<S> styleCodec) throws IOException {
         Codec.STRING_CODEC.encode(os, getText());
+        styleCodec.encode(os, style);
     }
-
 
     @Override
-    public void decode(DataInputStream is) throws IOException {
-//    public static <S> Segment<S> decode(DataInputStream is, Codec<S> styleCodec) throws IOException {
+    public void decode(DataInputStream is, Codec<S> styleCodec) throws IOException {
         text = Codec.STRING_CODEC.decode(is);
-//        style = styleCodec.decode(is);
-        // return new StyledText<>(text, style);
+        style = styleCodec.decode(is);
     }
-
 
     @SuppressWarnings("rawtypes")
     public static Function<StyledText, Node> nodeFactory;
@@ -111,10 +103,5 @@ public class StyledText<S> implements Segment<S> {
     @Override
     public Node createNode() {
         return nodeFactory.apply(this);
-    }
-
-    @Override
-    public void setStyle(S style) {
-        this.style = style;
     }
 }

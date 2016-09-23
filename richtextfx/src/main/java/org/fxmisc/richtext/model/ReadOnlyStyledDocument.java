@@ -193,18 +193,15 @@ public final class ReadOnlyStyledDocument<PS, S> implements StyledDocument<PS, S
             @Override
             public void encode(DataOutputStream os, Segment<S> t) throws IOException {
                 // encode the segment type and content
-                //STRING_CODEC.encode(os, t.getTypeId().getName());
                 STRING_CODEC.encode(os, t.getClass().getName());
-                t.encode(os);
+                t.encode(os, styleCodec);
 
                 // encode the segment style
-                styleCodec.encode(os, t.getStyle());
+                // styleCodec.encode(os, t.getStyle());
             }
 
             @Override
             public Segment<S> decode(DataInputStream is) throws IOException {
-                //Segment<S> result = SegmentFactory.decode(is, styleCodec);
-                
                 String segmentType = is.readUTF();
                 Segment<S> result = null;
                 try {
@@ -217,8 +214,8 @@ public final class ReadOnlyStyledDocument<PS, S> implements StyledDocument<PS, S
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }
-                result.decode(is);
-                result.setStyle(styleCodec.decode(is));
+                result.decode(is, styleCodec);
+                //result.setStyle(styleCodec.decode(is));
                 return result;
             }
 

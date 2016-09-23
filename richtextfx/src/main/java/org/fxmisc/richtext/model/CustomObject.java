@@ -8,8 +8,7 @@ package org.fxmisc.richtext.model;
  */
 public abstract class CustomObject<S> implements Segment<S> {
 
-    private S style;
-//    private SegmentType typeId;
+    protected S style;
 
     protected CustomObject() {}
 
@@ -76,8 +75,8 @@ public abstract class CustomObject<S> implements Segment<S> {
         return style;
     }
 
-    @Override
-    public void setStyle(S style) {
-        this.style = style;
-    }
+//    @Override
+//    public void setStyle(S style) {
+//        this.style = style;
+//    }
 }

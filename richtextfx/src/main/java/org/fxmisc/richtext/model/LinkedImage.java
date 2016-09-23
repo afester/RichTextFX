@@ -49,15 +49,15 @@ public class LinkedImage<S> extends CustomObject<S> {
 
 
     @Override
-    public void encode(DataOutputStream os) throws IOException {
+    public void encode(DataOutputStream os, Codec<S> styleCodec) throws IOException {
         Codec.STRING_CODEC.encode(os, imagePath);
+        styleCodec.encode(os, style);
     }
 
     @Override
-    public /*static <S> Segment<S> */ void decode(DataInputStream is) throws IOException {
+    public void decode(DataInputStream is, Codec<S> styleCodec) throws IOException {
         imagePath = Codec.STRING_CODEC.decode(is);
-        //S style = styleCodec.decode(is);
-        //return new LinkedImage<>(path, style);
+        style = styleCodec.decode(is);
     }
 
     @Override

@@ -28,11 +28,9 @@ public interface Segment<S> {
 
     S getStyle();
 
-    void encode(DataOutputStream os) throws IOException;
+    void encode(DataOutputStream os, Codec<S> styleCodec) throws IOException;
 
-    void decode(DataInputStream is) throws IOException;
+    void decode(DataInputStream is, Codec<S> styleCodec) throws IOException;
 
     Node createNode();
-
-    void setStyle(S style);
 }
