@@ -6,8 +6,7 @@
 
 package org.fxmisc.richtext.demo.richtext;
 
-import static org.fxmisc.richtext.model.TwoDimensional.Bias.Backward;
-import static org.fxmisc.richtext.model.TwoDimensional.Bias.Forward;
+import static org.fxmisc.richtext.model.TwoDimensional.Bias.*;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -19,15 +18,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-import org.fxmisc.flowless.VirtualizedScrollPane;
-import org.fxmisc.richtext.StyledTextArea;
 import org.fxmisc.richtext.model.Codec;
 import org.fxmisc.richtext.model.LinkedImage;
-import org.fxmisc.richtext.model.Paragraph;
 import org.fxmisc.richtext.model.ReadOnlyStyledDocument;
-import org.fxmisc.richtext.model.StyleSpans;
 import org.fxmisc.richtext.model.StyledDocument;
-import org.reactfx.SuspendableNo;
 import org.reactfx.util.Tuple2;
 
 import javafx.application.Application;
@@ -51,6 +45,12 @@ import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+
+import org.fxmisc.flowless.VirtualizedScrollPane;
+import org.fxmisc.richtext.StyledTextArea;
+import org.fxmisc.richtext.model.Paragraph;
+import org.fxmisc.richtext.model.StyleSpans;
+import org.reactfx.SuspendableNo;
 
 public class RichText extends Application {
 
@@ -265,7 +265,6 @@ public class RichText extends Application {
         primaryStage.setScene(scene);
         area.requestFocus();
         primaryStage.setTitle("Rich Text Demo");
-
         primaryStage.show();
     }
 
