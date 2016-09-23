@@ -122,7 +122,7 @@ public final class Paragraph<PS, S> {
 
     private boolean canJoin(Segment<S> left, Segment<S> right) {
         // if either of the segments are not StyledText segments, they can not be joined 
-        if (left.getTypeId() != DefaultSegmentTypes.STYLED_TEXT || right.getTypeId() != DefaultSegmentTypes.STYLED_TEXT) {
+        if ( !(left instanceof StyledText)  || !(right instanceof StyledText)) {    // TODO: More generic strategy
             return false;
         }
 

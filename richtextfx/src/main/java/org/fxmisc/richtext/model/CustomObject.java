@@ -9,11 +9,13 @@ package org.fxmisc.richtext.model;
 public abstract class CustomObject<S> implements Segment<S> {
 
     private S style;
-    private SegmentType typeId;
+//    private SegmentType typeId;
 
-    public CustomObject(S style, SegmentType typeId) {
+    protected CustomObject() {}
+
+    public CustomObject(S style) { // , SegmentType typeId) {
         this.style = style;
-        this.typeId = typeId;
+//        this.typeId = typeId;
     }
 
 
@@ -74,9 +76,8 @@ public abstract class CustomObject<S> implements Segment<S> {
         return style;
     }
 
-
     @Override
-    public SegmentType getTypeId() {
-        return typeId;
+    public void setStyle(S style) {
+        this.style = style;
     }
 }

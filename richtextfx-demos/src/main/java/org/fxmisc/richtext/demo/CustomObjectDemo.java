@@ -12,8 +12,6 @@ import org.fxmisc.richtext.model.Codec;
 import org.fxmisc.richtext.model.CustomObject;
 import org.fxmisc.richtext.model.LinkedImage;
 import org.fxmisc.richtext.model.ReadOnlyStyledDocument;
-import org.fxmisc.richtext.model.Segment;
-import org.fxmisc.richtext.model.SegmentType;
 
 import javafx.application.Application;
 import javafx.scene.Node;
@@ -24,20 +22,20 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 
-enum CustomSegmentTypes implements SegmentType {
-    CIRCLE("Circle"), RECTANGLE("Rectangle");
-
-    private String theName;
-
-    private CustomSegmentTypes(String typeName) {
-        theName = typeName;
-    }
-
-    @Override
-    public String getName() {
-        return theName;
-    }
-}
+//enum CustomSegmentTypes implements SegmentType {
+//    CIRCLE("Circle"), RECTANGLE("Rectangle");
+//
+//    private String theName;
+//
+//    private CustomSegmentTypes(String typeName) {
+//        theName = typeName;
+//    }
+//
+//    @Override
+//    public String getName() {
+//        return theName;
+//    }
+//}
 
 
 /**
@@ -48,8 +46,10 @@ class RectangleObject extends CustomObject<Collection<String>> {
     private double width;
     private double height;
 
+    public RectangleObject() {}
+
     public RectangleObject(double width, double height) {
-        super(new ArrayList<String>(), CustomSegmentTypes.RECTANGLE);
+        super(new ArrayList<String>()); // , CustomSegmentTypes.RECTANGLE);
         this.width = width;
         this.height = height;
     }
@@ -68,19 +68,26 @@ class RectangleObject extends CustomObject<Collection<String>> {
         Codec.STRING_CODEC.encode(os, Double.toString(height));
     }
 
-    public static Segment<Collection<String>> decode(DataInputStream is, Codec<Collection<String>> styleCodec) {
+    @Override
+    public void decode(DataInputStream is) throws IOException {
         try {
-            double width = Double.parseDouble(Codec.STRING_CODEC.decode(is));
-            double height = Double.parseDouble(Codec.STRING_CODEC.decode(is));
-            Collection<String> style = styleCodec.decode(is);   // Should be encapsulated by CustomObject!
-            return new RectangleObject(width, height);
+            width = Double.parseDouble(Codec.STRING_CODEC.decode(is));
+            height = Double.parseDouble(Codec.STRING_CODEC.decode(is));
+//            Collection<String> style = styleCodec.decode(is);   // Should be encapsulated by CustomObject!
+            //return new RectangleObject(width, height);
         } catch (NumberFormatException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return null;
+        // return null;
+    }
+
+    @Override
+    public Node createNode() {
+        Rectangle result = new Rectangle(getWidth(), getHeight());
+        return result;
     }
 }
 
@@ -92,8 +99,10 @@ class CircleObject extends CustomObject<Collection<String>> {
 
     private double radius;
 
+    public CircleObject() {}
+
     public CircleObject(double radius) {
-        super(new ArrayList<String>(), CustomSegmentTypes.CIRCLE);
+        super(new ArrayList<String>()); // , CustomSegmentTypes.CIRCLE);
         this.radius = radius;
     }
 
@@ -106,19 +115,40 @@ class CircleObject extends CustomObject<Collection<String>> {
         Codec.STRING_CODEC.encode(os, Double.toString(radius));
     }
 
-    public static Segment<Collection<String>> decode(DataInputStream is, Codec<Collection<String>> styleCodec) {
+//    public static Segment<Collection<String>> decode(DataInputStream is, Codec<Collection<String>> styleCodec) {
+//        try {
+//            double radius = Double.parseDouble(Codec.STRING_CODEC.decode(is));
+//            Collection<String> style = styleCodec.decode(is);   // Should be encapsulated by CustomObject!
+//            return new CircleObject(radius);
+//        } catch (NumberFormatException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//        return null;
+//    }
+//    
+
+    @Override
+    public void decode(DataInputStream is) throws IOException {
         try {
-            double radius = Double.parseDouble(Codec.STRING_CODEC.decode(is));
-            Collection<String> style = styleCodec.decode(is);   // Should be encapsulated by CustomObject!
-            return new CircleObject(radius);
+            radius = Double.parseDouble(Codec.STRING_CODEC.decode(is));
+            //Collection<String> style = styleCodec.decode(is);   // Should be encapsulated by CustomObject!
+            //return new CircleObject(radius);
         } catch (NumberFormatException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        return null;
     }
+
+    @Override
+    public Node createNode() {
+        Circle result = new Circle(getRadius());
+        return result;
+    }
+
 }
 
 
@@ -134,27 +164,24 @@ public class CustomObjectDemo extends Application {
         launch(args);
     }
 
-    /**
-     * Factory method to create a Circle node.
-     * @param segment The segment which represents the circle.
-     * @return A Circle shape object.
-     */
-    private Node createCircleNode(Segment<Collection<String>> segment) {
-        CircleObject circleData = (CircleObject) segment;
-        Circle result = new Circle(circleData.getRadius());
-        return result;
-    }
-
-    /**
-     * Factory method to create a Rectangle node.
-     * @param segment The segment which represents the rectangle.
-     * @return A Rectangle shape object.
-     */
-    private Node createRectangleNode(Segment<Collection<String>> segment) {
-        RectangleObject rectData = (RectangleObject) segment;
-        Rectangle result = new Rectangle(rectData.getWidth(), rectData.getHeight());
-        return result;
-    }
+//    /**
+//     * Factory method to create a Circle node.
+//     * @param segment The segment which represents the circle.
+//     * @return A Circle shape object.
+//     */
+//    private Node createCircleNode(Segment<Collection<String>> segment) {
+//    }
+//
+//    /**
+//     * Factory method to create a Rectangle node.
+//     * @param segment The segment which represents the rectangle.
+//     * @return A Rectangle shape object.
+//     */
+//    private Node createRectangleNode(Segment<Collection<String>> segment) {
+//        RectangleObject rectData = (RectangleObject) segment;
+//        Rectangle result = new Rectangle(rectData.getWidth(), rectData.getHeight());
+//        return result;
+//    }
 
     
     @Override
@@ -162,9 +189,9 @@ public class CustomObjectDemo extends Application {
         StyleClassedTextArea textArea = new StyleClassedTextArea();
         textArea.setWrapText(true);
 
-        // Register custom object types
-        textArea.registerFactory(CustomSegmentTypes.CIRCLE,    this::createCircleNode,    CircleObject::decode);
-        textArea.registerFactory(CustomSegmentTypes.RECTANGLE, this::createRectangleNode, RectangleObject::decode);
+//        // Register custom object types
+//        textArea.registerFactory(CustomSegmentTypes.CIRCLE,    this::createCircleNode,    CircleObject::decode);
+//        textArea.registerFactory(CustomSegmentTypes.RECTANGLE, this::createRectangleNode, RectangleObject::decode);
 
         // create the sample document
         textArea.replaceText(0, 0, "This example shows how to add custom nodes, for example Rectangles ");

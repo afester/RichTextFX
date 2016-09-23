@@ -1,7 +1,10 @@
 package org.fxmisc.richtext.model;
 
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+
+import javafx.scene.Node;
 
 /**
  * An interface to segment types, like StyledText or LinkedImage.
@@ -25,7 +28,11 @@ public interface Segment<S> {
 
     S getStyle();
 
-    SegmentType getTypeId();
-
     void encode(DataOutputStream os) throws IOException;
+
+    void decode(DataInputStream is) throws IOException;
+
+    Node createNode();
+
+    void setStyle(S style);
 }

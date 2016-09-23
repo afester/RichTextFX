@@ -4,6 +4,9 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.function.Function;
+
+import javafx.scene.Node;
 
 
 /**
@@ -13,7 +16,9 @@ import java.io.IOException;
  */
 public class LinkedImage<S> extends CustomObject<S> {
 
-    private final String imagePath;
+    private /*final*/ String imagePath;
+
+    LinkedImage() {}
 
     /**
      * Creates a new linked image object.
@@ -22,7 +27,7 @@ public class LinkedImage<S> extends CustomObject<S> {
      * @param style The text style to apply to the corresponding segment.
      */
     public LinkedImage(String imagePath, S style) {
-        super(style, DefaultSegmentTypes.LINKED_IMAGE);
+        super(style); // , DefaultSegmentTypes.LINKED_IMAGE);
 
         // if the image is below the current working directory,
         // then store as relative path name.
@@ -48,15 +53,24 @@ public class LinkedImage<S> extends CustomObject<S> {
         Codec.STRING_CODEC.encode(os, imagePath);
     }
 
-
-    public static <S> Segment<S> decode(DataInputStream is, Codec<S> styleCodec) throws IOException {
-        String path = Codec.STRING_CODEC.decode(is);
-        S style = styleCodec.decode(is);
-        return new LinkedImage<>(path, style);
+    @Override
+    public /*static <S> Segment<S> */ void decode(DataInputStream is) throws IOException {
+        imagePath = Codec.STRING_CODEC.decode(is);
+        //S style = styleCodec.decode(is);
+        //return new LinkedImage<>(path, style);
     }
 
     @Override
     public String toString() {
         return String.format("LinkedImage[path=%s]", imagePath);
     }
+
+    @SuppressWarnings("rawtypes")
+    public static Function<LinkedImage, Node> nodeFactory;
+
+    @Override
+    public Node createNode() {
+        return nodeFactory.apply(this);
+    }
+
 }

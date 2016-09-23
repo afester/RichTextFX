@@ -4,13 +4,18 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Objects;
+import java.util.function.Function;
+
+import javafx.scene.Node;
 
 /**
  * The default segment type which is a styled text string. 
  */
 public class StyledText<S> implements Segment<S> {
-    private final String text;
-    private final S style;
+    private /*final */String text;
+    private /*final*/ S style;
+
+    StyledText() {}
 
     public StyledText(String text, S style) {
         this.text = text;
@@ -80,10 +85,10 @@ public class StyledText<S> implements Segment<S> {
         return Objects.hash(text, style);
     }
 
-    @Override
-    public SegmentType getTypeId() {
-        return DefaultSegmentTypes.STYLED_TEXT;
-    }
+//    @Override
+//    public SegmentType getTypeId() {
+//        return DefaultSegmentTypes.STYLED_TEXT;
+//    }
 
     @Override
     public void encode(DataOutputStream os) throws IOException {
@@ -91,9 +96,25 @@ public class StyledText<S> implements Segment<S> {
     }
 
 
-    public static <S> Segment<S> decode(DataInputStream is, Codec<S> styleCodec) throws IOException {
-        String text = Codec.STRING_CODEC.decode(is);
-        S style = styleCodec.decode(is);
-        return new StyledText<>(text, style);
+    @Override
+    public void decode(DataInputStream is) throws IOException {
+//    public static <S> Segment<S> decode(DataInputStream is, Codec<S> styleCodec) throws IOException {
+        text = Codec.STRING_CODEC.decode(is);
+//        style = styleCodec.decode(is);
+        // return new StyledText<>(text, style);
+    }
+
+
+    @SuppressWarnings("rawtypes")
+    public static Function<StyledText, Node> nodeFactory;
+
+    @Override
+    public Node createNode() {
+        return nodeFactory.apply(this);
+    }
+
+    @Override
+    public void setStyle(S style) {
+        this.style = style;
     }
 }

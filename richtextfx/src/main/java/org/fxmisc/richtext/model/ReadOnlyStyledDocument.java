@@ -22,6 +22,7 @@ import org.reactfx.util.BiIndex;
 import org.reactfx.util.Either;
 import org.reactfx.util.FingerTree;
 import org.reactfx.util.FingerTree.NonEmptyFingerTree;
+
 import org.reactfx.util.ToSemigroup;
 import org.reactfx.util.Tuple2;
 import org.reactfx.util.Tuple3;
@@ -192,7 +193,8 @@ public final class ReadOnlyStyledDocument<PS, S> implements StyledDocument<PS, S
             @Override
             public void encode(DataOutputStream os, Segment<S> t) throws IOException {
                 // encode the segment type and content
-                STRING_CODEC.encode(os, t.getTypeId().getName());
+                //STRING_CODEC.encode(os, t.getTypeId().getName());
+                STRING_CODEC.encode(os, t.getClass().getName());
                 t.encode(os);
 
                 // encode the segment style
@@ -201,7 +203,22 @@ public final class ReadOnlyStyledDocument<PS, S> implements StyledDocument<PS, S
 
             @Override
             public Segment<S> decode(DataInputStream is) throws IOException {
-                Segment<S> result = SegmentFactory.decode(is, styleCodec);
+                //Segment<S> result = SegmentFactory.decode(is, styleCodec);
+                
+                String segmentType = is.readUTF();
+                Segment<S> result = null;
+                try {
+                    Class<?> clazz = Class.forName(segmentType);
+                    result = (Segment<S>) clazz.newInstance();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                } catch (InstantiationException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+                result.decode(is);
+                result.setStyle(styleCodec.decode(is));
                 return result;
             }
 
