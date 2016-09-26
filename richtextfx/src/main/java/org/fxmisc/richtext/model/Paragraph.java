@@ -67,13 +67,13 @@ public final class Paragraph<PS, S> {
         return segments.get(pos.getMajor()).charAt(pos.getMinor());
     }
 
-    public String substring(int from, int to) {
+    private String substring(int from, int to) {
         return getText().substring(from, Math.min(to, length()));
     }
 
-    public String substring(int from) {
-        return getText().substring(from);
-    }
+//    public String ysubstring(int from) {
+//        return getText().substring(from);
+//    }
 
     /**
      * Concatenates this paragraph with the given paragraph {@code p}.
@@ -82,10 +82,6 @@ public final class Paragraph<PS, S> {
      * case the paragraph style of the result will be that of {@code p}.
      */
     public Paragraph<PS, S> concat(Paragraph<PS, S> p) {
-        System.err.println("concat------------");
-        System.err.printf("%s\n", this.segments);
-        System.err.printf("%s\n", p.segments);
-        
         if(p.length() == 0) {
             return this;
         }
@@ -97,12 +93,6 @@ public final class Paragraph<PS, S> {
         Segment<S> left = segments.get(segments.size() - 1);
         Segment<S> right = p.segments.get(0);
 
-        
-        // if(canJoin(left, right)) {
-        System.err.printf("LEFT: %s\n", left);
-        System.err.printf("RIGHT: %s\n", right);
-        System.err.printf("CAN JOIN: %s\n", left.canJoin(right));
-        
         if(left.canJoin(right)) {
             Segment<S> segment = left.append(right.getText());
             List<Segment<S>> segs = new ArrayList<>(segments.size() + p.segments.size() - 1);
@@ -118,15 +108,6 @@ public final class Paragraph<PS, S> {
         }
     }
 
-//    private boolean canJoin(Segment<S> left, Segment<S> right) {
-//        // if either of the segments are not StyledText segments, they can not be joined 
-//        if ( !(left instanceof StyledText)  || !(right instanceof StyledText)) {    // TODO: More generic strategy
-//            return false;
-//        }
-//
-//        // otherwise, if the segments have the same style, they can be joined.
-//        return Objects.equals(left.getStyle(), right.getStyle());
-//    }
 
     /**
      * Similar to {@link #concat(Paragraph)}, except in case both paragraphs
@@ -206,37 +187,62 @@ public final class Paragraph<PS, S> {
         return new Paragraph<>(paragraphStyle, getText(), style);
     }
 
-    public Paragraph<PS, S> restyle(int from, int to, S style) {
-        if(from >= length()) {
-            return this;
-        } else {
-            to = Math.min(to, length());
-            Paragraph<PS, S> left = subSequence(0, from);
-            Paragraph<PS, S> middle = new Paragraph<>(paragraphStyle, substring(from, to), style);
-            Paragraph<PS, S> right = subSequence(to);
-            return left.concat(middle).concat(right);
-        }
-    }
+    
+    /**
+     * 
+     * @param from
+     * @param to
+     * @param style
+     * @return
+     */
+//    public Paragraph<PS, S> xrestyle(int from, int to, S style) {
+//        if(from >= length()) {
+//            return this;
+//        } else {
+//            to = Math.min(to, length());
+//            Paragraph<PS, S> left = subSequence(0, from);
+//            Paragraph<PS, S> middle = new Paragraph<>(paragraphStyle, substring(from, to), style);
+//            Paragraph<PS, S> right = subSequence(to);
+//            return left.concat(middle).concat(right);
+//        }
+//    }
 
+    /**
+     * Restyles the segments of this paragraph.
+     *
+     * @param from The start index of the range to restyle within this paragraph
+     * @param styleSpans
+     *
+     * @return
+     */
     public Paragraph<PS, S> restyle(int from, StyleSpans<? extends S> styleSpans) {
         int len = styleSpans.length();
         if(styleSpans.equals(getStyleSpans(from, from + len))) {
             return this;
         }
 
-        Paragraph<PS, S> left = trim(from);
-        Paragraph<PS, S> right = subSequence(from + len);
-
+        // extract the text to restyle
         String middleString = substring(from, from + len);
+
+        System.err.printf("  MIDDLE: %s\n", middleString);
+
         List<Segment<S>> middleSegs = new ArrayList<>(styleSpans.getSpanCount());
+
         int offset = 0;
         for(StyleSpan<? extends S> span: styleSpans) {
             int end = offset + span.getLength();
+
+            // Recreate segment
+            
             String text = middleString.substring(offset, end);
             middleSegs.add(new StyledText<>(text, span.getStyle()));
+
             offset = end;
         }
         Paragraph<PS, S> middle = new Paragraph<>(paragraphStyle, middleSegs);
+
+        Paragraph<PS, S> left = trim(from);
+        Paragraph<PS, S> right = subSequence(from + len);
 
         return left.concat(middle).concat(right);
     }

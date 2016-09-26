@@ -431,4 +431,16 @@ public final class ReadOnlyStyledDocument<PS, S> implements StyledDocument<PS, S
             }
         }
     }
+    
+    
+    public void dump() {
+        System.err.println("ReadOnlyStyledDocument:");
+        for (Paragraph<PS, S> p : this.getParagraphs()) {
+            System.err.println("  Paragraph:");
+            for (Segment<S> seg : p.getSegments()) {
+                System.err.printf("    %s - \"%s\"\n", seg.getClass().getName(), seg.getText());
+            }
+        }
+        
+    }
 }

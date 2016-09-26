@@ -40,6 +40,11 @@ public class StyleSpansBuilder<S> {
         public StyleSpan<S> getStyleSpan(int index) {
             return spans.get(index);
         }
+
+        @Override
+        public String toString() {
+            return String.format("StyleSpansImpl[list=%s]", spans);
+        }
     }
 
     static <S> StyleSpans<S> overlay(

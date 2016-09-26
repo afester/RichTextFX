@@ -139,4 +139,6 @@ public interface StyledDocument<PS, S> extends TwoDimensional {
         }
         return position;
     }
+
+    void dump();
 }

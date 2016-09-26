@@ -207,4 +207,18 @@ public final class SimpleEditableStyledDocument<PS, S> implements EditableStyled
             parChanges.push(parChange);
         });
     }
+    
+    
+    public void dump() {
+        System.err.println("SimpleEditableStyledDocument:");
+        for (Paragraph<PS, S> p : this.getParagraphs()) {
+            System.err.println("  Paragraph:");
+            for (Segment<S> seg : p.getSegments()) {
+                System.err.printf("    %s - \"%s\"\n", seg.getClass().getName(), seg.getText());
+            }
+        }
+        
+        
+    }
+
 }

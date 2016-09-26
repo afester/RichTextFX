@@ -15,6 +15,8 @@ public class StyledText<S> implements Segment<S> {
     StyledText() {}
 
     public StyledText(String text, S style) {
+//        new Throwable().printStackTrace();
+
         this.text = text;
         this.style = style;
     }
