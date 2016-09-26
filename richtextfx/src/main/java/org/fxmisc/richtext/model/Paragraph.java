@@ -82,6 +82,10 @@ public final class Paragraph<PS, S> {
      * case the paragraph style of the result will be that of {@code p}.
      */
     public Paragraph<PS, S> concat(Paragraph<PS, S> p) {
+        System.err.println("concat------------");
+        System.err.printf("%s\n", this.segments);
+        System.err.printf("%s\n", p.segments);
+        
         if(p.length() == 0) {
             return this;
         }
@@ -92,7 +96,13 @@ public final class Paragraph<PS, S> {
 
         Segment<S> left = segments.get(segments.size() - 1);
         Segment<S> right = p.segments.get(0);
+
+        
         // if(canJoin(left, right)) {
+        System.err.printf("LEFT: %s\n", left);
+        System.err.printf("RIGHT: %s\n", right);
+        System.err.printf("CAN JOIN: %s\n", left.canJoin(right));
+        
         if(left.canJoin(right)) {
             Segment<S> segment = left.append(right.getText());
             List<Segment<S>> segs = new ArrayList<>(segments.size() + p.segments.size() - 1);
