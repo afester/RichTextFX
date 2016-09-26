@@ -29,13 +29,6 @@ public final class Paragraph<PS, S> {
     private final TwoLevelNavigator navigator;
     private final PS paragraphStyle;
 
-    /**
-     * Creates a new Paragraph with one styled text segment which contains the given text.
-     *
-     * @param paragraphStyle The paragraph style to use.
-     * @param text The text contained in the paragraph.
-     * @param style The style of the text.
-     */
     public Paragraph(PS paragraphStyle, String text, S style) {
         this(paragraphStyle, new StyledText<>(text, style));
     }
@@ -87,12 +80,6 @@ public final class Paragraph<PS, S> {
      * The paragraph style of the result will be that of this paragraph,
      * unless this paragraph is empty and {@code p} is non-empty, in which
      * case the paragraph style of the result will be that of {@code p}.
-     * 
-     * @param p The paragraph to append.
-     * @return A paragraph which contains all text segments from this paragraph plus all
-     *         text segments from the other paragraph. If the style of the last text segment from this
-     *         paragraph matches the style of the first text segment of the other
-     *         paragraph, the text segments are combined into one single text segment.
      */
     public Paragraph<PS, S> concat(Paragraph<PS, S> p) {
         if(p.length() == 0) {
@@ -105,7 +92,8 @@ public final class Paragraph<PS, S> {
 
         Segment<S> left = segments.get(segments.size() - 1);
         Segment<S> right = p.segments.get(0);
-        if(canJoin(left, right)) {
+        // if(canJoin(left, right)) {
+        if(left.canJoin(right)) {
             Segment<S> segment = left.append(right.getText());
             List<Segment<S>> segs = new ArrayList<>(segments.size() + p.segments.size() - 1);
             segs.addAll(segments.subList(0, segments.size()-1));
@@ -120,15 +108,15 @@ public final class Paragraph<PS, S> {
         }
     }
 
-    private boolean canJoin(Segment<S> left, Segment<S> right) {
-        // if either of the segments are not StyledText segments, they can not be joined 
-        if ( !(left instanceof StyledText)  || !(right instanceof StyledText)) {    // TODO: More generic strategy
-            return false;
-        }
-
-        // otherwise, if the segments have the same style, they can be joined.
-        return Objects.equals(left.getStyle(), right.getStyle());
-    }
+//    private boolean canJoin(Segment<S> left, Segment<S> right) {
+//        // if either of the segments are not StyledText segments, they can not be joined 
+//        if ( !(left instanceof StyledText)  || !(right instanceof StyledText)) {    // TODO: More generic strategy
+//            return false;
+//        }
+//
+//        // otherwise, if the segments have the same style, they can be joined.
+//        return Objects.equals(left.getStyle(), right.getStyle());
+//    }
 
     /**
      * Similar to {@link #concat(Paragraph)}, except in case both paragraphs

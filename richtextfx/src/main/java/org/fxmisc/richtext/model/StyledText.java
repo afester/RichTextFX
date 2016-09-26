@@ -8,12 +8,9 @@ import java.util.function.Function;
 
 import javafx.scene.Node;
 
-/**
- * The default segment type which is a styled text string. 
- */
 public class StyledText<S> implements Segment<S> {
-    private /*final */String text;
-    private /*final*/ S style;
+    private String text;
+    private S style;
 
     StyledText() {}
 
@@ -98,10 +95,25 @@ public class StyledText<S> implements Segment<S> {
     }
 
     @SuppressWarnings("rawtypes")
-    public static Function<StyledText, Node> nodeFactory;
+    private static Function<StyledText, Node> nodeFactory;
 
     @Override
     public Node createNode() {
         return nodeFactory.apply(this);
+    }
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public static <S> void setNodeFactory(Function<StyledText<S>, Node> nodeFactory) {
+        StyledText.nodeFactory = (Function<StyledText, Node>) (Object) nodeFactory;
+    }
+
+    @Override
+    public boolean canJoin(Segment<S> right) {
+
+        if (right instanceof StyledText) {
+            return Objects.equals(getStyle(), right.getStyle());
+        }
+
+        return false;
     }
 }

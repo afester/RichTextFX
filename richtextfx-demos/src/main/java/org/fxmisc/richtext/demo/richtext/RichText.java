@@ -409,8 +409,8 @@ public class RichText extends Application {
         if (selectedFile != null) {
             String imagePath = selectedFile.getAbsolutePath();
             ReadOnlyStyledDocument<ParStyle, TextStyle> ros = 
-                    ReadOnlyStyledDocument.createObject(new LinkedImage<>(imagePath, TextStyle.EMPTY), 
-                                                      ParStyle.EMPTY, TextStyle.EMPTY); 
+                    ReadOnlyStyledDocument.from(new LinkedImage<>(imagePath, TextStyle.EMPTY), 
+                                                ParStyle.EMPTY, TextStyle.EMPTY); 
             area.replaceSelection(ros);
         }
     }

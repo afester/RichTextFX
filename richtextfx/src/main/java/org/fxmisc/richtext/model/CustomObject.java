@@ -12,9 +12,8 @@ public abstract class CustomObject<S> implements Segment<S> {
 
     protected CustomObject() {}
 
-    public CustomObject(S style) { // , SegmentType typeId) {
+    public CustomObject(S style) {
         this.style = style;
-//        this.typeId = typeId;
     }
 
 
@@ -75,8 +74,8 @@ public abstract class CustomObject<S> implements Segment<S> {
         return style;
     }
 
-//    @Override
-//    public void setStyle(S style) {
-//        this.style = style;
-//    }
+    @Override
+    public boolean canJoin(Segment<S> right) {
+        return false;
+    }
 }

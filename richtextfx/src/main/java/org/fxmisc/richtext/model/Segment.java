@@ -33,4 +33,6 @@ public interface Segment<S> {
     void decode(DataInputStream is, Codec<S> styleCodec) throws IOException;
 
     Node createNode();
+
+    boolean canJoin(Segment<S> right);
 }

@@ -573,29 +573,27 @@ public class StyledTextArea<PS, S> extends Region
         this.applyParagraphStyle = applyParagraphStyle;
 
         // Inject node factories into model layer
-        StyledText.nodeFactory =
-              segment -> {
-                  TextExt t = new TextExt(segment.getText());
-                  t.setTextOrigin(VPos.TOP);
-                  t.getStyleClass().add("text");
-                  this.applyStyle.accept(t, (S) segment.getStyle());    // TODO: bogus cast
-    
-                  // XXX: binding selectionFill to textFill,
-                  // see the note at highlightTextFill
-                  t.impl_selectionFillProperty().bind(t.fillProperty());
-      
-                  return t;
-              };
+        StyledText.<S>setNodeFactory(segment -> {
+            TextExt t = new TextExt(segment.getText());
+            t.setTextOrigin(VPos.TOP);
+            t.getStyleClass().add("text");
+            this.applyStyle.accept(t, segment.getStyle());
 
-        LinkedImage.nodeFactory = 
-              segment -> {
-              String imagePath = segment.getImagePath();
-              Image image = new Image("file:" + imagePath); // XXX: No need to create new Image objects each time -
-                                                            // could be cached in the model layer
-  
-              ImageView result = new ImageView(image);
-              return result;
-          };
+            // XXX: binding selectionFill to textFill,
+            // see the note at highlightTextFill
+            t.impl_selectionFillProperty().bind(t.fillProperty());
+
+            return t;
+        });
+
+        LinkedImage.<S>setNodeFactory(segment -> {
+            String imagePath = segment.getImagePath();
+            Image image = new Image("file:" + imagePath); // XXX: No need to create new Image objects each time -
+                                                          // could be cached in the model layer
+
+            ImageView result = new ImageView(image);
+            return result;
+        });
 
         // allow tab traversal into area
         setFocusTraversable(true);

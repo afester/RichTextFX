@@ -16,7 +16,7 @@ import javafx.scene.Node;
  */
 public class LinkedImage<S> extends CustomObject<S> {
 
-    private /*final*/ String imagePath;
+    private String imagePath;
 
     LinkedImage() {}
 
@@ -66,11 +66,15 @@ public class LinkedImage<S> extends CustomObject<S> {
     }
 
     @SuppressWarnings("rawtypes")
-    public static Function<LinkedImage, Node> nodeFactory;
+    private static Function<LinkedImage, Node> nodeFactory;
 
     @Override
     public Node createNode() {
         return nodeFactory.apply(this);
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public static <S> void setNodeFactory(Function<LinkedImage<S>, Node> nodeFactory) {
+        LinkedImage.nodeFactory = (Function<LinkedImage, Node>) (Object) nodeFactory;
+    }
 }

@@ -96,33 +96,24 @@ public final class ReadOnlyStyledDocument<PS, S> implements StyledDocument<PS, S
     }
 
     /**
-     * Creates a new ReadOnlyStyledDocument with a custom object.
+     * Creates a new ReadOnlyStyledDocument with one Segment.
      *
-     * @param obj   The custom object which shall be contained in the document.
-     * @param paragraphStyle The paragraph style to use for the custom object.
-     * @param style The text style to use for the custom object.
+     * @param seg   The segment which shall be contained in the document.
+     * @param paragraphStyle The paragraph style to use for the paragraph which contains the segment.
+     * @param style The style to use for the segment.
      *
      * @return A StyledDocument with the custom object. The StyledDocument can be
      *         inserted or appended to the StyledTextArea.
      */
-    public static <PS, S> ReadOnlyStyledDocument<PS, S> createObject(CustomObject<S> obj, PS paragraphStyle, S style) {
+    public static <PS, S> ReadOnlyStyledDocument<PS, S> from(Segment<S> obj, PS paragraphStyle, S style) {
         List<Paragraph<PS, S>> res = new ArrayList<>(1);
         Paragraph<PS, S> content = new Paragraph<>(paragraphStyle, Arrays.asList(obj));
         res.add(content);
         return new ReadOnlyStyledDocument<>(res);
     }
 
-
-    /**
-     * @param pCodec The codec for paragraph style data
-     * @param tCodec The codec for text style data
-     *
-     * @return A codec to encode and decode a StyledDocument into / from a binary format.
-     */
     public static <PS, S> Codec<StyledDocument<PS, S>> codec(Codec<PS> pCodec, Codec<S> tCodec) {
-
         return new Codec<StyledDocument<PS, S>>() {
-            // create a codec to encode/decode a list of paragraph objects
             private final Codec<List<Paragraph<PS, S>>> codec = Codec.listCodec(paragraphCodec(pCodec, tCodec));
 
             @Override
@@ -143,15 +134,8 @@ public final class ReadOnlyStyledDocument<PS, S> implements StyledDocument<PS, S
         };
     }
 
-    /**
-     * @param pCodec The codec for paragraph style data
-     * @param tCodec The codec for text style data
-     *
-     * @return A coded to encode/decode one paragraph.
-     */
     private static <PS, S> Codec<Paragraph<PS, S>> paragraphCodec(Codec<PS> pCodec, Codec<S> tCodec) {
         return new Codec<Paragraph<PS, S>>() {
-            // create a codec to encode/decode a list of segment objects
             private final Codec<List<Segment<S>>> segmentsCodec = Codec.listCodec(styledTextCodec(tCodec));
 
             @Override
@@ -174,13 +158,7 @@ public final class ReadOnlyStyledDocument<PS, S> implements StyledDocument<PS, S
         };
     }
 
-    /**
-     * @param styleCodec The codec for text style data
-     *
-     * @return A coded to encode/decode one text segment.
-     */
     private static <S> Codec<Segment<S>> styledTextCodec(Codec<S> styleCodec) {
-
         return new Codec<Segment<S>>() {
 
             @Override
@@ -193,9 +171,6 @@ public final class ReadOnlyStyledDocument<PS, S> implements StyledDocument<PS, S
                 // encode the segment type and content
                 STRING_CODEC.encode(os, t.getClass().getName());
                 t.encode(os, styleCodec);
-
-                // encode the segment style
-                // styleCodec.encode(os, t.getStyle());
             }
 
             @Override
@@ -203,17 +178,13 @@ public final class ReadOnlyStyledDocument<PS, S> implements StyledDocument<PS, S
                 String segmentType = is.readUTF();
                 Segment<S> result = null;
                 try {
-                    Class<?> clazz = Class.forName(segmentType);
+                    @SuppressWarnings("unchecked")
+                    Class<Segment<S>> clazz = (Class<Segment<S>>) Class.forName(segmentType);
                     result = (Segment<S>) clazz.newInstance();
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                } catch (InstantiationException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
+                } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
                     e.printStackTrace();
                 }
                 result.decode(is, styleCodec);
-                //result.setStyle(styleCodec.decode(is));
                 return result;
             }
 
