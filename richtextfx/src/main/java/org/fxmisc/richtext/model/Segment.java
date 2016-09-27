@@ -35,4 +35,6 @@ public interface Segment<S> {
     Node createNode();
 
     boolean canJoin(Segment<S> right);
+
+    void setStyle(S style);
 }

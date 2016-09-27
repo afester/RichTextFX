@@ -105,9 +105,9 @@ public final class ReadOnlyStyledDocument<PS, S> implements StyledDocument<PS, S
      * @return A StyledDocument with the custom object. The StyledDocument can be
      *         inserted or appended to the StyledTextArea.
      */
-    public static <PS, S> ReadOnlyStyledDocument<PS, S> from(Segment<S> obj, PS paragraphStyle, S style) {
+    public static <PS, S> ReadOnlyStyledDocument<PS, S> from(Segment<S> obj, PS paragraphStyle, S textStyle) {
         List<Paragraph<PS, S>> res = new ArrayList<>(1);
-        Paragraph<PS, S> content = new Paragraph<>(paragraphStyle, Arrays.asList(obj));
+        Paragraph<PS, S> content = new Paragraph<PS, S>(paragraphStyle, Arrays.asList(obj));
         res.add(content);
         return new ReadOnlyStyledDocument<>(res);
     }
@@ -438,7 +438,7 @@ public final class ReadOnlyStyledDocument<PS, S> implements StyledDocument<PS, S
         for (Paragraph<PS, S> p : this.getParagraphs()) {
             System.err.println("  Paragraph:");
             for (Segment<S> seg : p.getSegments()) {
-                System.err.printf("    %s - \"%s\"\n", seg.getClass().getName(), seg.getText());
+                System.err.printf("    %s - \"%s\" - %s\n", seg.getClass().getName(), seg.getText(), seg.getStyle());
             }
         }
         

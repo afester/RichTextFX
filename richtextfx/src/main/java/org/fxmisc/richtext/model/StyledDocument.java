@@ -83,21 +83,47 @@ public interface StyledDocument<PS, S> extends TwoDimensional {
         return getParagraphs().get(paragraph).getStyleRangeAtPosition(position);
     }
 
+
+    /**
+     * 
+     * @param from The index of the first character in the range
+     * @param to The index of the last character in the range + 1
+     * @return
+     */
     default StyleSpans<S> getStyleSpans(int from, int to) {
+
+        // Calculate paragraph and relative character position for start and end
         Position start = offsetToPosition(from, Forward);
         Position end = to == from
                 ? start
                 : start.offsetBy(to - from, Backward);
+        
+        System.err.printf("Start: %s, End: %s\n", start, end);
+
         int startParIdx = start.getMajor();
         int endParIdx = end.getMajor();
 
+        // create array to hold the style spans for each paragraph
         int affectedPars = endParIdx - startParIdx + 1;
         List<StyleSpans<S>> subSpans = new ArrayList<>(affectedPars);
 
-        if(startParIdx == endParIdx) {
+        if(startParIdx == endParIdx) {  // range within one paragraph
             Paragraph<PS, S> par = getParagraphs().get(startParIdx);
-            subSpans.add(par.getStyleSpans(start.getMinor(), end.getMinor()));
-        } else {
+            StyleSpans<S> styles = par.getStyleSpans(start.getMinor(), end.getMinor());
+            
+            int offset = 0;
+            for(StyleSpan<S> span: styles) {
+                int endX = offset + span.getLength();
+
+                // Recreate segment
+                System.err.printf("$    SPAN: %s %s\n", span.getLength(), span.getStyle());
+                System.err.printf("$          %s %s\n", offset, endX);
+                offset = endX;
+            }
+            
+            subSpans.add(styles); // par.getStyleSpans(start.getMinor(), end.getMinor()));
+
+        } else {                        // range spans more than one paragraph
             Paragraph<PS, S> startPar = getParagraphs().get(startParIdx);
             subSpans.add(startPar.getStyleSpans(start.getMinor(), startPar.length() + 1));
 

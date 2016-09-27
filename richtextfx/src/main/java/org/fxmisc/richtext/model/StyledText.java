@@ -15,7 +15,7 @@ public class StyledText<S> implements Segment<S> {
     StyledText() {}
 
     public StyledText(String text, S style) {
-//        new Throwable().printStackTrace();
+        new Throwable().printStackTrace();
 
         this.text = text;
         this.style = style;
@@ -65,7 +65,7 @@ public class StyledText<S> implements Segment<S> {
 
     @Override
     public String toString() {
-        return '"' + text + '"' + ":" + style;
+        return String.format("StyledText[text=\"%s\", style=%s]", text, style);
     }
 
     @Override
@@ -117,5 +117,10 @@ public class StyledText<S> implements Segment<S> {
         }
 
         return false;
+    }
+
+    @Override
+    public void setStyle(S style) {
+        this.style = style;
     }
 }

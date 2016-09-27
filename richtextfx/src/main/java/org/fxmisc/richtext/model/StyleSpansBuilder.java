@@ -151,19 +151,24 @@ public class StyleSpansBuilder<S> {
     }
 
     private void _add(StyleSpan<S> span) {
+        System.err.printf("ADD: %s\n",  span);
+
         if(spans.isEmpty()) {
             spans.add(span);
         } else if(span.getLength() > 0) {
+
             if(spans.size() == 1 && spans.get(0).getLength() == 0) {
                 spans.set(0, span);
             } else {
                 StyleSpan<S> prev = spans.get(spans.size() - 1);
-                if(prev.getStyle().equals(span.getStyle())) {
+
+                if(prev.getStyle().equals(span.getStyle())) {   // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                     spans.set(spans.size() - 1, new StyleSpan<>(span.getStyle(), prev.getLength() + span.getLength()));
                 } else {
                     spans.add(span);
                 }
             }
+
         } else {
             // do nothing, don't add a zero-length span
         }

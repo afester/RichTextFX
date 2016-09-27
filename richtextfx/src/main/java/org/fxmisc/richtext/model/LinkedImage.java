@@ -27,7 +27,7 @@ public class LinkedImage<S> extends CustomObject<S> {
      * @param style The text style to apply to the corresponding segment.
      */
     public LinkedImage(String imagePath, S style) {
-        super(style); // , DefaultSegmentTypes.LINKED_IMAGE);
+        super(style);
 
         // if the image is below the current working directory,
         // then store as relative path name.
@@ -49,15 +49,15 @@ public class LinkedImage<S> extends CustomObject<S> {
 
 
     @Override
-    public void encode(DataOutputStream os, Codec<S> styleCodec) throws IOException {
+    public void encode(DataOutputStream os/*, Codec<S> styleCodec*/) throws IOException {
         Codec.STRING_CODEC.encode(os, imagePath);
-        styleCodec.encode(os, style);
+        // styleCodec.encode(os, style);
     }
 
     @Override
-    public void decode(DataInputStream is, Codec<S> styleCodec) throws IOException {
+    public void decode(DataInputStream is/*, Codec<S> styleCodec*/) throws IOException {
         imagePath = Codec.STRING_CODEC.decode(is);
-        style = styleCodec.decode(is);
+        // style = styleCodec.decode(is);
     }
 
     @Override
