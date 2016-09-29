@@ -158,6 +158,7 @@ public final class SimpleEditableStyledDocument<PS, S> implements EditableStyled
 
                 System.err.println("2-----------------");
                 newPara.dump();
+
                 pars.add(newPara);
                 i = j.offsetBy(1, Forward); // skip the newline
             }

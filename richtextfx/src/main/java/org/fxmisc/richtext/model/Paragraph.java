@@ -202,7 +202,7 @@ public final class Paragraph<PS, S> {
         if(styleSpans.equals(getStyleSpans(from, from + len))) {
             return this;
         }
-
+System.err.println("XXX" + styleSpans.getSpanCount());
         List<Segment<S>> middleSegs = new ArrayList<>(styleSpans.getSpanCount());
 
         int offset = 0;
@@ -212,7 +212,7 @@ public final class Paragraph<PS, S> {
             // get the segment at the given position
             Position pos = navigator.offsetToPosition(offset, Forward);
             Segment<S> seg = segments.get(pos.getMajor());
-
+System.err.println("SEGMENT: " + seg);
             // set the new style
             seg.setStyle(span.getStyle());
             middleSegs.add(seg);
@@ -222,7 +222,11 @@ public final class Paragraph<PS, S> {
         Paragraph<PS, S> middle = new Paragraph<>(paragraphStyle, middleSegs);
 
         Paragraph<PS, S> left = trim(from);
+        System.err.println("LEFT:");
+        left.dump();
         Paragraph<PS, S> right = subSequence(from + len);
+        System.err.println("RIGHT:");
+        right.dump();
         return left.concat(middle).concat(right);
     }
 
