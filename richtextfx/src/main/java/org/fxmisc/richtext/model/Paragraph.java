@@ -67,13 +67,13 @@ public final class Paragraph<PS, S> {
         return segments.get(pos.getMajor()).charAt(pos.getMinor());
     }
 
-    private String substring(int from, int to) {
+    public String substring(int from, int to) {
         return getText().substring(from, Math.min(to, length()));
     }
 
-//    public String ysubstring(int from) {
-//        return getText().substring(from);
-//    }
+    public String substring(int from) {
+        return getText().substring(from);
+    }
 
     /**
      * Concatenates this paragraph with the given paragraph {@code p}.
@@ -92,7 +92,6 @@ public final class Paragraph<PS, S> {
 
         Segment<S> left = segments.get(segments.size() - 1);
         Segment<S> right = p.segments.get(0);
-
         if(left.canJoin(right)) {
             Segment<S> segment = left.append(right.getText());
             List<Segment<S>> segs = new ArrayList<>(segments.size() + p.segments.size() - 1);
@@ -107,7 +106,6 @@ public final class Paragraph<PS, S> {
             return new Paragraph<>(paragraphStyle, segs);
         }
     }
-
 
     /**
      * Similar to {@link #concat(Paragraph)}, except in case both paragraphs
@@ -187,34 +185,18 @@ public final class Paragraph<PS, S> {
         return new Paragraph<>(paragraphStyle, getText(), style);
     }
 
+    public Paragraph<PS, S> restyle(int from, int to, S style) {
+        if(from >= length()) {
+            return this;
+        } else {
+            to = Math.min(to, length());
+            Paragraph<PS, S> left = subSequence(0, from);
+            Paragraph<PS, S> middle = new Paragraph<>(paragraphStyle, substring(from, to), style);
+            Paragraph<PS, S> right = subSequence(to);
+            return left.concat(middle).concat(right);
+        }
+    }
 
-//    /**
-//     * 
-//     * @param from
-//     * @param to
-//     * @param style
-//     * @return
-//     */
-//    public Paragraph<PS, S> restyle(int from, int to, S style) {
-//        if(from >= length()) {
-//            return this;
-//        } else {
-//            to = Math.min(to, length());
-//            Paragraph<PS, S> left = subSequence(0, from);
-//            Paragraph<PS, S> middle = new Paragraph<>(paragraphStyle, substring(from, to), style);
-//            Paragraph<PS, S> right = subSequence(to);
-//            return left.concat(middle).concat(right);
-//        }
-//    }
-
-    /**
-     * Restyles (all?) segments of this paragraph.
-     *
-     * @param from The start index of the range to restyle within this paragraph
-     * @param styleSpans The style spans which correspond to the segments of this paragraph.
-     *
-     * @return The restyled paragraph
-     */
     public Paragraph<PS, S> restyle(int from, StyleSpans<? extends S> styleSpans) {
         int len = styleSpans.length();
         if(styleSpans.equals(getStyleSpans(from, from + len))) {
@@ -237,12 +219,10 @@ public final class Paragraph<PS, S> {
 
             offset = end;
         }
-        
         Paragraph<PS, S> middle = new Paragraph<>(paragraphStyle, middleSegs);
 
         Paragraph<PS, S> left = trim(from);
         Paragraph<PS, S> right = subSequence(from + len);
-
         return left.concat(middle).concat(right);
     }
 
@@ -305,13 +285,6 @@ public final class Paragraph<PS, S> {
         return builder.create();
     }
 
-    /**
-     * 
-     * @param from The index of the first character in this Paragraph.
-     * @param to The index of the last character + 1
-     *
-     * @return The style spans for a range within this paragraph. 
-     */
     public StyleSpans<S> getStyleSpans(int from, int to) {
         Position start = navigator.offsetToPosition(from, Forward);
         Position end = to == from
@@ -323,31 +296,19 @@ public final class Paragraph<PS, S> {
         int n = endSegIdx - startSegIdx + 1;
         StyleSpansBuilder<S> builder = new StyleSpansBuilder<>(n);
 
-        System.err.printf("PARA: %s, %s\n", startSegIdx, endSegIdx);
-
         if(startSegIdx == endSegIdx) {
             Segment<S> seg = segments.get(startSegIdx);
             builder.add(seg.getStyle(), to - from);
         } else {
             Segment<S> startSeg = segments.get(startSegIdx);
-
-            System.err.printf("  %s - %s\n", startSeg.getClass().getSimpleName(), startSeg.length());
-
             builder.add(startSeg.getStyle(), startSeg.length() - start.getMinor());
 
             for(int i = startSegIdx + 1; i < endSegIdx; ++i) {
                 Segment<S> seg = segments.get(i);
-                
-                
-                
-                
-                
-                System.err.printf("  %s - %s\n", seg.getClass().getSimpleName(), seg.length());
                 builder.add(seg.getStyle(), seg.length());
             }
 
             Segment<S> endSeg = segments.get(endSegIdx);
-            System.err.printf("  %s - %s\n", endSeg.getClass().getSimpleName(), endSeg.length());
             builder.add(endSeg.getStyle(), end.getMinor());
         }
 
@@ -392,6 +353,12 @@ public final class Paragraph<PS, S> {
     @Override
     public int hashCode() {
         return Objects.hash(paragraphStyle, segments);
+    }
+
+    public void dump() {
+        for (Segment<S> seg : getSegments()) {
+            System.err.println("   " + seg);
+        }
     }
 
 }

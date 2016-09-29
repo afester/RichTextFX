@@ -1,6 +1,8 @@
 package org.fxmisc.richtext.model;
 
 import static org.fxmisc.richtext.model.ReadOnlyStyledDocument.*;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.*;
 
 import java.util.List;
@@ -38,4 +40,47 @@ public class ReadOnlyStyledDocumentTest {
         });
     }
 
+    @Test
+    public void testRestyle() {
+        final String fooBar = "Foo Bar";
+        final String and = " and ";
+        final String helloWorld = "Hello World";
+        
+        SimpleEditableStyledDocument<String, String> doc0 = new SimpleEditableStyledDocument<>("", ""); //fromString(fooBar, "", "bold");
+
+        ReadOnlyStyledDocument<String, String> text = fromString(fooBar, "", "bold");
+        doc0.replace(doc0.getLength(),  doc0.getLength(), text);
+
+        text = fromString(and, "", "");
+        doc0.replace(doc0.getLength(),  doc0.getLength(), text);
+
+        text = fromString(helloWorld, "", "bold");
+        doc0.replace(doc0.getLength(),  doc0.getLength(), text);
+
+        System.err.println("####");
+        for (Paragraph<String, String> par : doc0.getParagraphs()) {
+          for (Segment<String> seg : par.getSegments()) {
+            System.err.println(seg);
+          }
+        }
+        System.err.println("####\n");
+
+        StyleSpans<String> styles = doc0.getStyleSpans(4,  17);
+        assertThat("Invalid number of Spans", styles.getSpanCount(), equalTo(3));
+        System.err.println(styles);
+
+        StyleSpans<String> newStyles = styles.mapStyles(style -> "italic");
+        System.err.println(newStyles);
+
+        doc0.setStyleSpans(4, newStyles);
+
+        System.err.println("####");
+        for (Paragraph<String, String> par : doc0.getParagraphs()) {
+          for (Segment<String> seg : par.getSegments()) {
+            System.err.println(seg);
+          }
+        }
+        System.err.println("####\n");
+    }
+    
 }

@@ -2,12 +2,6 @@ package org.fxmisc.richtext.model;
 
 import java.util.Objects;
 
-
-/**
- * A container for a style which applies to a text fragment of a specific length.
- *
- * @param <S> The style to store in this container.
- */
 public class StyleSpan<S> {
 
     private final S style;
@@ -48,5 +42,10 @@ public class StyleSpan<S> {
     @Override
     public int hashCode() {
         return Objects.hash(style, length);
+    }
+    
+    @Override
+    public String toString() {
+        return String.format("StyleSpan[length=%s, style=%s]", length, style);
     }
 }

@@ -401,29 +401,25 @@ public class RichText extends Application {
      * Action listener which inserts a new image at the current caret position.
      */
     private void insertImage() {
-        area.getDocument().dump();
-
-//        
-//        String initialDir = System.getProperty("user.dir");
-//        FileChooser fileChooser = new FileChooser();
-//        fileChooser.setTitle("Insert image");
-//        fileChooser.setInitialDirectory(new File(initialDir));
-//        File selectedFile = fileChooser.showOpenDialog(mainStage);
-//        if (selectedFile != null) {
-//            String imagePath = selectedFile.getAbsolutePath();
-//            ReadOnlyStyledDocument<ParStyle, TextStyle> ros = 
-//                    ReadOnlyStyledDocument.from(new LinkedImage<>(imagePath, TextStyle.EMPTY), 
-//                                                ParStyle.EMPTY, TextStyle.EMPTY); 
-//            area.replaceSelection(ros);
-//        }
+        
+        String initialDir = System.getProperty("user.dir");
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Insert image");
+        fileChooser.setInitialDirectory(new File(initialDir));
+        File selectedFile = fileChooser.showOpenDialog(mainStage);
+        if (selectedFile != null) {
+            String imagePath = selectedFile.getAbsolutePath();
+            ReadOnlyStyledDocument<ParStyle, TextStyle> ros = 
+                    ReadOnlyStyledDocument.from(new LinkedImage<>(imagePath, TextStyle.EMPTY), 
+                                                ParStyle.EMPTY, TextStyle.EMPTY); 
+            area.replaceSelection(ros);
+        }
     }
-
 
     private void updateStyleInSelection(Function<StyleSpans<TextStyle>, TextStyle> mixinGetter) {
         IndexRange selection = area.getSelection();
         if(selection.getLength() != 0) {
             StyleSpans<TextStyle> styles = area.getStyleSpans(selection);
-            System.err.printf("STYLE SPANS: %s\n", styles);
             TextStyle mixin = mixinGetter.apply(styles);
             StyleSpans<TextStyle> newStyles = styles.mapStyles(style -> style.updateWith(mixin));
             area.setStyleSpans(selection.getStart(), newStyles);

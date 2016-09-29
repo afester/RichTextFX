@@ -37,19 +37,17 @@ public class RectangleObject extends CustomObject<Collection<String>> {
     }
 
     @Override
-    public void encode(DataOutputStream os, Codec<Collection<String>> styleCodec) throws IOException {
+    public void encode(DataOutputStream os) throws IOException {
         Codec.STRING_CODEC.encode(os, Double.toString(width));
         Codec.STRING_CODEC.encode(os, Double.toString(height));
     }
 
     @Override
-    public void decode(DataInputStream is, Codec<Collection<String>> styleCodec) throws IOException {
+    public void decode(DataInputStream is) throws IOException {
         try {
             width = Double.parseDouble(Codec.STRING_CODEC.decode(is));
             height = Double.parseDouble(Codec.STRING_CODEC.decode(is));
         } catch (NumberFormatException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -58,5 +56,10 @@ public class RectangleObject extends CustomObject<Collection<String>> {
     public Node createNode() {
         Rectangle result = new Rectangle(getWidth(), getHeight());
         return result;
+    }
+    
+    @Override
+    public String toString() {
+        return String.format("RectangleObject[width=%s, height=%s]", width, height);
     }
 }

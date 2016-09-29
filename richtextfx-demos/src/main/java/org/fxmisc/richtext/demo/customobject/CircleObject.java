@@ -31,17 +31,15 @@ public class CircleObject extends CustomObject<Collection<String>> {
     }
 
     @Override
-    public void encode(DataOutputStream os, Codec<Collection<String>> styleCodec) throws IOException {
+    public void encode(DataOutputStream os) throws IOException {
         Codec.STRING_CODEC.encode(os, Double.toString(radius));
     }
 
     @Override
-    public void decode(DataInputStream is, Codec<Collection<String>> styleCodec) throws IOException {
+    public void decode(DataInputStream is) throws IOException {
         try {
             radius = Double.parseDouble(Codec.STRING_CODEC.decode(is));
         } catch (NumberFormatException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -50,6 +48,11 @@ public class CircleObject extends CustomObject<Collection<String>> {
     public Node createNode() {
         Circle result = new Circle(getRadius());
         return result;
+    }
+    
+    @Override
+    public String toString() {
+        return String.format("CircleObject[radius=%s]", radius);
     }
 
 }

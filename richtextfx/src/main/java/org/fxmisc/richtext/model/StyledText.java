@@ -15,8 +15,6 @@ public class StyledText<S> implements Segment<S> {
     StyledText() {}
 
     public StyledText(String text, S style) {
-        new Throwable().printStackTrace();
-
         this.text = text;
         this.style = style;
     }
@@ -37,22 +35,22 @@ public class StyledText<S> implements Segment<S> {
     }
 
     @Override
-    public Segment<S> subSequence(int start, int end) {
+    public StyledText<S> subSequence(int start, int end) {
         return new StyledText<>(text.substring(start, end), style);
     }
 
     @Override
-    public Segment<S> subSequence(int start) {
+    public StyledText<S> subSequence(int start) {
         return new StyledText<>(text.substring(start), style);
     }
 
     @Override
-    public Segment<S> append(String str) {
+    public StyledText<S> append(String str) {
         return new StyledText<>(text + str, style);
     }
 
     @Override
-    public Segment<S> spliced(int from, int to, CharSequence replacement) {
+    public StyledText<S> spliced(int from, int to, CharSequence replacement) {
         String left = text.substring(0, from);
         String right = text.substring(to);
         return new StyledText<>(left + replacement + right, style);
@@ -61,6 +59,11 @@ public class StyledText<S> implements Segment<S> {
     @Override
     public S getStyle() {
         return style;
+    }
+
+    @Override
+    public void setStyle(S style) {
+        this.style = style;
     }
 
     @Override
@@ -84,6 +87,18 @@ public class StyledText<S> implements Segment<S> {
         return Objects.hash(text, style);
     }
 
+
+    @Override
+    public boolean canJoin(Segment<S> right) {
+
+        if (right instanceof StyledText) {
+            return Objects.equals(getStyle(), right.getStyle());
+        }
+
+        return false;
+    }
+
+    
     @Override
     public void encode(DataOutputStream os, Codec<S> styleCodec) throws IOException {
         Codec.STRING_CODEC.encode(os, getText());
@@ -109,18 +124,4 @@ public class StyledText<S> implements Segment<S> {
         StyledText.nodeFactory = (Function<StyledText, Node>) (Object) nodeFactory;
     }
 
-    @Override
-    public boolean canJoin(Segment<S> right) {
-
-        if (right instanceof StyledText) {
-            return Objects.equals(getStyle(), right.getStyle());
-        }
-
-        return false;
-    }
-
-    @Override
-    public void setStyle(S style) {
-        this.style = style;
-    }
 }

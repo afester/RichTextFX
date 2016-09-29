@@ -11,38 +11,33 @@ import java.io.IOException;
  */
 public abstract class CustomObject<S> implements Segment<S> {
 
-    @Override
-    public void setStyle(S style) {
-        this.style = style;
-    }
-
-    protected S style; //  = new ;    // the style of a custom object is unique and different from all other styles ...
+    protected S style;
 
     protected CustomObject() {}
 
-    CustomObject(S style) {
+    public CustomObject(S style) {
         this.style = style;
     }
 
-
+    
     @Override
-    public CustomObject<S> subSequence(int start, int end) {
-//        if (start == 0 && end == 1) {
+    public Segment<S> subSequence(int start, int end) {
+        if (start == 0 && end == 1) {
             return this;
-//        }
-//        return new StyledText<>("", getStyle());
+        }
+        return new StyledText<>("", style);
     }
 
 
     @Override
-    public CustomObject<S> subSequence(int start) {
-//        if (start == 1) {
-//            return new StyledText<>("", getStyle());
-//        }
+    public Segment<S> subSequence(int start) {
+        if (start == 1) {
+            return new StyledText<>("", style);
+        }
         return this;
     }
 
-
+    
     @Override
     public CustomObject<S> append(String str) {
         throw new UnsupportedOperationException();
@@ -82,10 +77,15 @@ public abstract class CustomObject<S> implements Segment<S> {
         return style;
     }
 
+    @Override
+    public void setStyle(S style) {
+        this.style = style;
+    }
+
     public abstract void encode(DataOutputStream os) throws IOException;
 
     @Override
-    public void encode(DataOutputStream os, Codec<S> styleCodec) throws IOException {
+    public final void encode(DataOutputStream os, Codec<S> styleCodec) throws IOException {
         encode(os);
         styleCodec.encode(os, style);
     }
@@ -93,7 +93,7 @@ public abstract class CustomObject<S> implements Segment<S> {
     public abstract void decode(DataInputStream is) throws IOException;
 
     @Override
-    public void decode(DataInputStream is, Codec<S> styleCodec) throws IOException {
+    public final void decode(DataInputStream is, Codec<S> styleCodec) throws IOException {
         decode(is);
         style = styleCodec.decode(is);
     }

@@ -49,24 +49,25 @@ public class LinkedImage<S> extends CustomObject<S> {
 
 
     @Override
-    public void encode(DataOutputStream os/*, Codec<S> styleCodec*/) throws IOException {
+    public void encode(DataOutputStream os) throws IOException {
         Codec.STRING_CODEC.encode(os, imagePath);
-        // styleCodec.encode(os, style);
     }
 
+    
     @Override
-    public void decode(DataInputStream is/*, Codec<S> styleCodec*/) throws IOException {
+    public void decode(DataInputStream is) throws IOException {
         imagePath = Codec.STRING_CODEC.decode(is);
-        // style = styleCodec.decode(is);
     }
 
+    
     @Override
     public String toString() {
         return String.format("LinkedImage[path=%s]", imagePath);
     }
 
+    
     @SuppressWarnings("rawtypes")
-    private static Function<LinkedImage, Node> nodeFactory;
+    private static Function<CustomObject, Node> nodeFactory;
 
     @Override
     public Node createNode() {
@@ -75,6 +76,6 @@ public class LinkedImage<S> extends CustomObject<S> {
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public static <S> void setNodeFactory(Function<LinkedImage<S>, Node> nodeFactory) {
-        LinkedImage.nodeFactory = (Function<LinkedImage, Node>) (Object) nodeFactory;
+        LinkedImage.nodeFactory = (Function<CustomObject, Node>) (Object) nodeFactory;
     }
 }

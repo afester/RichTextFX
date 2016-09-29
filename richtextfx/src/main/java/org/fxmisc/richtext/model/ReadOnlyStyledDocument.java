@@ -97,13 +97,13 @@ public final class ReadOnlyStyledDocument<PS, S> implements StyledDocument<PS, S
 
     /**
      * Creates a new ReadOnlyStyledDocument with one Segment.
+     * The resulting ReadOnlyStyledDocument can be inserted or appended to a StyledTextArea.
      *
      * @param seg   The segment which shall be contained in the document.
      * @param paragraphStyle The paragraph style to use for the paragraph which contains the segment.
      * @param style The style to use for the segment.
      *
-     * @return A StyledDocument with the custom object. The StyledDocument can be
-     *         inserted or appended to the StyledTextArea.
+     * @return A ReadOnlyStyledDocument with the given segment.
      */
     public static <PS, S> ReadOnlyStyledDocument<PS, S> from(Segment<S> obj, PS paragraphStyle, S textStyle) {
         List<Paragraph<PS, S>> res = new ArrayList<>(1);
@@ -176,16 +176,15 @@ public final class ReadOnlyStyledDocument<PS, S> implements StyledDocument<PS, S
             @Override
             public Segment<S> decode(DataInputStream is) throws IOException {
                 String segmentType = is.readUTF();
-                Segment<S> result = null;
                 try {
                     @SuppressWarnings("unchecked")
                     Class<Segment<S>> clazz = (Class<Segment<S>>) Class.forName(segmentType);
-                    result = (Segment<S>) clazz.newInstance();
+                    Segment<S> result = (Segment<S>) clazz.newInstance();
+                    result.decode(is, styleCodec);
+                    return result;
                 } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-                    e.printStackTrace();
+                    throw new IOException("Could not create Segment for " + segmentType, e);
                 }
-                result.decode(is, styleCodec);
-                return result;
             }
 
         };
@@ -430,17 +429,5 @@ public final class ReadOnlyStyledDocument<PS, S> implements StyledDocument<PS, S
                 return tree.getSummaryBetween(0, major).get().length() + 1 + minor;
             }
         }
-    }
-    
-    
-    public void dump() {
-        System.err.println("ReadOnlyStyledDocument:");
-        for (Paragraph<PS, S> p : this.getParagraphs()) {
-            System.err.println("  Paragraph:");
-            for (Segment<S> seg : p.getSegments()) {
-                System.err.printf("    %s - \"%s\" - %s\n", seg.getClass().getName(), seg.getText(), seg.getStyle());
-            }
-        }
-        
     }
 }

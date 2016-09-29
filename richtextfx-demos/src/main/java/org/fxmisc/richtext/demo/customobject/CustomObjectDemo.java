@@ -34,19 +34,25 @@ public class CustomObjectDemo extends Application {
 
         // create the sample document
         textArea.replaceText(0, 0, "This example shows how to add custom nodes, for example Rectangles ");
-        textArea.append(
+        ReadOnlyStyledDocument<Collection<String>, Collection<String>> d1 = 
                 ReadOnlyStyledDocument.from(new RectangleObject(20, 10), 
-                                            new ArrayList<String>(), new ArrayList<String>()));
+                                            new ArrayList<String>(), new ArrayList<String>()); 
+        textArea.append(d1);
         textArea.appendText(" or Circles ");
-        textArea.append(
-                ReadOnlyStyledDocument.from(new CircleObject(5), 
-                                            new ArrayList<String>(), new ArrayList<String>()));
-        textArea.appendText("\nImages are supported by default (no need to register them): ");
-        textArea.append(
-                ReadOnlyStyledDocument.from(new LinkedImage<Collection<String>>("sample.png", new ArrayList<String>()), 
-                                            new ArrayList<String>(), new ArrayList<String>()));
-        textArea.appendText("\nNow, select some text from above (including one or more of the custom objects) using CTRL-C, and paste it somewhere in the document with CTRL-V.");
 
+        ReadOnlyStyledDocument<Collection<String>, Collection<String>> d2 =
+                ReadOnlyStyledDocument.from(new CircleObject(5), 
+                                            new ArrayList<String>(), new ArrayList<String>());
+        textArea.append(d2);
+
+        textArea.appendText("\nImages are supported by default: ");
+        ReadOnlyStyledDocument<Collection<String>, Collection<String>> d3 =
+                ReadOnlyStyledDocument.from(new LinkedImage<Collection<String>>("sample.png", new ArrayList<String>()), 
+                                            new ArrayList<String>(), new ArrayList<String>());
+        textArea.append(d3);
+
+        textArea.appendText("\nNow, select some text from above (including one or more of the custom objects) using CTRL-C, and paste it somewhere in the document with CTRL-V.");
+        
         Scene scene = new Scene(new StackPane(new VirtualizedScrollPane<>(textArea)), 600, 400);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Custom Object demo");
