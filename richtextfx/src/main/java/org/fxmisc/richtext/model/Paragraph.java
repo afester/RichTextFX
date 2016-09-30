@@ -61,7 +61,7 @@ public final class Paragraph<PS, SEG, S> {
     private int length = -1;
     public int length() {
         if(length == -1) {
-            length = segments.stream().mapToInt(seg -> segmentOps.length(seg) /*StyledText::length*/).sum();
+            length = segments.stream().mapToInt(segmentOps::length).sum();
         }
         return length;
     }
@@ -334,7 +334,7 @@ public final class Paragraph<PS, SEG, S> {
     public String toString() {
         return
                 "Par[" + paragraphStyle  + "; " +
-                segments.stream().map(seg -> segmentOps.toString(seg) /*StyledText::toString*/)
+                segments.stream().map(segmentOps::toString)
                         .reduce((s1, s2) -> s1 + "," + s2).orElse("") +
                 "]";
     }
