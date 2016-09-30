@@ -6,8 +6,6 @@ import java.util.List;
 
 import org.junit.Test;
 
-import javafx.scene.control.IndexRange;
-
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -79,28 +77,27 @@ public class CustomObjectTest {
 
         StyleSpans<String> styles = doc.getStyleSpans(6,  17);
         assertThat("Invalid number of Spans", styles.getSpanCount(), equalTo(3));
-        System.err.println(styles);
 
         StyleSpans<String> newStyles = styles.mapStyles(style -> "italic");
-
-        System.err.println(newStyles);
-
         doc.setStyleSpans(6, newStyles);
 
         // Assert that the document now contains one paragraph with five segments
+        //  StyledText[text="Hello ", style=bold]
+        //  StyledText[text="World", style=italic]
+        //  LinkedImage[path=sample.png]
+        //  StyledText[text="Hello", style=italic]
+        //  StyledText[text=" Moon", style=bold]
 
         assertThat(doc.getParagraphs().size(), equalTo(1));
-        Paragraph<Boolean, String> p = doc.getParagraphs().get(0);
-        List<Segment<String>> segs = p.getSegments();
+        List<Segment<String>> segs = doc.getParagraphs().get(0).getSegments();
 
         assertThat(segs.size(), equalTo(5));
-
-        System.err.println("------");
-        for (Paragraph<Boolean, String> par : doc.getParagraphs()) {
-            for (Segment<String> seg : par.getSegments()) {
-                System.err.println(seg);
-            }
-        }
+        assertThat(segs.get(0).getText(), equalTo("Hello "));
+        assertThat(segs.get(1).getText(), equalTo("World"));
+        assertThat(segs.get(2).getText(), equalTo("\ufffc"));
+        assertThat(segs.get(2),           instanceOf(LinkedImage.class));
+        assertThat(segs.get(3).getText(), equalTo("Hello"));
+        assertThat(segs.get(4).getText(), equalTo(" Moon"));
     }
 
 }

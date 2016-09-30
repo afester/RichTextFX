@@ -46,7 +46,7 @@ public class ReadOnlyStyledDocumentTest {
         final String and = " and ";
         final String helloWorld = "Hello World";
         
-        SimpleEditableStyledDocument<String, String> doc0 = new SimpleEditableStyledDocument<>("", ""); //fromString(fooBar, "", "bold");
+        SimpleEditableStyledDocument<String, String> doc0 = new SimpleEditableStyledDocument<>("", "");
 
         ReadOnlyStyledDocument<String, String> text = fromString(fooBar, "", "bold");
         doc0.replace(doc0.getLength(),  doc0.getLength(), text);
@@ -57,30 +57,21 @@ public class ReadOnlyStyledDocumentTest {
         text = fromString(helloWorld, "", "bold");
         doc0.replace(doc0.getLength(),  doc0.getLength(), text);
 
-        System.err.println("####");
-        for (Paragraph<String, String> par : doc0.getParagraphs()) {
-          for (Segment<String> seg : par.getSegments()) {
-            System.err.println(seg);
-          }
-        }
-        System.err.println("####\n");
-
         StyleSpans<String> styles = doc0.getStyleSpans(4,  17);
         assertThat("Invalid number of Spans", styles.getSpanCount(), equalTo(3));
-        System.err.println(styles);
 
         StyleSpans<String> newStyles = styles.mapStyles(style -> "italic");
-        System.err.println(newStyles);
-
         doc0.setStyleSpans(4, newStyles);
 
-        System.err.println("####");
-        for (Paragraph<String, String> par : doc0.getParagraphs()) {
-          for (Segment<String> seg : par.getSegments()) {
-            System.err.println(seg);
-          }
-        }
-        System.err.println("####\n");
+        // assert the new segment structure:
+        //  StyledText[text="Foo ", style=bold]
+        //  StyledText[text="Bar and Hello", style=italic]
+        //  StyledText[text=" World", style=bold]
+        List<Segment<String>> result = doc0.getParagraphs().get(0).getSegments();
+        assertThat(result.size(), equalTo(3));
+        assertThat(result.get(0).getText(), equalTo("Foo "));
+        assertThat(result.get(1).getText(), equalTo("Bar and Hello"));
+        assertThat(result.get(2).getText(), equalTo(" World"));
     }
     
 }
