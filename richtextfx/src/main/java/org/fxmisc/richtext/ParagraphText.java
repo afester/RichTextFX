@@ -51,7 +51,7 @@ class ParagraphText<PS, SEG, S> extends TextFlowExt {
     private final List<Path> backgroundShapes = new ArrayList<>();
     private final List<Path> underlineShapes = new ArrayList<>();
 
-    private final SegmentOps<SEG, S> segmentOps = null;
+    private final SegmentOps<SEG, S> segmentOps;
 
     // proxy for caretShape.visibleProperty() that implements unbind() correctly.
     // This is necessary due to a bug in BooleanPropertyBase#unbind().
@@ -61,8 +61,9 @@ class ParagraphText<PS, SEG, S> extends TextFlowExt {
         caretShape.visibleProperty().bind(caretVisible);
     }
 
-    public ParagraphText(Paragraph<PS, SEG, S> par, BiConsumer<? super TextExt, S> applyStyle) {
+    public ParagraphText(Paragraph<PS, SEG, S> par, BiConsumer<? super TextExt, S> applyStyle, SegmentOps<SEG, S> segOps) {
         this.paragraph = par;
+        this.segmentOps = segOps;
 
         getStyleClass().add("paragraph-text");
 

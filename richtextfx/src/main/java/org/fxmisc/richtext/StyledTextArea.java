@@ -1118,7 +1118,7 @@ public class StyledTextArea<PS, SEG, S> extends Region
             BiConsumer<? super TextExt, S> applyStyle,
             BiConsumer<TextFlow, PS> applyParagraphStyle) {
 
-        ParagraphBox<PS, SEG, S> box = new ParagraphBox<>(paragraph, applyParagraphStyle, applyStyle);
+        ParagraphBox<PS, SEG, S> box = new ParagraphBox<>(paragraph, applyParagraphStyle, applyStyle, getContent().getSegOps());
 
         box.highlightFillProperty().bind(highlightFill);
         box.highlightTextFillProperty().bind(highlightTextFill);

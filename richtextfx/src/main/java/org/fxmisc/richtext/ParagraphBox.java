@@ -25,6 +25,7 @@ import javafx.scene.paint.Paint;
 import javafx.scene.text.TextFlow;
 
 import org.fxmisc.richtext.model.Paragraph;
+import org.fxmisc.richtext.model.SegmentOps;
 import org.fxmisc.richtext.util.MouseStationaryHelper;
 import org.reactfx.EventStream;
 import org.reactfx.util.Either;
@@ -70,9 +71,9 @@ class ParagraphBox<PS, SEG, S> extends Region {
     public void setIndex(int index) { this.index.setValue(index); }
     public int getIndex() { return index.getValue(); }
 
-    ParagraphBox(Paragraph<PS, SEG, S> par, BiConsumer<TextFlow, PS> applyParagraphStyle, BiConsumer<? super TextExt, S> applyStyle) {
+    ParagraphBox(Paragraph<PS, SEG, S> par, BiConsumer<TextFlow, PS> applyParagraphStyle, BiConsumer<? super TextExt, S> applyStyle, SegmentOps<SEG, S> segOps) {
         this.getStyleClass().add("paragraph-box");
-        this.text = new ParagraphText<>(par, applyStyle);
+        this.text = new ParagraphText<>(par, applyStyle, segOps);
         applyParagraphStyle.accept(this.text, par.getParagraphStyle());
         this.index = Var.newSimpleVar(0);
         getChildren().add(text);
