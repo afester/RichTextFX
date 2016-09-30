@@ -84,6 +84,7 @@ public final class SimpleEditableStyledDocument<PS, SEG, S> implements EditableS
     @Override public final boolean isBeingUpdated() { return beingUpdated.get(); }
 
     private final SegmentOps<SEG, S> segmentOps;
+    @Override public final SegmentOps<SEG, S> getSegOps() { return segmentOps; }
 
     SimpleEditableStyledDocument(Paragraph<PS, SEG, S> initialParagraph, SegmentOps<SEG, S> segmentOps) {
         this.doc = new ReadOnlyStyledDocument<>(Collections.singletonList(initialParagraph), segmentOps);

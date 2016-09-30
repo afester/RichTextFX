@@ -619,7 +619,7 @@ public class StyledTextAreaModel<PS, SEG, S>
     @Override
     public void replaceText(int start, int end, String text) {
         StyledDocument<PS, SEG, S> doc = ReadOnlyStyledDocument.fromString(
-                text, getParagraphStyleForInsertionAt(start), getStyleForInsertionAt(start));
+                text, getParagraphStyleForInsertionAt(start), getStyleForInsertionAt(start), content.getSegOps());
         replace(start, end, doc);
     }
 

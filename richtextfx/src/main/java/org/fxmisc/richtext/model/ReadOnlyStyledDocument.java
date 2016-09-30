@@ -66,7 +66,7 @@ public final class ReadOnlyStyledDocument<PS, SEG, S> implements StyledDocument<
     private static final BiFunction<Summary, Integer, Either<Integer, Integer>> NAVIGATE =
             (s, i) -> i <= s.length() ? left(i) : right(i - (s.length() + 1));
 
-    public static <PS, SEG, S> ReadOnlyStyledDocument<PS, SEG, S> fromString(String str, PS paragraphStyle, S style) {
+    public static <PS, SEG, S> ReadOnlyStyledDocument<PS, SEG, S> fromString(String str, PS paragraphStyle, S style, SegmentOps<SEG, S> segmentOps) {
         Matcher m = LINE_TERMINATOR.matcher(str);
 
         int n = 1;
@@ -90,13 +90,13 @@ public final class ReadOnlyStyledDocument<PS, SEG, S> implements StyledDocument<
         if(doc instanceof ReadOnlyStyledDocument) {
             return (ReadOnlyStyledDocument<PS, SEG, S>) doc;
         } else {
-            return new ReadOnlyStyledDocument<>(doc.getParagraphs(), segmentOps);
+            return new ReadOnlyStyledDocument<>(doc.getParagraphs(), doc.getSegOps());
         }
     }
 
-    public static <PS, SEG, S> Codec<StyledDocument<PS, SEG, S>> codec(Codec<PS> pCodec, Codec<S> tCodec) {
+    public static <PS, SEG, S> Codec<StyledDocument<PS, SEG, S>> codec(Codec<PS> pCodec, Codec<S> tCodec, SegmentOps<SEG, S> segmentOps) {
         return new Codec<StyledDocument<PS, SEG, S>>() {
-            private final Codec<List<Paragraph<PS, SEG, S>>> codec = Codec.listCodec(paragraphCodec(pCodec, tCodec));
+            private final Codec<List<Paragraph<PS, SEG, S>>> codec = Codec.listCodec(paragraphCodec(pCodec, tCodec, segmentOps));
 
             @Override
             public String getName() {
@@ -116,9 +116,9 @@ public final class ReadOnlyStyledDocument<PS, SEG, S> implements StyledDocument<
         };
     }
 
-    private static <PS, SEG, S> Codec<Paragraph<PS, SEG, S>> paragraphCodec(Codec<PS> pCodec, Codec<S> tCodec) {
+    private static <PS, SEG, S> Codec<Paragraph<PS, SEG, S>> paragraphCodec(Codec<PS> pCodec, Codec<S> tCodec, SegmentOps<SEG, S> segmentOps) {
         return new Codec<Paragraph<PS, SEG, S>>() {
-            private final Codec<List<SEG>> segmentsCodec = Codec.listCodec(styledTextCodec(tCodec));
+            private final Codec<List<SEG>> segmentsCodec = Codec.listCodec(styledTextCodec(tCodec, segmentOps));
 
             @Override
             public String getName() {
@@ -140,7 +140,7 @@ public final class ReadOnlyStyledDocument<PS, SEG, S> implements StyledDocument<
         };
     }
 
-    private static <SEG, S> Codec<SEG> styledTextCodec(Codec<S> styleCodec) {
+    private static <SEG, S> Codec<SEG> styledTextCodec(Codec<S> styleCodec, SegmentOps<SEG, S> segmentOps) {
         return new Codec<SEG>() {
 
             @Override
@@ -171,6 +171,7 @@ public final class ReadOnlyStyledDocument<PS, SEG, S> implements StyledDocument<
     private List<Paragraph<PS, SEG, S>> paragraphs = null;
 
     private final SegmentOps<SEG, S> segmentOps;
+    public final SegmentOps<SEG, S> getSegOps() { return segmentOps; }
 
     private ReadOnlyStyledDocument(NonEmptyFingerTree<Paragraph<PS, SEG, S>, Summary> tree, SegmentOps<SEG, S> segmentOps) {
         this.tree = tree;
