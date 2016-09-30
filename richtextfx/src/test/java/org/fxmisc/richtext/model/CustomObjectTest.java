@@ -17,7 +17,7 @@ public class CustomObjectTest {
         SimpleEditableStyledDocument<Boolean, String> doc = 
                 new SimpleEditableStyledDocument<>(true, "");
         StyledDocument<Boolean, String> customObj = 
-                ReadOnlyStyledDocument.from(new LinkedImage<String>("sample.png", ""), true, "");
+                ReadOnlyStyledDocument.from(new LinkedImage<String>("sample.png", ""), true);
         doc.replace(0, 0, customObj);
         assertEquals(1, doc.getLength());
 
@@ -36,7 +36,7 @@ public class CustomObjectTest {
         StyledDocument<Boolean, String> text = ReadOnlyStyledDocument.fromString(helloWorld, true, "");
         doc.replace(0, 0, text);
 
-        StyledDocument<Boolean, String> customObj = ReadOnlyStyledDocument.from(new LinkedImage<String>("sample.png", ""), true, "");
+        StyledDocument<Boolean, String> customObj = ReadOnlyStyledDocument.from(new LinkedImage<String>("sample.png", ""), true);
         doc.replace(doc.getLength(), doc.getLength(), customObj);
 
         StyledDocument<Boolean, String> text2 = ReadOnlyStyledDocument.fromString(helloMoon, true, "");
@@ -66,7 +66,7 @@ public class CustomObjectTest {
         StyledDocument<Boolean, String> text = ReadOnlyStyledDocument.fromString(helloWorld, true, "bold");
         doc.replace(0, 0, text);
 
-        StyledDocument<Boolean, String> customObj = ReadOnlyStyledDocument.from(new LinkedImage<String>("sample.png", ""), true, "");
+        StyledDocument<Boolean, String> customObj = ReadOnlyStyledDocument.from(new LinkedImage<String>("sample.png", ""), true);
         doc.replace(doc.getLength(), doc.getLength(), customObj);
 
         StyledDocument<Boolean, String> text2 = ReadOnlyStyledDocument.fromString(helloMoon, true, "bold");

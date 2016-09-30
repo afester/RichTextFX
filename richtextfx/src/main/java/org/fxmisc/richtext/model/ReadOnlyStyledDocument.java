@@ -101,13 +101,12 @@ public final class ReadOnlyStyledDocument<PS, S> implements StyledDocument<PS, S
      *
      * @param seg   The segment which shall be contained in the document.
      * @param paragraphStyle The paragraph style to use for the paragraph which contains the segment.
-     * @param style The style to use for the segment.
      *
      * @return A ReadOnlyStyledDocument with the given segment.
      */
-    public static <PS, S> ReadOnlyStyledDocument<PS, S> from(Segment<S> obj, PS paragraphStyle, S textStyle) {
+    public static <PS, S> ReadOnlyStyledDocument<PS, S> from(Segment<S> seg, PS paragraphStyle) {
         List<Paragraph<PS, S>> res = new ArrayList<>(1);
-        Paragraph<PS, S> content = new Paragraph<PS, S>(paragraphStyle, Arrays.asList(obj));
+        Paragraph<PS, S> content = new Paragraph<PS, S>(paragraphStyle, Arrays.asList(seg));
         res.add(content);
         return new ReadOnlyStyledDocument<>(res);
     }
