@@ -543,30 +543,25 @@ public class StyledTextArea<PS, SEG, S> extends Region
                               S initialTextStyle, SegmentOps<SEG, S> segmentOps, BiConsumer<? super TextExt, S> applyStyle,
                               boolean preserveStyle
     ) {
-        this(initialParagraphStyle, applyParagraphStyle, initialTextStyle, segmentOps, applyStyle,
+        this(initialParagraphStyle, applyParagraphStyle, initialTextStyle, applyStyle,
                 new SimpleEditableStyledDocument<>(initialParagraphStyle, initialTextStyle, segmentOps), preserveStyle);
     }
 
     /**
-     * The same as {@link #StyledTextArea(Object, BiConsumer, Object, BiConsumer)} except that
+     * The same as {@link #StyledTextArea(Object, BiConsumer, Object, SegmentOps, BiConsumer)} except that
      * this constructor can be used to create another {@code StyledTextArea} object that
      * shares the same {@link EditableStyledDocument}.
      */
     public StyledTextArea(PS initialParagraphStyle, BiConsumer<TextFlow, PS> applyParagraphStyle,
-                          S initialTextStyle, 
-                          SegmentOps<SEG, S> segmentOps, BiConsumer<? super TextExt, S> applyStyle,
+                          S initialTextStyle, BiConsumer<? super TextExt, S> applyStyle,
                           EditableStyledDocument<PS, SEG, S> document
     ) {
-        this(initialParagraphStyle, applyParagraphStyle, initialTextStyle, segmentOps, applyStyle, document, true);
+        this(initialParagraphStyle, applyParagraphStyle, initialTextStyle, applyStyle, document, true);
 
     }
 
     public StyledTextArea(PS initialParagraphStyle, BiConsumer<TextFlow, PS> applyParagraphStyle,
-                          S initialTextStyle,
-                          
-                          SegmentOps<SEG, S> segmentOps,
-                          
-                          BiConsumer<? super TextExt, S> applyStyle,
+                          S initialTextStyle, BiConsumer<? super TextExt, S> applyStyle,
                           EditableStyledDocument<PS, SEG, S> document, boolean preserveStyle
     ) {
         this.model = new StyledTextAreaModel<>(initialParagraphStyle, initialTextStyle, document, preserveStyle);

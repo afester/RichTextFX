@@ -236,7 +236,7 @@ public class StyledTextAreaModel<PS, SEG, S>
     }
 
     /**
-     * The same as {@link #StyledTextAreaModel(Object, Object)} except that
+     * The same as {@link #StyledTextAreaModel(Object, Object, SegmentOps)} except that
      * this constructor can be used to create another {@code StyledTextArea} object that
      * shares the same {@link EditableStyledDocument}.
      */
