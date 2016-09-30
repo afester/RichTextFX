@@ -4,6 +4,7 @@ import static org.fxmisc.richtext.model.TwoDimensional.Bias.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
@@ -197,37 +198,58 @@ public final class Paragraph<PS, S> {
         }
     }
 
-    public Paragraph<PS, S> restyle(int from, StyleSpans<? extends S> styleSpans) {
+    public Paragraph<PS, S> restyle(int from, StyleSpans<S> styleSpans) {
         int len = styleSpans.length();
         if(styleSpans.equals(getStyleSpans(from, from + len))) {
             return this;
         }
-System.err.println("XXX" + styleSpans.getSpanCount());
-        List<Segment<S>> middleSegs = new ArrayList<>(styleSpans.getSpanCount());
 
-        int offset = 0;
-        for(StyleSpan<? extends S> span: styleSpans) {
-            int end = offset + span.getLength();
-
-            // get the segment at the given position
-            Position pos = navigator.offsetToPosition(offset, Forward);
-            Segment<S> seg = segments.get(pos.getMajor());
-System.err.println("SEGMENT: " + seg);
-            // set the new style
+        // Step 1: Restyle all segments according to the corresponding style span
+        //
+        // Assumptions: 
+        // * borders of segments are aligned to borders of spans
+        // * One style span can span multiple segments
+        // * One segment can (obviously) not span multiple StyleSpans 
+        List<Segment<S>> intermediateSegs = new ArrayList<>(segments.size());
+        int segOff = 0;
+        Iterator<StyleSpan<S>> spans = styleSpans.iterator();
+        StyleSpan<S> span = spans.next();
+        int spanEnd = span.getLength();  
+        for (Segment<S> seg : segments) {
             seg.setStyle(span.getStyle());
-            middleSegs.add(seg);
 
-            offset = end;
+            intermediateSegs.add(seg);
+
+            segOff = segOff + seg.length();
+            if (segOff > spanEnd) {
+                span = (StyleSpan<S>) spans.next();
+                spanEnd += span.getLength();
+            }
         }
-        Paragraph<PS, S> middle = new Paragraph<>(paragraphStyle, middleSegs);
 
+        // Step 2: Join segments with the same style
+        //
+        // Assumptions:
+        // * There is at least one segment available
+        List<Segment<S>> middleSegs = new ArrayList<>(intermediateSegs.size());
+        Iterator<Segment<S>>  segs = intermediateSegs.iterator();
+        Segment<S> currentSeg = (Segment<S>) segs.next();
+        while(segs.hasNext()) {
+            Segment<S> nextSeg = (Segment<S>) segs.next();
+            if (currentSeg.canJoin(nextSeg)) {
+                currentSeg = currentSeg.append(nextSeg.getText());
+            } else {
+                middleSegs.add(currentSeg);
+                currentSeg = nextSeg;
+            }
+        }
+        middleSegs.add(currentSeg);
+
+        Paragraph<PS, S> middle = new Paragraph<>(paragraphStyle, middleSegs);
+        
         Paragraph<PS, S> left = trim(from);
-        System.err.println("LEFT:");
-        left.dump();
         Paragraph<PS, S> right = subSequence(from + len);
-        System.err.println("RIGHT:");
-        right.dump();
-        return left.concat(middle).concat(right);
+       return left.concat(middle).concat(right);
     }
 
     public Paragraph<PS, S> setParagraphStyle(PS paragraphStyle) {

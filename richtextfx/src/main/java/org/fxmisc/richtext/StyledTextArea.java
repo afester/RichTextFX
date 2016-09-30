@@ -566,8 +566,7 @@ public class StyledTextArea<PS, S> extends Region
 
     public StyledTextArea(PS initialParagraphStyle, BiConsumer<TextFlow, PS> applyParagraphStyle,
                           S initialTextStyle, BiConsumer<? super TextExt, S> applyStyle,
-                          EditableStyledDocument<PS, S> document, boolean preserveStyle
-    ) {
+                          EditableStyledDocument<PS, S> document, boolean preserveStyle) {
         this.model = new StyledTextAreaModel<>(initialParagraphStyle, initialTextStyle, document, preserveStyle);
         this.applyStyle = applyStyle;
         this.applyParagraphStyle = applyParagraphStyle;
@@ -1019,7 +1018,7 @@ public class StyledTextArea<PS, S> extends Region
      * </pre>
      * but the actual implementation is more efficient.
      */
-    public void setStyleSpans(int from, StyleSpans<? extends S> styleSpans) {
+    public void setStyleSpans(int from, StyleSpans<S> styleSpans) {
         model.setStyleSpans(from, styleSpans);
     }
 
@@ -1033,7 +1032,7 @@ public class StyledTextArea<PS, S> extends Region
      * </pre>
      * but the actual implementation is more efficient.
      */
-    public void setStyleSpans(int paragraph, int from, StyleSpans<? extends S> styleSpans) {
+    public void setStyleSpans(int paragraph, int from, StyleSpans<S> styleSpans) {
         model.setStyleSpans(paragraph, from, styleSpans);
     }
 
