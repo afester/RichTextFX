@@ -11,6 +11,8 @@ import javafx.stage.Stage;
 
 import org.fxmisc.richtext.InlineCssTextArea;
 import org.fxmisc.richtext.PopupAlignment;
+import org.fxmisc.richtext.model.SegmentOps;
+import org.omg.CORBA.Object;
 
 public class PopupDemo extends Application {
 
@@ -20,7 +22,57 @@ public class PopupDemo extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        InlineCssTextArea area = new InlineCssTextArea("Hello popup!");
+        InlineCssTextArea area = new InlineCssTextArea("Hello popup!", new SegmentOps<Object, String>() {
+            @Override
+            public int length(Object object) {
+                return 0;
+            }
+
+            @Override
+            public char charAt(Object object, int index) {
+                return 0;
+            }
+
+            @Override
+            public String getText(Object object) {
+                return null;
+            }
+
+            @Override
+            public Object subSequence(Object object, int start, int end) {
+                return null;
+            }
+
+            @Override
+            public Object subSequence(Object object, int start) {
+                return null;
+            }
+
+            @Override
+            public Object append(Object object, String str) {
+                return null;
+            }
+
+            @Override
+            public Object spliced(Object object, int from, int to, CharSequence replacement) {
+                return null;
+            }
+
+            @Override
+            public String getStyle(Object object) {
+                return null;
+            }
+
+            @Override
+            public Object create(String text, String style) {
+                return null;
+            }
+
+            @Override
+            public String toString(Object object) {
+                return null;
+            }
+        });
         area.setWrapText(true);
 
         Popup popup = new Popup();
