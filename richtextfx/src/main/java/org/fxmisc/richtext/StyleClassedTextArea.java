@@ -5,6 +5,7 @@ import java.util.Collections;
 
 import org.fxmisc.richtext.model.Codec;
 import org.fxmisc.richtext.model.EditableStyledDocument;
+import org.fxmisc.richtext.model.SegmentOps;
 import org.fxmisc.richtext.model.SimpleEditableStyledDocument;
 
 /**
@@ -25,18 +26,18 @@ public class StyleClassedTextArea extends StyledTextArea<Collection<String>, Str
                 Codec.collectionCodec(Codec.STRING_CODEC)
         );
     }
-    public StyleClassedTextArea(boolean preserveStyle) {
+    public StyleClassedTextArea(SegmentOps<String, Collection<String>> segOps, boolean preserveStyle) {
         this(
                 new SimpleEditableStyledDocument<>(
-                    Collections.<String>emptyList(), Collections.<String>emptyList()
+                    Collections.<String>emptyList(), Collections.<String>emptyList(), segOps
                 ), preserveStyle);
     }
 
     /**
      * Creates a text area with empty text content.
      */
-    public StyleClassedTextArea() {
-        this(true);
+    public StyleClassedTextArea(SegmentOps<String, Collection<String>> segOps) {
+        this(segOps, true);
     }
 
     /**
