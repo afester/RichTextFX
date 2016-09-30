@@ -35,10 +35,10 @@ import javafx.stage.Stage;
 
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.StyledTextArea;
-import org.fxmisc.richtext.demo.StyledTextOps;
+import org.fxmisc.richtext.model.StyledTextOps;
 import org.fxmisc.richtext.model.Paragraph;
 import org.fxmisc.richtext.model.StyleSpans;
-import org.fxmisc.richtext.demo.StyledText;
+import org.fxmisc.richtext.model.StyledText;
 import org.reactfx.SuspendableNo;
 
 public class RichText extends Application {

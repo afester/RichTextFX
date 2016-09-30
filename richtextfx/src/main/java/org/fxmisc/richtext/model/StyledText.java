@@ -1,4 +1,4 @@
-package org.fxmisc.richtext.demo;
+package org.fxmisc.richtext.model;
 
 import java.util.Objects;
 

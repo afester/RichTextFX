@@ -1,6 +1,4 @@
-package org.fxmisc.richtext.demo;
-
-import org.fxmisc.richtext.model.SegmentOps;
+package org.fxmisc.richtext.model;
 
 public final class StyledTextOps<S> implements SegmentOps<StyledText<S>, S> {
 
