@@ -21,7 +21,6 @@ import javafx.scene.shape.StrokeLineCap;
 
 import org.fxmisc.richtext.model.Paragraph;
 import org.fxmisc.richtext.model.SegmentOps;
-//import org.fxmisc.richtext.model.StyledText;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
