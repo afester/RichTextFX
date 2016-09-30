@@ -381,10 +381,4 @@ public final class Paragraph<PS, S> {
         return Objects.hash(paragraphStyle, segments);
     }
 
-    public void dump() {
-        for (Segment<S> seg : getSegments()) {
-            System.err.println("   " + seg);
-        }
-    }
-
 }

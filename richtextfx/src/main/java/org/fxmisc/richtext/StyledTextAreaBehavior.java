@@ -27,6 +27,7 @@ import org.fxmisc.richtext.ParagraphBox.CaretOffsetX;
 import org.fxmisc.wellbehaved.event.EventPattern;
 import org.fxmisc.wellbehaved.event.template.InputMapTemplate;
 import org.reactfx.EventStream;
+import org.reactfx.Subscription;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 

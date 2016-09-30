@@ -138,28 +138,13 @@ public final class SimpleEditableStyledDocument<PS, S> implements EditableStyled
     public void setStyleSpans(int from, StyleSpans<S> styleSpans) {
         int len = styleSpans.length();
         ensureValidRange(from, from + len);
-
         doc.replace(from, from + len, d -> {
             Position i = styleSpans.position(0, 0);
             List<Paragraph<PS, S>> pars = new ArrayList<>(d.getParagraphs().size());
             for(Paragraph<PS, S> p: d.getParagraphs()) {
                 Position j = i.offsetBy(p.length(), Backward);
-                
-                System.err.println("================");
-                System.err.println(styleSpans);
-                
                 StyleSpans<S> spans = styleSpans.subView(i, j);
-                System.err.println(spans);
-
-                System.err.println("1-----------------");
-                p.dump();
-
-                Paragraph<PS, S> newPara = p.restyle(0, spans);
-
-                System.err.println("2-----------------");
-                newPara.dump();
-
-                pars.add(newPara);
+                pars.add(p.restyle(0, spans));
                 i = j.offsetBy(1, Forward); // skip the newline
             }
             return new ReadOnlyStyledDocument<>(pars);

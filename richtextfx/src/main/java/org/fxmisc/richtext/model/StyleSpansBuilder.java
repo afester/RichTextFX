@@ -40,12 +40,6 @@ public class StyleSpansBuilder<S> {
         public StyleSpan<S> getStyleSpan(int index) {
             return spans.get(index);
         }
-        
-        @Override
-        public String toString() {
-            return String.format("StyleSpansImpl(%s)", spans);
-        }
-
     }
 
     static <S> StyleSpans<S> overlay(
@@ -282,12 +276,6 @@ class SubSpans<S> extends StyleSpansBase<S> {
             return original.getStyleSpan(firstIdxInOrig + index);
         }
     }
-    
-    @Override
-    public String toString() {
-        return String.format("SubSpans(original=%s, first=%s, last=%s)", original, firstSpan, lastSpan);
-    }
-    
 }
 
 
@@ -326,11 +314,6 @@ class AppendedSpans<S> extends StyleSpansBase<S> {
         } else {
             return original.getStyleSpan(index);
         }
-    }
-    
-    @Override
-    public String toString() {
-        return "AppendedSpans";
     }
 }
 
@@ -371,12 +354,6 @@ class PrependedSpans<S> extends StyleSpansBase<S> {
             return original.getStyleSpan(index - 1);
         }
     }
-
-    @Override
-    public String toString() {
-        return "PrependedSpans";
-    }
-
 }
 
 
@@ -414,11 +391,6 @@ class UpdatedSpans<S> extends StyleSpansBase<S> {
             return original.getStyleSpan(index);
         }
     }
-
-    @Override
-    public String toString() {
-        return "UpdatedSpans";
-    }
 }
 
 class SingletonSpans<S> extends StyleSpansBase<S> {
@@ -446,10 +418,4 @@ class SingletonSpans<S> extends StyleSpansBase<S> {
             throw new IndexOutOfBoundsException(String.valueOf(index));
         }
     }
-
-    @Override
-    public String toString() {
-        return "SingletonSpans";
-    }
-
 }
