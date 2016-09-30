@@ -221,7 +221,7 @@ public final class Paragraph<PS, S> {
             intermediateSegs.add(seg);
 
             segOff = segOff + seg.length();
-            if (segOff > spanEnd) {
+            if (segOff >= spanEnd && spans.hasNext()) {
                 span = (StyleSpan<S>) spans.next();
                 spanEnd += span.getLength();
             }
@@ -246,10 +246,10 @@ public final class Paragraph<PS, S> {
         middleSegs.add(currentSeg);
 
         Paragraph<PS, S> middle = new Paragraph<>(paragraphStyle, middleSegs);
-        
+
         Paragraph<PS, S> left = trim(from);
         Paragraph<PS, S> right = subSequence(from + len);
-       return left.concat(middle).concat(right);
+        return left.concat(middle).concat(right);
     }
 
     public Paragraph<PS, S> setParagraphStyle(PS paragraphStyle) {
