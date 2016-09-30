@@ -17,6 +17,7 @@ import javafx.scene.input.DataFormat;
 import org.fxmisc.richtext.model.Codec;
 import org.fxmisc.richtext.model.EditActions;
 import org.fxmisc.richtext.model.ReadOnlyStyledDocument;
+import org.fxmisc.richtext.model.SegmentOps;
 import org.fxmisc.richtext.model.StyledDocument;
 import org.fxmisc.richtext.model.TextEditingArea;
 import org.reactfx.util.Tuple2;
@@ -27,6 +28,8 @@ import org.reactfx.util.Tuple2;
 public interface ClipboardActions<PS, SEG, S> extends EditActions<PS, SEG, S> {
 
     Optional<Tuple2<Codec<PS>, Codec<S>>> getStyleCodecs();
+
+    SegmentOps<SEG, S> getSegOps();
 
     /**
      * Transfers the currently selected text to the clipboard,
@@ -50,7 +53,7 @@ public interface ClipboardActions<PS, SEG, S> extends EditActions<PS, SEG, S> {
             content.putString(getSelectedText());
 
             getStyleCodecs().ifPresent(codecs -> {
-                Codec<StyledDocument<PS, SEG, S>> codec = ReadOnlyStyledDocument.codec(codecs._1, codecs._2);
+                Codec<StyledDocument<PS, SEG, S>> codec = ReadOnlyStyledDocument.codec(codecs._1, codecs._2, getSegOps());
                 DataFormat format = dataFormat(codec.getName());
                 StyledDocument<PS, SEG, S> doc = subDocument(selection.getStart(), selection.getEnd());
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -78,7 +81,7 @@ public interface ClipboardActions<PS, SEG, S> extends EditActions<PS, SEG, S> {
 
         if(getStyleCodecs().isPresent()) {
             Tuple2<Codec<PS>, Codec<S>> codecs = getStyleCodecs().get();
-            Codec<StyledDocument<PS, SEG, S>> codec = ReadOnlyStyledDocument.codec(codecs._1, codecs._2);
+            Codec<StyledDocument<PS, SEG, S>> codec = ReadOnlyStyledDocument.codec(codecs._1, codecs._2, getSegOps());
             DataFormat format = dataFormat(codec.getName());
             if(clipboard.hasContent(format)) {
                 byte[] bytes = (byte[]) clipboard.getContent(format);
