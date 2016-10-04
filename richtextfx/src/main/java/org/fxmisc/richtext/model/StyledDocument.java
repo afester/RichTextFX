@@ -3,6 +3,7 @@ package org.fxmisc.richtext.model;
 import static org.fxmisc.richtext.model.TwoDimensional.Bias.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javafx.scene.control.IndexRange;
@@ -19,6 +20,7 @@ public interface StyledDocument<PS, SEG, S> extends TwoDimensional {
 
     StyledDocument<PS, SEG, S> subSequence(int start, int end);
 
+    SegmentOps<SEG, S> getSegOps();
 
     default String getText(IndexRange range) {
         return getText(range.getStart(), range.getEnd());
@@ -32,10 +34,9 @@ public interface StyledDocument<PS, SEG, S> extends TwoDimensional {
         return subSequence(range.getStart(), range.getEnd());
     }
 
-    StyledDocument<PS, SEG, S> subDocument(int paragraphIndex);
-//    default StyledDocument<PS, SEG, S> subDocument(int paragraphIndex) {
-//        return new ReadOnlyStyledDocument<>(Collections.singletonList(getParagraphs().get(paragraphIndex)), segmentOps);
-//    }
+    default StyledDocument<PS, SEG, S> subDocument(int paragraphIndex) {
+        return new ReadOnlyStyledDocument<>(Collections.singletonList(getParagraphs().get(paragraphIndex)), getSegOps());
+    }
 
     default char charAt(int index) {
         Position pos = offsetToPosition(index, Forward);

@@ -35,6 +35,7 @@ import javafx.stage.Stage;
 
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.StyledTextArea;
+import org.fxmisc.richtext.model.StyledTextOps;
 import org.fxmisc.richtext.model.Paragraph;
 import org.fxmisc.richtext.model.StyleSpans;
 import org.fxmisc.richtext.model.StyledText;
@@ -46,9 +47,10 @@ public class RichText extends Application {
         launch(args);
     }
 
-    private final StyledTextArea<ParStyle, TextStyle> area = new StyledTextArea<>(
-                    ParStyle.EMPTY, ( paragraph, style) -> paragraph.setStyle(style.toCss()),
+    private final StyledTextArea<ParStyle, StyledText<TextStyle>, TextStyle> area = new StyledTextArea<>(
+                    ParStyle.EMPTY, (paragraph, style) -> paragraph.setStyle(style.toCss()),
                     TextStyle.EMPTY.updateFontSize(12).updateFontFamily("Serif").updateTextColor(Color.BLACK),
+                    new StyledTextOps<>(),
                     ( text, style) -> text.setStyle(style.toCss()));
     {
         area.setWrapText(true);
@@ -235,7 +237,7 @@ public class RichText extends Application {
                 paragraphBackgroundPicker);
         panel2.getChildren().addAll(sizeCombo, familyCombo, textColorPicker, backgroundColorPicker);
 
-        VirtualizedScrollPane<StyledTextArea<ParStyle, TextStyle>> vsPane = new VirtualizedScrollPane<>(area);
+        VirtualizedScrollPane<StyledTextArea<ParStyle, StyledText<TextStyle>, TextStyle>> vsPane = new VirtualizedScrollPane<>(area);
         VBox vbox = new VBox();
         VBox.setVgrow(vsPane, Priority.ALWAYS);
         vbox.getChildren().addAll(panel1, panel2, vsPane);

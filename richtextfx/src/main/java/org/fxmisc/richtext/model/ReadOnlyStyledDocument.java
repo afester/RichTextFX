@@ -7,7 +7,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
@@ -87,11 +86,11 @@ public final class ReadOnlyStyledDocument<PS, SEG, S> implements StyledDocument<
         return new ReadOnlyStyledDocument<>(res, segmentOps);
     }
 
-    public static <PS, SEG, S> ReadOnlyStyledDocument<PS, SEG, S> from(StyledDocument<PS, SEG, S> doc, SegmentOps<SEG, S> segmentOps) {
+    public static <PS, SEG, S> ReadOnlyStyledDocument<PS, SEG, S> from(StyledDocument<PS, SEG, S> doc) {
         if(doc instanceof ReadOnlyStyledDocument) {
             return (ReadOnlyStyledDocument<PS, SEG, S>) doc;
         } else {
-            return new ReadOnlyStyledDocument<>(doc.getParagraphs(), segmentOps);
+            return new ReadOnlyStyledDocument<>(doc.getParagraphs(), doc.getSegOps());
         }
     }
 
@@ -172,6 +171,7 @@ public final class ReadOnlyStyledDocument<PS, SEG, S> implements StyledDocument<
     private List<Paragraph<PS, SEG, S>> paragraphs = null;
 
     private final SegmentOps<SEG, S> segmentOps;
+    public final SegmentOps<SEG, S> getSegOps() { return segmentOps; }
 
     private ReadOnlyStyledDocument(NonEmptyFingerTree<Paragraph<PS, SEG, S>, Summary> tree, SegmentOps<SEG, S> segmentOps) {
         this.tree = tree;
@@ -267,11 +267,6 @@ public final class ReadOnlyStyledDocument<PS, SEG, S> implements StyledDocument<
     @Override
     public StyledDocument<PS, SEG, S> subSequence(int start, int end) {
         return split(end)._1.split(start)._2;
-    }
-
-    @Override
-    public StyledDocument<PS, SEG, S> subDocument(int paragraphIndex) {
-        return new ReadOnlyStyledDocument<>(Collections.singletonList(getParagraphs().get(paragraphIndex)), segmentOps);
     }
 
     public Tuple3<ReadOnlyStyledDocument<PS, SEG, S>, RichTextChange<PS, SEG, S>, MaterializedListModification<Paragraph<PS, SEG, S>>> replace(

@@ -13,12 +13,10 @@ public class StyledTextAreaModelTest {
     public void testUndoWithWinNewlines() {
         String text1 = "abc\r\ndef";
         String text2 = "A\r\nB\r\nC";
-        
-        final StyledTextOps<Collection<String>> ops = new StyledTextOps<>();
-        StyledTextAreaModel<Collection<String>, StyledText<Collection<String>>, Collection<String>> model = new StyledTextAreaModel<>(
+        StyledTextAreaModel<Collection<String>, Collection<String>> model = new StyledTextAreaModel<>(
                 Collections.<String>emptyList(),
-                Collections.<String>emptyList(),
-                ops);
+                Collections.<String>emptyList()
+        );
 
         model.replaceText(text1);
         model.getUndoManager().forgetHistory();
@@ -33,9 +31,8 @@ public class StyledTextAreaModelTest {
     public void testForBug216() {
         // set up area with some styled text content
         boolean initialStyle = false;
-        final StyledTextOps<Boolean> ops = new StyledTextOps<>();
-        StyledTextAreaModel<String, StyledText<Boolean>, Boolean> model = new StyledTextAreaModel<>(
-                "", initialStyle, ops, new SimpleEditableStyledDocument<>("", initialStyle, ops), true);
+        StyledTextAreaModel<String, Boolean> model = new StyledTextAreaModel<>(
+                "", initialStyle, new SimpleEditableStyledDocument<>("", initialStyle), true);
         model.replaceText("testtest");
         model.setStyle(0, 8, true);
 

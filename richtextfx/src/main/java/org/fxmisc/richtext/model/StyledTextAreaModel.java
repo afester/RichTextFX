@@ -28,7 +28,7 @@ import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
 /**
- * Model for {@link org.fxmisc.richtext.GenericRichtextArea}
+ * Model for {@link org.fxmisc.richtext.StyledTextArea}
  *
  * @param <S> type of style that can be applied to text.
  * @param <PS> type of style that can be applied to Paragraph
@@ -178,8 +178,6 @@ public class StyledTextAreaModel<PS, SEG, S>
     private Position selectionStart2D;
     private Position selectionEnd2D;
 
-    private final SegmentOps<SEG, S> segmentOps;
-
     /**
      * content model
      */
@@ -233,28 +231,27 @@ public class StyledTextAreaModel<PS, SEG, S>
 
     public StyledTextAreaModel(PS initialParagraphStyle, S initialTextStyle, SegmentOps<SEG, S> segmentOps, boolean preserveStyle
     ) {
-        this(initialParagraphStyle, initialTextStyle, segmentOps,
+        this(initialParagraphStyle, initialTextStyle,
                 new SimpleEditableStyledDocument<>(initialParagraphStyle, initialTextStyle, segmentOps), preserveStyle);
     }
 
     /**
-     * The same as {@link #StyledTextAreaModel(Object, Object)} except that
+     * The same as {@link #StyledTextAreaModel(Object, Object, SegmentOps)} except that
      * this constructor can be used to create another {@code StyledTextArea} object that
      * shares the same {@link EditableStyledDocument}.
      */
-    public StyledTextAreaModel(PS initialParagraphStyle, S initialTextStyle, SegmentOps<SEG, S> segmentOps,
+    public StyledTextAreaModel(PS initialParagraphStyle, S initialTextStyle,
                                EditableStyledDocument<PS, SEG, S> document
     ) {
-        this(initialParagraphStyle, initialTextStyle, segmentOps, document, true);
+        this(initialParagraphStyle, initialTextStyle, document, true);
     }
 
-    public StyledTextAreaModel(PS initialParagraphStyle, S initialTextStyle, SegmentOps<SEG, S> segmentOps,
+    public StyledTextAreaModel(PS initialParagraphStyle, S initialTextStyle,
                                EditableStyledDocument<PS, SEG, S> document, boolean preserveStyle
     ) {
         this.initialTextStyle = initialTextStyle;
         this.initialParagraphStyle = initialParagraphStyle;
         this.preserveStyle = preserveStyle;
-        this.segmentOps = segmentOps;
 
         content = document;
         paragraphs = LiveList.suspendable(content.getParagraphs());
@@ -622,7 +619,7 @@ public class StyledTextAreaModel<PS, SEG, S>
     @Override
     public void replaceText(int start, int end, String text) {
         StyledDocument<PS, SEG, S> doc = ReadOnlyStyledDocument.fromString(
-                text, getParagraphStyleForInsertionAt(start), getStyleForInsertionAt(start), segmentOps);
+                text, getParagraphStyleForInsertionAt(start), getStyleForInsertionAt(start), content.getSegOps());
         replace(start, end, doc);
     }
 

@@ -4,7 +4,7 @@ package org.fxmisc.richtext;
 import java.util.Collection;
 
 import org.fxmisc.richtext.model.EditableStyledDocument;
-import org.fxmisc.richtext.model.StyledText;
+import org.fxmisc.richtext.model.SegmentOps;
 
 /**
  * A convenience subclass of {@link StyleClassedTextArea}
@@ -23,12 +23,12 @@ public class CodeArea extends StyleClassedTextArea {
         setUseInitialStyleForInsertion(true);
     }
 
-    public CodeArea(EditableStyledDocument<Collection<String>, StyledText<Collection<String>>, Collection<String>> document) {
+    public CodeArea(EditableStyledDocument<Collection<String>, String, Collection<String>> document) {
         super(document, false);
     }
 
-    public CodeArea() {
-        super(false);
+    public CodeArea(SegmentOps<String, Collection<String>> segOps) {
+        super(segOps, false);
     }
 
     /**
@@ -37,8 +37,8 @@ public class CodeArea extends StyleClassedTextArea {
      *
      * @param text Initial text content.
      */
-    public CodeArea(String text) {
-        this();
+    public CodeArea(String text, SegmentOps<String, Collection<String>> segOps) {
+        this(segOps);
 
         appendText(text);
         getUndoManager().forgetHistory();

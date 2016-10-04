@@ -204,7 +204,7 @@ class StyledTextAreaBehavior {
      * Fields                                                                 *
      * ********************************************************************** */
 
-    private final GenericRichtextArea<?, ?, ?> view;
+    private final StyledTextArea<?, ?, ?> view;
 
     private final StyledTextAreaModel<?, ?, ?> model;
 
@@ -232,7 +232,7 @@ class StyledTextAreaBehavior {
      * Constructors                                                           *
      * ********************************************************************** */
 
-    StyledTextAreaBehavior(GenericRichtextArea<?, ?, ?> area) {
+    StyledTextAreaBehavior(StyledTextArea<?, ?, ?> area) {
         this.view = area;
         this.model = area.getModel();
 

@@ -25,4 +25,12 @@ public interface SegmentOps<SEG, S> {
     public S getStyle(SEG seg);
 
     public SEG create(String text, S style);
+
+    public String toString(SEG seg);
+
+//    @Override
+//    public boolean equals(Object obj);
+//
+//    @Override
+//    public int hashCode();
 }
