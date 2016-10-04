@@ -1,5 +1,8 @@
 package org.fxmisc.richtext.model;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 /**
  * Defines the operations which are supported on a specific segment type.
@@ -28,9 +31,7 @@ public interface SegmentOps<SEG, S> {
 
     public String toString(SEG seg);
 
-//    @Override
-//    public boolean equals(Object obj);
-//
-//    @Override
-//    public int hashCode();
+    public void encode(DataOutputStream os, SEG t, Codec<S> styleCodec) throws IOException;
+
+    public SEG decode(DataInputStream is, Codec<S> styleCodec) throws IOException;
 }

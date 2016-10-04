@@ -118,7 +118,7 @@ public final class ReadOnlyStyledDocument<PS, SEG, S> implements StyledDocument<
 
     private static <PS, SEG, S> Codec<Paragraph<PS, SEG, S>> paragraphCodec(Codec<PS> pCodec, Codec<S> tCodec, SegmentOps<SEG, S> segmentOps) {
         return new Codec<Paragraph<PS, SEG, S>>() {
-            private final Codec<List<SEG>> segmentsCodec = Codec.listCodec(styledTextCodec(tCodec, segmentOps));
+            private final Codec<List<SEG>> segmentsCodec = Codec.listCodec(segmentCodec(tCodec, segmentOps));
 
             @Override
             public String getName() {
@@ -140,25 +140,22 @@ public final class ReadOnlyStyledDocument<PS, SEG, S> implements StyledDocument<
         };
     }
 
-    private static <SEG, S> Codec<SEG> styledTextCodec(Codec<S> styleCodec, SegmentOps<SEG, S> segmentOps) {
+    private static <SEG, S> Codec<SEG> segmentCodec(Codec<S> styleCodec, SegmentOps<SEG, S> segmentOps) {
         return new Codec<SEG>() {
 
             @Override
             public String getName() {
-                return "styledtext<" + styleCodec.getName() + ">";
+                return "segment<" + styleCodec.getName() + ">";
             }
 
             @Override
             public void encode(DataOutputStream os, SEG t) throws IOException {
-                STRING_CODEC.encode(os, segmentOps.getText(t));
-                styleCodec.encode(os, segmentOps.getStyle(t));
+                segmentOps.encode(os, t, styleCodec);
             }
 
             @Override
             public SEG decode(DataInputStream is) throws IOException {
-                String text = STRING_CODEC.decode(is);
-                S style = styleCodec.decode(is);
-                return segmentOps.create(text, style); // new StyledText<>(text, style);
+                return segmentOps.decode(is, styleCodec);
             }
 
         };
