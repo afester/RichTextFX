@@ -27,7 +27,6 @@ import org.fxmisc.richtext.ParagraphBox.CaretOffsetX;
 import org.fxmisc.wellbehaved.event.EventPattern;
 import org.fxmisc.wellbehaved.event.template.InputMapTemplate;
 import org.reactfx.EventStream;
-import org.reactfx.Subscription;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
@@ -205,9 +204,9 @@ class StyledTextAreaBehavior {
      * Fields                                                                 *
      * ********************************************************************** */
 
-    private final StyledTextArea<?, ?> view;
+    private final StyledTextArea<?, ?, ?> view;
 
-    private final StyledTextAreaModel<?, ?> model;
+    private final StyledTextAreaModel<?, ?, ?> model;
 
     /**
      * Indicates whether selection is being dragged by the user.
@@ -233,7 +232,7 @@ class StyledTextAreaBehavior {
      * Constructors                                                           *
      * ********************************************************************** */
 
-    StyledTextAreaBehavior(StyledTextArea<?, ?> area) {
+    StyledTextAreaBehavior(StyledTextArea<?, ?, ?> area) {
         this.view = area;
         this.model = area.getModel();
 

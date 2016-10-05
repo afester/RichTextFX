@@ -2,47 +2,16 @@ package org.fxmisc.richtext.model;
 
 import java.util.Objects;
 
-public class StyledText<S> {
+public class StyledText<S>  {
     private final String text;
+    public String getText() { return text; }
+
     private final S style;
+    public S getStyle() { return style; }
 
     public StyledText(String text, S style) {
         this.text = text;
         this.style = style;
-    }
-
-    public int length() {
-        return text.length();
-    }
-
-    public char charAt(int index) {
-        return text.charAt(index);
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public StyledText<S> subSequence(int start, int end) {
-        return new StyledText<>(text.substring(start, end), style);
-    }
-
-    public StyledText<S> subSequence(int start) {
-        return new StyledText<>(text.substring(start), style);
-    }
-
-    public StyledText<S> append(String str) {
-        return new StyledText<>(text + str, style);
-    }
-
-    public StyledText<S> spliced(int from, int to, CharSequence replacement) {
-        String left = text.substring(0, from);
-        String right = text.substring(to);
-        return new StyledText<>(left + replacement + right, style);
-    }
-
-    public S getStyle() {
-        return style;
     }
 
     @Override

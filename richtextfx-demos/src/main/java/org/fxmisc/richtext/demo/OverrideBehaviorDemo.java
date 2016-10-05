@@ -17,8 +17,10 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import org.fxmisc.richtext.InlineCssTextArea;
+import org.fxmisc.richtext.model.SegmentOps;
 import org.fxmisc.wellbehaved.event.InputMap;
 import org.fxmisc.wellbehaved.event.Nodes;
+import org.omg.CORBA.Object;
 
 /**
  * This demo shows how to override the default behavior of a StyledTextArea via an InputMap.
@@ -33,7 +35,57 @@ public class OverrideBehaviorDemo extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        InlineCssTextArea area = new InlineCssTextArea();
+        InlineCssTextArea area = new InlineCssTextArea(new SegmentOps<Object, String>() {
+            @Override
+            public int length(Object object) {
+                return 0;
+            }
+
+            @Override
+            public char charAt(Object object, int index) {
+                return 0;
+            }
+
+            @Override
+            public String getText(Object object) {
+                return null;
+            }
+
+            @Override
+            public Object subSequence(Object object, int start, int end) {
+                return null;
+            }
+
+            @Override
+            public Object subSequence(Object object, int start) {
+                return null;
+            }
+
+            @Override
+            public Object append(Object object, String str) {
+                return null;
+            }
+
+            @Override
+            public Object spliced(Object object, int from, int to, CharSequence replacement) {
+                return null;
+            }
+
+            @Override
+            public String getStyle(Object object) {
+                return null;
+            }
+
+            @Override
+            public Object create(String text, String style) {
+                return null;
+            }
+
+            @Override
+            public String toString(Object object) {
+                return null;
+            }
+        });
 
         InputMap<Event> preventSelectionOrRightArrowNavigation = InputMap.consume(
                 anyOf(

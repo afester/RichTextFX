@@ -9,6 +9,10 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.fxmisc.richtext.InlineCssTextArea;
+import org.fxmisc.richtext.model.SegmentOps;
+import org.omg.CORBA.Object;
+
+import java.time.format.TextStyle;
 
 public class CloneDemo extends Application {
 
@@ -21,7 +25,57 @@ public class CloneDemo extends Application {
         String selectedText = "selection";
         String text = "Edit the top area (original)\nand watch the (clone) bottom area's displayed text change and its " +
                 "selected text [" + selectedText + "] update itself accordingly.";
-        InlineCssTextArea area = new InlineCssTextArea(text);
+        InlineCssTextArea area = new InlineCssTextArea(text, new SegmentOps<Object, String>() {
+            @Override
+            public int length(Object object) {
+                return 0;
+            }
+
+            @Override
+            public char charAt(Object object, int index) {
+                return 0;
+            }
+
+            @Override
+            public String getText(Object object) {
+                return null;
+            }
+
+            @Override
+            public Object subSequence(Object object, int start, int end) {
+                return null;
+            }
+
+            @Override
+            public Object subSequence(Object object, int start) {
+                return null;
+            }
+
+            @Override
+            public Object append(Object object, String str) {
+                return null;
+            }
+
+            @Override
+            public Object spliced(Object object, int from, int to, CharSequence replacement) {
+                return null;
+            }
+
+            @Override
+            public String getStyle(Object object) {
+                return null;
+            }
+
+            @Override
+            public Object create(String text, String style) {
+                return null;
+            }
+
+            @Override
+            public String toString(Object object) {
+                return null;
+            }
+        });
         InlineCssTextArea clone = new InlineCssTextArea(area.getContent());
 
         VBox vbox = new VBox(area, clone);
