@@ -1,13 +1,17 @@
 package org.fxmisc.richtext.model;
 
+import java.io.DataInputStream;
+import java.io.IOException;
 import java.util.Objects;
 
 public class StyledText<S>  {
-    private final String text;
+    private String text;
     public String getText() { return text; }
 
-    private final S style;
+    private S style;
     public S getStyle() { return style; }
+
+    StyledText() { }
 
     public StyledText(String text, S style) {
         this.text = text;
@@ -33,5 +37,13 @@ public class StyledText<S>  {
     @Override
     public int hashCode() {
         return Objects.hash(text, style);
+    }
+
+    public void decode(DataInputStream is, Codec<S> styleCodec) throws IOException {
+        // TODO Auto-generated method stub
+//      return StyledText.decode(is, styleCodec);
+          text = Codec.STRING_CODEC.decode(is);
+          style = styleCodec.decode(is);
+        
     }
 }

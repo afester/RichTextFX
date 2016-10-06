@@ -32,7 +32,7 @@ public final class Paragraph<PS, SEG, S> {
     private final SegmentOps<SEG, S> segmentOps;
 
     public Paragraph(PS paragraphStyle, SegmentOps<SEG, S> segmentOps, String text, S style) {
-        this(paragraphStyle, segmentOps, segmentOps.create(text, style)); // new StyledText<>(text, style));
+        this(paragraphStyle, segmentOps, segmentOps.create(StyledText.class, text, style));
     }
 
     @SafeVarargs
@@ -216,7 +216,7 @@ public final class Paragraph<PS, SEG, S> {
         for(StyleSpan<? extends S> span: styleSpans) {
             int end = offset + span.getLength();
             String text = middleString.substring(offset, end);
-            middleSegs.add(segmentOps.create(text, span.getStyle()));
+            middleSegs.add(segmentOps.create(StyledText.class, text, span.getStyle()));
             offset = end;
         }
         Paragraph<PS, SEG, S> middle = new Paragraph<>(paragraphStyle, segmentOps, middleSegs);

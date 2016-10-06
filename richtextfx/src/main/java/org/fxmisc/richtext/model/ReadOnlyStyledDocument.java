@@ -150,11 +150,14 @@ public final class ReadOnlyStyledDocument<PS, SEG, S> implements StyledDocument<
 
             @Override
             public void encode(DataOutputStream os, SEG t) throws IOException {
-                segmentOps.encode(os, t, styleCodec);
+                segmentOps.encode(t, os, styleCodec);
             }
 
             @Override
             public SEG decode(DataInputStream is) throws IOException {
+                // SEG seg = segmentOps.create(clazz); // , text, style);
+                // here we do not know anything about the actual encode/decode algorithm.
+                // delegate the whole decode process, including object creation, to SegmentOps
                 return segmentOps.decode(is, styleCodec);
             }
 

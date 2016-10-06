@@ -25,17 +25,17 @@ public final class StyledTextOps<S> implements SegmentOps<StyledText<S>, S> {
 
     @Override
     public StyledText<S> subSequence(StyledText<S> styledText, int start, int end) {
-        return create(styledText.getText().substring(start, end), styledText.getStyle());
+        return new StyledText<>(styledText.getText().substring(start, end), styledText.getStyle());
     }
 
     @Override
     public StyledText<S> subSequence(StyledText<S> styledText, int start) {
-        return create(styledText.getText().substring(start), styledText.getStyle());
+        return new StyledText<>(styledText.getText().substring(start), styledText.getStyle());
     }
 
     @Override
     public StyledText<S> append(StyledText<S> styledText, String str) {
-        return create(styledText.getText() + str, styledText.getStyle());
+        return new StyledText<>(styledText.getText() + str, styledText.getStyle());
     }
 
     @Override
@@ -43,7 +43,7 @@ public final class StyledTextOps<S> implements SegmentOps<StyledText<S>, S> {
         String text = styledText.getText();
         String left = text.substring(0, from);
         String right = text.substring(to);
-        return create(left + replacement + right, styledText.getStyle());
+        return new StyledText<>(left + replacement + right, styledText.getStyle());
     }
 
     @Override
@@ -51,26 +51,37 @@ public final class StyledTextOps<S> implements SegmentOps<StyledText<S>, S> {
         return styledText.getStyle();
     }
 
-    @Override
-    public StyledText<S> create(String text, S style) {
-        return new StyledText<S>(text, style);
-    }
+//    @Override
+//    public StyledText<S> create(String text, S style) {
+//        return new StyledText<S>(text, style);
+//    }
 
     @Override
     public String toString(StyledText<S> styledText) {
         return styledText.toString();
     }
 
+    
+
     @Override
-    public void encode(DataOutputStream os, StyledText<S> t, Codec<S> styleCodec) throws IOException {
-        Codec.STRING_CODEC.encode(os, getText(t));
-        styleCodec.encode(os, getStyle(t));
+    public StyledText<S> create(Class<?> clazz, String text, S style) {
+        return new StyledText<>(text, style);
+    }
+
+    @Override
+    public void encode(StyledText<S> seg, DataOutputStream os, Codec<S> styleCodec) throws IOException {
+        Codec.STRING_CODEC.encode(os, getText(seg));
+        styleCodec.encode(os, getStyle(seg));
     }
 
     @Override
     public StyledText<S> decode(DataInputStream is, Codec<S> styleCodec) throws IOException {
-        String text = Codec.STRING_CODEC.decode(is);
-        S style = styleCodec.decode(is);
-        return create(text, style);
+        StyledText<S> result = new StyledText<>();
+        result.decode(is, styleCodec);
+        return result;
+//        return StyledText.decode(is, styleCodec);
+//        String text = Codec.STRING_CODEC.decode(is);
+//        S style = styleCodec.decode(is);
+//        return new StyledText<>(text, style);
     }
 }

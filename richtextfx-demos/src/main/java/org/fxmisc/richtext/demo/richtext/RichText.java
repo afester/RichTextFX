@@ -40,6 +40,7 @@ import org.fxmisc.richtext.model.Paragraph;
 import org.fxmisc.richtext.model.StyleSpans;
 import org.fxmisc.richtext.model.StyledText;
 import org.reactfx.SuspendableNo;
+import org.reactfx.util.Either;
 
 public class RichText extends Application {
 
@@ -47,11 +48,13 @@ public class RichText extends Application {
         launch(args);
     }
 
-    private final StyledTextArea<ParStyle, StyledText<TextStyle>, TextStyle> area = new StyledTextArea<>(
-                    ParStyle.EMPTY, (paragraph, style) -> paragraph.setStyle(style.toCss()),
+    private final StyledTextArea<ParStyle, Either<StyledText<TextStyle>, CustomObject<TextStyle>>, TextStyle> area = 
+            new StyledTextArea<>(
+                    ParStyle.EMPTY, 
+                    (paragraph, style) -> paragraph.setStyle(style.toCss()),
                     TextStyle.EMPTY.updateFontSize(12).updateFontFamily("Serif").updateTextColor(Color.BLACK),
-                    new StyledTextOps<>(),
-                    ( text, style) -> text.setStyle(style.toCss()));
+                    StyledTextOrCustomObjectOps.eitherOps(new StyledTextOps<>(), new CustomObjectOps<>()),
+                    (text, style) -> text.setStyle(style.toCss()));
     {
         area.setWrapText(true);
         area.setStyleCodecs(ParStyle.CODEC, TextStyle.CODEC);
@@ -150,7 +153,7 @@ public class RichText extends Application {
 
                 int startPar = area.offsetToPosition(selection.getStart(), Forward).getMajor();
                 int endPar = area.offsetToPosition(selection.getEnd(), Backward).getMajor();
-                List<Paragraph<ParStyle, StyledText<TextStyle>, TextStyle>> pars = area.getParagraphs().subList(startPar, endPar + 1);
+                List<Paragraph<ParStyle, Either<StyledText<TextStyle>,CustomObject<TextStyle>>, TextStyle>> pars = area.getParagraphs().subList(startPar, endPar + 1);
 
                 @SuppressWarnings("unchecked")
                 Optional<TextAlignment>[] alignments = pars.stream().map(p -> p.getParagraphStyle().alignment).distinct().toArray(Optional[]::new);
@@ -237,7 +240,7 @@ public class RichText extends Application {
                 paragraphBackgroundPicker);
         panel2.getChildren().addAll(sizeCombo, familyCombo, textColorPicker, backgroundColorPicker);
 
-        VirtualizedScrollPane<StyledTextArea<ParStyle, StyledText<TextStyle>, TextStyle>> vsPane = new VirtualizedScrollPane<>(area);
+        VirtualizedScrollPane<StyledTextArea<ParStyle, Either<StyledText<TextStyle>,CustomObject<TextStyle>>, TextStyle>> vsPane = new VirtualizedScrollPane<>(area);
         VBox vbox = new VBox();
         VBox.setVgrow(vsPane, Priority.ALWAYS);
         vbox.getChildren().addAll(panel1, panel2, vsPane);
@@ -331,7 +334,7 @@ public class RichText extends Application {
         int startPar = area.offsetToPosition(selection.getStart(), Forward).getMajor();
         int endPar = area.offsetToPosition(selection.getEnd(), Backward).getMajor();
         for(int i = startPar; i <= endPar; ++i) {
-            Paragraph<ParStyle, StyledText<TextStyle>, TextStyle> paragraph = area.getParagraph(i);
+            Paragraph<ParStyle, Either<StyledText<TextStyle>,CustomObject<TextStyle>>, TextStyle> paragraph = area.getParagraph(i);
             area.setParagraphStyle(i, updater.apply(paragraph.getParagraphStyle()));
         }
     }
