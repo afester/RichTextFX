@@ -50,12 +50,14 @@ public class LinkedImage<S> extends CustomObject<S> {
     @Override
     public void encode(DataOutputStream os, Codec<S> styleCodec) throws IOException {
         Codec.STRING_CODEC.encode(os, imagePath);
+        styleCodec.encode(os, style);
     }
 
     
     @Override
     public void decode(DataInputStream is, Codec<S> styleCodec) throws IOException {
         imagePath = Codec.STRING_CODEC.decode(is);
+        style = styleCodec.decode(is);
     }
 
     

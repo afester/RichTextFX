@@ -109,6 +109,9 @@ public class StyledTextOrCustomObjectOps { // <S> implements SegmentOps<Either<S
             public Either<StyledText<S>, CustomObject<S>> decode(DataInputStream is, Codec<S> styleCodec) throws IOException {
                 String segmentType = Codec.STRING_CODEC.decode(is);
                 try {
+                    if (segmentType.equals("org.fxmisc.richtext.model.LinkedImage")) {
+                        segmentType = "org.fxmisc.richtext.demo.richtext.LinkedImage";
+                    }
                     Class<?> segmentClass = Class.forName(segmentType);
                     if (segmentClass.isAssignableFrom(StyledText.class)) {
                         return Either.left(lOps.decode(is, styleCodec));
