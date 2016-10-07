@@ -66,12 +66,12 @@ public class RichText extends Application {
 
     private final StyledTextArea<ParStyle, Either<StyledText<TextStyle>, CustomObject<TextStyle>>, TextStyle> area = 
             new StyledTextArea<>(
-                    ParStyle.EMPTY, 
-                    (paragraph, style) -> paragraph.setStyle(style.toCss()),
-                    TextStyle.EMPTY.updateFontSize(12).updateFontFamily("Serif").updateTextColor(Color.BLACK),
-                    StyledTextOrCustomObjectOps.eitherOps(new StyledTextOps<>(), new CustomObjectOps<>()),
-                    /*(text, style) -> text.setStyle(style.toCss()),*/ 
-                    seg -> createNode(seg, (text, style) -> text.setStyle(style.toCss())));
+                    ParStyle.EMPTY,                                                 // default paragraph style
+                    (paragraph, style) -> paragraph.setStyle(style.toCss()),        // paragraph style setter
+
+                    TextStyle.EMPTY.updateFontSize(12).updateFontFamily("Serif").updateTextColor(Color.BLACK),  // default segment style
+                    StyledTextOrCustomObjectOps.eitherOps(new StyledTextOps<>(), new CustomObjectOps<>()),      // segment operations      
+                    seg -> createNode(seg, (text, style) -> text.setStyle(style.toCss())));                     // Node creator and segment style setter
     {
         area.setWrapText(true);
         area.setStyleCodecs(ParStyle.CODEC, TextStyle.CODEC);

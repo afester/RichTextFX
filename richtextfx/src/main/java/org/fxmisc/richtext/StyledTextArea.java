@@ -6,6 +6,8 @@ import static org.reactfx.EventStreams.*;
 import static org.reactfx.util.Tuples.*;
 
 import java.time.Duration;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -36,6 +38,7 @@ import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
+import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.control.IndexRange;
 import javafx.scene.layout.Background;
@@ -65,6 +68,7 @@ import org.fxmisc.richtext.model.SegmentOps;
 import org.fxmisc.richtext.model.SimpleEditableStyledDocument;
 import org.fxmisc.richtext.model.StyleSpans;
 import org.fxmisc.richtext.model.StyledDocument;
+import org.fxmisc.richtext.model.StyledText;
 import org.fxmisc.richtext.model.StyledTextAreaModel;
 import org.fxmisc.richtext.model.TextEditingArea;
 import org.fxmisc.richtext.model.TwoDimensional;
@@ -1296,5 +1300,19 @@ public class StyledTextArea<PS, SEG, S> extends Region
                 .on(restartImpulse.withDefaultEvent(null)).transition((state, impulse) -> true)
                 .on(ticks).transition((state, tick) -> !state)
                 .toStateStream();
+    }
+
+
+    protected Node createStyledTextNode(SEG seg, BiConsumer<? super TextExt, S> applyStyle) {
+
+        TextExt t = new TextExt(getSegOps().getText(seg));
+        t.setTextOrigin(VPos.TOP);
+        t.getStyleClass().add("text");
+        applyStyle.accept(t, getSegOps().getStyle(seg));
+
+        // XXX: binding selectionFill to textFill,
+        // see the note at highlightTextFill
+        t.impl_selectionFillProperty().bind(t.fillProperty());
+        return t;
     }
 }

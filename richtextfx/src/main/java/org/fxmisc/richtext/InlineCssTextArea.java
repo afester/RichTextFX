@@ -1,31 +1,34 @@
 package org.fxmisc.richtext;
 
 
+
 import org.fxmisc.richtext.model.Codec;
 import org.fxmisc.richtext.model.EditableStyledDocument;
 import org.fxmisc.richtext.model.SegmentOps;
 import org.fxmisc.richtext.model.SimpleEditableStyledDocument;
+import org.fxmisc.richtext.model.StyledText;
 
 import javafx.scene.text.TextFlow;
-import org.omg.CORBA.Object;
 
 /**
  * Text area that uses inline css to define style of text segments and paragraph segments.
  */
-public class InlineCssTextArea extends StyledTextArea<String, Object, String> {
+public class InlineCssTextArea extends StyledTextArea<String, StyledText<String>, String> {
 
-    public InlineCssTextArea(SegmentOps<Object, String> segOps) {
+    public InlineCssTextArea(SegmentOps<StyledText<String>, String> segOps) {
         this(new SimpleEditableStyledDocument<>("", "", segOps));
     }
 
-    public InlineCssTextArea(EditableStyledDocument<String, Object, String> document) {
-        super(
-                "", TextFlow::setStyle,
-                "", TextExt::setStyle,
-                document,
-                true
+    public InlineCssTextArea(EditableStyledDocument<String, StyledText<String>, String> document) {
+        super("",                   // default paragraph style 
+              TextFlow::setStyle,   // paragraph style setter
+              "",                   // default segment style
+              TextExt::setStyle,
+              document,
+              true
         );
     }
+
 
     /**
      * Creates a text area with initial text content.
@@ -33,7 +36,7 @@ public class InlineCssTextArea extends StyledTextArea<String, Object, String> {
      *
      * @param text Initial text content.
      */
-    public InlineCssTextArea(String text, SegmentOps<Object, String> segOps) {
+    public InlineCssTextArea(String text, SegmentOps<StyledText<String>, String> segOps) {
         this(segOps);
 
         replaceText(0, 0, text);
