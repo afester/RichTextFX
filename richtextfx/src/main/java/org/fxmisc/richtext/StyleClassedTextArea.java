@@ -18,8 +18,7 @@ public class StyleClassedTextArea extends StyledTextArea<Collection<String>, Str
                 (paragraph, styleClasses) -> paragraph.getStyleClass().addAll(styleClasses),
                 Collections.<String>emptyList(),
                 (text, styleClasses) -> text.getStyleClass().addAll(styleClasses),
-                document, preserveStyle
-        );
+                document, preserveStyle, StyledTextNodeFactory::createNode);
 
         setStyleCodecs(
                 Codec.collectionCodec(Codec.STRING_CODEC),

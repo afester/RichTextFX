@@ -40,10 +40,7 @@ public class StyledText<S>  {
     }
 
     public void decode(DataInputStream is, Codec<S> styleCodec) throws IOException {
-        // TODO Auto-generated method stub
-//      return StyledText.decode(is, styleCodec);
           text = Codec.STRING_CODEC.decode(is);
           style = styleCodec.decode(is);
-        
     }
 }

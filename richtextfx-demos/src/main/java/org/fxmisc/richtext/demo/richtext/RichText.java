@@ -16,6 +16,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import org.fxmisc.richtext.model.Codec;
@@ -27,6 +28,7 @@ import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -47,6 +49,8 @@ import javafx.stage.Stage;
 
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.StyledTextArea;
+import org.fxmisc.richtext.StyledTextNodeFactory;
+import org.fxmisc.richtext.TextExt;
 import org.fxmisc.richtext.model.StyledTextOps;
 import org.fxmisc.richtext.model.Paragraph;
 import org.fxmisc.richtext.model.StyleSpans;
@@ -66,7 +70,8 @@ public class RichText extends Application {
                     (paragraph, style) -> paragraph.setStyle(style.toCss()),
                     TextStyle.EMPTY.updateFontSize(12).updateFontFamily("Serif").updateTextColor(Color.BLACK),
                     StyledTextOrCustomObjectOps.eitherOps(new StyledTextOps<>(), new CustomObjectOps<>()),
-                    (text, style) -> text.setStyle(style.toCss()));
+                    /*(text, style) -> text.setStyle(style.toCss()),*/ 
+                    seg -> createNode(seg, (text, style) -> text.setStyle(style.toCss())));
     {
         area.setWrapText(true);
         area.setStyleCodecs(ParStyle.CODEC, TextStyle.CODEC);
@@ -271,6 +276,19 @@ public class RichText extends Application {
         area.requestFocus();
         primaryStage.setTitle("Rich Text Demo");
         primaryStage.show();
+    }
+
+    
+    private StyledTextNodeFactory<TextStyle> styledTextNodeFactory = new StyledTextNodeFactory<>();
+
+    private Node createNode(Either<StyledText<TextStyle>, CustomObject<TextStyle>> seg,
+                            BiConsumer<? super TextExt, TextStyle> applyStyle) {
+        if (seg.isLeft()) {
+            return styledTextNodeFactory.createNode(seg.asLeft().get(), applyStyle);
+        } else {
+            System.err.println("CREATE NODE FOR CUSTOM OBJECT");
+            return new TextExt("[OBJ]");
+        }
     }
 
     @Deprecated

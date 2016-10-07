@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -60,7 +61,8 @@ class ParagraphText<PS, SEG, S> extends TextFlowExt {
         caretShape.visibleProperty().bind(caretVisible);
     }
 
-    public ParagraphText(Paragraph<PS, SEG, S> par, BiConsumer<? super TextExt, S> applyStyle, SegmentOps<SEG, S> segOps) {
+    ParagraphText(Paragraph<PS, SEG, S> par, /*BiConsumer<? super TextExt, S> applyStyle,*/ 
+                         SegmentOps<SEG, S> segOps, Function<SEG, Node> nodeFactory) {
         this.paragraph = par;
         this.segmentOps = segOps;
 
@@ -103,16 +105,18 @@ class ParagraphText<PS, SEG, S> extends TextFlowExt {
 
         // populate with text nodes
         for(SEG segment: par.getSegments()) {
-            TextExt t = new TextExt(segmentOps.getText(segment));
-            t.setTextOrigin(VPos.TOP);
-            t.getStyleClass().add("text");
-            applyStyle.accept(t, segmentOps.getStyle(segment));
-
-            // XXX: binding selectionFill to textFill,
-            // see the note at highlightTextFill
-            t.impl_selectionFillProperty().bind(t.fillProperty());
-
-            getChildren().add(t);
+            // create Segment
+            Node fxNode = nodeFactory.apply(segment);
+//            TextExt t = new TextExt(segmentOps.getText(segment));
+//            t.setTextOrigin(VPos.TOP);
+//            t.getStyleClass().add("text");
+//            applyStyle.accept(t, segmentOps.getStyle(segment));
+//
+//            // XXX: binding selectionFill to textFill,
+//            // see the note at highlightTextFill
+//            t.impl_selectionFillProperty().bind(t.fillProperty());
+//
+            getChildren().add(fxNode);
 
             // add corresponding background node (empty)
             Path backgroundShape = new Path();
