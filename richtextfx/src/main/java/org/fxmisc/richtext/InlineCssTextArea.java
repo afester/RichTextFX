@@ -23,9 +23,10 @@ public class InlineCssTextArea extends StyledTextArea<String, StyledText<String>
         super("",                   // default paragraph style 
               TextFlow::setStyle,   // paragraph style setter
               "",                   // default segment style
-              TextExt::setStyle,
-              document,
-              true
+              document, true, 
+              seg -> createStyledTextNode(seg, 
+            		  				      document.getSegOps(), 
+            		  				      TextExt::setStyle)
         );
     }
 

@@ -278,13 +278,11 @@ public class RichText extends Application {
         primaryStage.show();
     }
 
-    
-    private StyledTextNodeFactory<TextStyle> styledTextNodeFactory = new StyledTextNodeFactory<>();
 
     private Node createNode(Either<StyledText<TextStyle>, CustomObject<TextStyle>> seg,
                             BiConsumer<? super TextExt, TextStyle> applyStyle) {
         if (seg.isLeft()) {
-            return styledTextNodeFactory.createNode(seg.asLeft().get(), applyStyle);
+            return StyledTextArea.createStyledTextNode(seg, area.getSegOps(), applyStyle);
         } else {
             System.err.println("CREATE NODE FOR CUSTOM OBJECT");
             return new TextExt("[OBJ]");

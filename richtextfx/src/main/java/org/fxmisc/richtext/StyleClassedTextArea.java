@@ -16,25 +16,14 @@ import javafx.geometry.VPos;
  */
 public class StyleClassedTextArea extends StyledTextArea<Collection<String>, StyledText<Collection<String>>, Collection<String>> {
 
-    public StyleClassedTextArea(EditableStyledDocument<Collection<String>, StyledText<Collection<String>>, Collection<String>> document, boolean preserveStyle) {
+    public StyleClassedTextArea(EditableStyledDocument<Collection<String>, StyledText<Collection<String>>, Collection<String>> document, 
+    						   boolean preserveStyle) {
         super(Collections.<String>emptyList(),                                              // default paragraph style
               (paragraph, styleClasses) -> paragraph.getStyleClass().addAll(styleClasses),   // paragraph style setter
               Collections.<String>emptyList(),                                            // default text style
               document, preserveStyle,
-              seg -> { 
-                  TextExt t = new TextExt(seg.getText());
-                  t.setTextOrigin(VPos.TOP);
-                  t.getStyleClass().add("text");
-                  
-                  t.getStyleClass().addAll(styleClasses);
-                  // applyStyle.accept(t, seg.getStyle());
-
-                  // XXX: binding selectionFill to textFill,
-                  // see the note at highlightTextFill
-                  t.impl_selectionFillProperty().bind(t.fillProperty());
-                  return t;
-              } );//,(text, styleClasses) -> text.getStyleClass().addAll(styleClasses),          //
-                //StyledTextNodeFactory::createNode);                                         // Segment node creator and text style setter
+              seg -> createStyledTextNode(seg, document.getSegOps(), (text, styleClasses) -> text.getStyleClass().addAll(styleClasses))
+        );
 
         setStyleCodecs(
                 Codec.collectionCodec(Codec.STRING_CODEC),
@@ -42,7 +31,7 @@ public class StyleClassedTextArea extends StyledTextArea<Collection<String>, Sty
         );
     }
     
-    public StyleClassedTextArea(SegmentOps<String, Collection<String>> segOps, boolean preserveStyle) {
+    public StyleClassedTextArea(SegmentOps<StyledText<Collection<String>>, Collection<String>> segOps, boolean preserveStyle) {
         this(
                 new SimpleEditableStyledDocument<>(
                     Collections.<String>emptyList(), Collections.<String>emptyList(), segOps
@@ -52,7 +41,7 @@ public class StyleClassedTextArea extends StyledTextArea<Collection<String>, Sty
     /**
      * Creates a text area with empty text content.
      */
-    public StyleClassedTextArea(SegmentOps<String, Collection<String>> segOps) {
+    public StyleClassedTextArea(SegmentOps<StyledText<Collection<String>>, Collection<String>> segOps) {
         this(segOps, true);
     }
 

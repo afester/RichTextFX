@@ -553,8 +553,8 @@ public class StyledTextArea<PS, SEG, S> extends Region
     }
 
     public StyledTextArea(PS initialParagraphStyle, BiConsumer<TextFlow, PS> applyParagraphStyle,
-                              S initialTextStyle, SegmentOps<SEG, S> segmentOps, /*BiConsumer<? super TextExt, S> applyStyle,*/
-                              boolean preserveStyle, Function<SEG, Node> nodeFactory) {
+                          S initialTextStyle, SegmentOps<SEG, S> segmentOps, /*BiConsumer<? super TextExt, S> applyStyle,*/
+                          boolean preserveStyle, Function<SEG, Node> nodeFactory) {
         this(initialParagraphStyle, applyParagraphStyle, initialTextStyle, /*applyStyle,*/
                 new SimpleEditableStyledDocument<>(initialParagraphStyle, initialTextStyle, segmentOps), preserveStyle, nodeFactory);
     }
@@ -1303,12 +1303,12 @@ public class StyledTextArea<PS, SEG, S> extends Region
     }
 
 
-    protected Node createStyledTextNode(SEG seg, BiConsumer<? super TextExt, S> applyStyle) {
+    public static <SEG, S> Node createStyledTextNode(SEG seg, SegmentOps<SEG, S> segOps, BiConsumer<? super TextExt, S> applyStyle) {
 
-        TextExt t = new TextExt(getSegOps().getText(seg));
+        TextExt t = new TextExt(segOps.getText(seg));
         t.setTextOrigin(VPos.TOP);
         t.getStyleClass().add("text");
-        applyStyle.accept(t, getSegOps().getStyle(seg));
+        applyStyle.accept(t, segOps.getStyle(seg));
 
         // XXX: binding selectionFill to textFill,
         // see the note at highlightTextFill
