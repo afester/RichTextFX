@@ -9,7 +9,6 @@ import org.fxmisc.richtext.model.SegmentOps;
 import org.fxmisc.richtext.model.SimpleEditableStyledDocument;
 import org.fxmisc.richtext.model.StyledText;
 
-import javafx.geometry.VPos;
 
 /**
  * Text area that uses style classes to define style of text segments and paragraph segments.
@@ -17,7 +16,7 @@ import javafx.geometry.VPos;
 public class StyleClassedTextArea extends StyledTextArea<Collection<String>, StyledText<Collection<String>>, Collection<String>> {
 
     public StyleClassedTextArea(EditableStyledDocument<Collection<String>, StyledText<Collection<String>>, Collection<String>> document, 
-    						   boolean preserveStyle) {
+                                boolean preserveStyle) {
         super(Collections.<String>emptyList(),                                              // default paragraph style
               (paragraph, styleClasses) -> paragraph.getStyleClass().addAll(styleClasses),   // paragraph style setter
               Collections.<String>emptyList(),                                            // default text style

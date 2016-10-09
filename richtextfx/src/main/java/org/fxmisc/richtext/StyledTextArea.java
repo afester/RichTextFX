@@ -6,8 +6,6 @@ import static org.reactfx.EventStreams.*;
 import static org.reactfx.util.Tuples.*;
 
 import java.time.Duration;
-import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -68,7 +66,6 @@ import org.fxmisc.richtext.model.SegmentOps;
 import org.fxmisc.richtext.model.SimpleEditableStyledDocument;
 import org.fxmisc.richtext.model.StyleSpans;
 import org.fxmisc.richtext.model.StyledDocument;
-import org.fxmisc.richtext.model.StyledText;
 import org.fxmisc.richtext.model.StyledTextAreaModel;
 import org.fxmisc.richtext.model.TextEditingArea;
 import org.fxmisc.richtext.model.TwoDimensional;
@@ -502,12 +499,6 @@ public class StyledTextArea<PS, SEG, S> extends Region
     /**
      * Style applicator used by the default skin.
      */
-//    private final BiConsumer<? super TextExt, S> applyStyle;
-//    public final BiConsumer<? super TextExt, S> getApplyStyle() { return applyStyle; }
-
-    /**
-     * Style applicator used by the default skin.
-     */
     private final BiConsumer<TextFlow, PS> applyParagraphStyle;
     public final BiConsumer<TextFlow, PS> getApplyParagraphStyle() { return applyParagraphStyle; }
 
@@ -547,15 +538,15 @@ public class StyledTextArea<PS, SEG, S> extends Region
      * used by the default skin to apply style to paragraph nodes.
      */
     public StyledTextArea(PS initialParagraphStyle, BiConsumer<TextFlow, PS> applyParagraphStyle,
-                          S initialTextStyle, SegmentOps<SEG, S> segmentOps, /* BiConsumer<? super TextExt, S> applyStyle,*/
+                          S initialTextStyle, SegmentOps<SEG, S> segmentOps,
                           Function<SEG, Node> nodeFactory) {
-        this(initialParagraphStyle, applyParagraphStyle, initialTextStyle, segmentOps, /*applyStyle, */true, nodeFactory);
+        this(initialParagraphStyle, applyParagraphStyle, initialTextStyle, segmentOps, true, nodeFactory);
     }
 
     public StyledTextArea(PS initialParagraphStyle, BiConsumer<TextFlow, PS> applyParagraphStyle,
-                          S initialTextStyle, SegmentOps<SEG, S> segmentOps, /*BiConsumer<? super TextExt, S> applyStyle,*/
+                          S initialTextStyle, SegmentOps<SEG, S> segmentOps,
                           boolean preserveStyle, Function<SEG, Node> nodeFactory) {
-        this(initialParagraphStyle, applyParagraphStyle, initialTextStyle, /*applyStyle,*/
+        this(initialParagraphStyle, applyParagraphStyle, initialTextStyle,
                 new SimpleEditableStyledDocument<>(initialParagraphStyle, initialTextStyle, segmentOps), preserveStyle, nodeFactory);
     }
 
@@ -565,18 +556,17 @@ public class StyledTextArea<PS, SEG, S> extends Region
      * shares the same {@link EditableStyledDocument}.
      */
     public StyledTextArea(PS initialParagraphStyle, BiConsumer<TextFlow, PS> applyParagraphStyle,
-                          S initialTextStyle, /*BiConsumer<? super TextExt, S> applyStyle,*/
+                          S initialTextStyle,
                           EditableStyledDocument<PS, SEG, S> document, Function<SEG, Node> nodeFactory) {
-        this(initialParagraphStyle, applyParagraphStyle, initialTextStyle, /*applyStyle, */document, true, nodeFactory);
+        this(initialParagraphStyle, applyParagraphStyle, initialTextStyle, document, true, nodeFactory);
 
     }
 
     public StyledTextArea(PS initialParagraphStyle, BiConsumer<TextFlow, PS> applyParagraphStyle,
-                          S initialTextStyle, /*BiConsumer<? super TextExt, S> applyStyle,*/
+                          S initialTextStyle,
                           EditableStyledDocument<PS, SEG, S> document, boolean preserveStyle,
                           Function<SEG, Node> nodeFactory) {
         this.model = new StyledTextAreaModel<>(initialParagraphStyle, initialTextStyle, document, preserveStyle);
-        //this.applyStyle = applyStyle;
         this.applyParagraphStyle = applyParagraphStyle;
 
         // allow tab traversal into area
@@ -596,7 +586,6 @@ public class StyledTextArea<PS, SEG, S> extends Region
                 par -> {
                     Cell<Paragraph<PS, SEG, S>, ParagraphBox<PS, SEG, S>> cell = createCell(
                             par,
-                            /*applyStyle,*/
                             applyParagraphStyle,
                             nodeFactory);
                     nonEmptyCells.add(cell.getNode());

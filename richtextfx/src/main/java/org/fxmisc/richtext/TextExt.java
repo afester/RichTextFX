@@ -105,7 +105,7 @@ public class TextExt extends Text {
         }
     };
 
-    public TextExt(String text) {
+    TextExt(String text) {
         super(text);
     }
 

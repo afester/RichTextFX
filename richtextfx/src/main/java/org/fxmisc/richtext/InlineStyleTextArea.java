@@ -29,9 +29,8 @@ public class InlineStyleTextArea<PS, SEG, S> extends StyledTextArea<PS, SEG, S> 
               //(text, style) -> text.setStyle(styleToCss.apply(style)),
               segOps, 
               seg -> createStyledTextNode(seg, 
-            		  					  segOps, 
-            		  					  (text, style) -> text.setStyle(styleToCss.apply(style)))
-              //                       // Segment node creator and segment style setter 
+                                          segOps, 
+                                          (text, style) -> text.setStyle(styleToCss.apply(style)))
         );
     }
 }

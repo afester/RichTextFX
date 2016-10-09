@@ -3,7 +3,6 @@ package org.fxmisc.richtext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import javafx.beans.property.ObjectProperty;
@@ -11,7 +10,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.transformation.FilteredList;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
-import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.control.IndexRange;
 import javafx.scene.paint.Color;
@@ -61,7 +59,7 @@ class ParagraphText<PS, SEG, S> extends TextFlowExt {
         caretShape.visibleProperty().bind(caretVisible);
     }
 
-    ParagraphText(Paragraph<PS, SEG, S> par, /*BiConsumer<? super TextExt, S> applyStyle,*/ 
+    ParagraphText(Paragraph<PS, SEG, S> par,
                          SegmentOps<SEG, S> segOps, Function<SEG, Node> nodeFactory) {
         this.paragraph = par;
         this.segmentOps = segOps;
@@ -107,15 +105,6 @@ class ParagraphText<PS, SEG, S> extends TextFlowExt {
         for(SEG segment: par.getSegments()) {
             // create Segment
             Node fxNode = nodeFactory.apply(segment);
-//            TextExt t = new TextExt(segmentOps.getText(segment));
-//            t.setTextOrigin(VPos.TOP);
-//            t.getStyleClass().add("text");
-//            applyStyle.accept(t, segmentOps.getStyle(segment));
-//
-//            // XXX: binding selectionFill to textFill,
-//            // see the note at highlightTextFill
-//            t.impl_selectionFillProperty().bind(t.fillProperty());
-//
             getChildren().add(fxNode);
 
             // add corresponding background node (empty)

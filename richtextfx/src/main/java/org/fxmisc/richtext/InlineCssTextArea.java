@@ -25,8 +25,8 @@ public class InlineCssTextArea extends StyledTextArea<String, StyledText<String>
               "",                   // default segment style
               document, true, 
               seg -> createStyledTextNode(seg, 
-            		  				      document.getSegOps(), 
-            		  				      TextExt::setStyle)
+                                          document.getSegOps(),
+                                          TextExt::setStyle)
         );
     }
 

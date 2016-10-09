@@ -43,13 +43,13 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.StyledTextArea;
-import org.fxmisc.richtext.StyledTextNodeFactory;
 import org.fxmisc.richtext.TextExt;
 import org.fxmisc.richtext.model.StyledTextOps;
 import org.fxmisc.richtext.model.Paragraph;
@@ -285,7 +285,7 @@ public class RichText extends Application {
             return StyledTextArea.createStyledTextNode(seg, area.getSegOps(), applyStyle);
         } else {
             System.err.println("CREATE NODE FOR CUSTOM OBJECT");
-            return new TextExt("[OBJ]");
+            return new Text("[OBJ]");   // dummy - for now ...
         }
     }
 
