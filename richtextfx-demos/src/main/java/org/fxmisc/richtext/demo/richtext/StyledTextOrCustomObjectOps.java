@@ -85,12 +85,12 @@ public class StyledTextOrCustomObjectOps { // <S> implements SegmentOps<Either<S
 
 
             @Override
-            public Either<StyledText<S>, CustomObject<S>> create(Class<?> clazz, String text, S style) {
-                if (clazz.isAssignableFrom(StyledText.class)) {
-                    return Either.left(lOps.create(StyledText.class, text, style));
-                } else {
-                    return Either.right(rOps.create(clazz, text, style));
-                }
+            public Either<StyledText<S>, CustomObject<S>> create(String text, S style) {
+                //if (clazz.isAssignableFrom(StyledText.class)) {
+                    return Either.left(lOps.create(text, style));
+                //} else {
+                //    return Either.right(rOps.create(clazz, text, style));
+                //}
             }
 
 
@@ -119,6 +119,25 @@ public class StyledTextOrCustomObjectOps { // <S> implements SegmentOps<Either<S
                 } catch (ClassNotFoundException e) {
                     throw new IOException("", e);
                 }
+            }
+
+            @Override
+            public void setStyle(Either<StyledText<S>, CustomObject<S>> seg, S style) {
+                if (seg.isLeft()) {
+                    lOps.setStyle(seg.getLeft(), style);
+                } else {
+                    rOps.setStyle(seg.getRight(), style);
+                }
+            }
+
+            @Override
+            public boolean canJoin(Either<StyledText<S>, CustomObject<S>> left,
+                                   Either<StyledText<S>, CustomObject<S>> right) {
+                if (left.isRight() || right.isRight()) {
+                    return false;
+                }
+
+                return lOps.canJoin(left.getLeft(), right.getLeft());
             }
         };
     }

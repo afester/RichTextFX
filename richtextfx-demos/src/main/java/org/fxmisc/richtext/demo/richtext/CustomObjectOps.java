@@ -55,9 +55,8 @@ public class CustomObjectOps<S> implements SegmentOps<CustomObject<S>, S> {
     }
 
     @Override
-    public CustomObject<S> create(Class<?> clazz, String text, S style) {
-        // TODO Auto-generated method stub
-        return null;
+    public CustomObject<S> create(String text, S style) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -68,6 +67,15 @@ public class CustomObjectOps<S> implements SegmentOps<CustomObject<S>, S> {
     @Override
     public CustomObject<S> decode(DataInputStream is, Codec<S> styleCodec) throws IOException {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setStyle(CustomObject<S> seg, S style) {
+    }
+
+    @Override
+    public boolean canJoin(CustomObject<S> currentSeg, CustomObject<S> nextSeg) {
+        return false;
     }
 
 
@@ -83,4 +91,5 @@ public class CustomObjectOps<S> implements SegmentOps<CustomObject<S>, S> {
             throw new IOException(e);
         }
     }
+
 }

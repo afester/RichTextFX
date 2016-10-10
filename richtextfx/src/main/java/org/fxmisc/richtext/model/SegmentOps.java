@@ -28,11 +28,15 @@ public interface SegmentOps<SEG, S> {
 
     public S getStyle(SEG seg);
 
+    public void setStyle(SEG seg, S style);
+
     public String toString(SEG seg);
 
-    public SEG create(Class<?> clazz, String text, S style);
+    public SEG create(/*Class<?> clazz, */String text, S style);
 
     public void encode(SEG seg, DataOutputStream os, Codec<S> styleCodec) throws IOException;
 
     public SEG decode(DataInputStream is, Codec<S> styleCodec) throws IOException;
+
+    public boolean canJoin(SEG currentSeg, SEG nextSeg);
 }

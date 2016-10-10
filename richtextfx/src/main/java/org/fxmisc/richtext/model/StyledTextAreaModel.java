@@ -562,7 +562,7 @@ public class StyledTextAreaModel<PS, SEG, S>
      * </pre>
      * but the actual implementation is more efficient.
      */
-    public void setStyleSpans(int from, StyleSpans<? extends S> styleSpans) {
+    public void setStyleSpans(int from, StyleSpans</*? extends */S> styleSpans) {
         content.setStyleSpans(from, styleSpans);
     }
 
@@ -576,7 +576,7 @@ public class StyledTextAreaModel<PS, SEG, S>
      * </pre>
      * but the actual implementation is more efficient.
      */
-    public void setStyleSpans(int paragraph, int from, StyleSpans<? extends S> styleSpans) {
+    public void setStyleSpans(int paragraph, int from, StyleSpans</*? extends */ S> styleSpans) {
         content.setStyleSpans(paragraph, from, styleSpans);
     }
 

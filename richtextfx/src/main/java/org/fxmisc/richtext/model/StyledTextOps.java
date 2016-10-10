@@ -57,7 +57,7 @@ public final class StyledTextOps<S> implements SegmentOps<StyledText<S>, S> {
     }
 
     @Override
-    public StyledText<S> create(Class<?> clazz, String text, S style) {
+    public StyledText<S> create(String text, S style) {
         return new StyledText<>(text, style);
     }
 
@@ -72,5 +72,15 @@ public final class StyledTextOps<S> implements SegmentOps<StyledText<S>, S> {
         StyledText<S> result = new StyledText<>();
         result.decode(is, styleCodec);
         return result;
+    }
+
+    @Override
+    public void setStyle(StyledText<S> seg, S style) {
+        seg.setStyle(style);
+    }
+
+    @Override
+    public boolean canJoin(StyledText<S> left, StyledText<S> right) {
+        return left.getStyle().equals(right.getStyle());
     }
 }

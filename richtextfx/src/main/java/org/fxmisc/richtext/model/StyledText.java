@@ -6,10 +6,15 @@ import java.util.Objects;
 
 public class StyledText<S>  {
     private String text;
+
     public String getText() { return text; }
 
     private S style;
     public S getStyle() { return style; }
+
+    public void setStyle(S style) {
+        this.style = style;
+    }
 
     StyledText() { }
 
@@ -20,7 +25,7 @@ public class StyledText<S>  {
 
     @Override
     public String toString() {
-        return '"' + text + '"' + ":" + style;
+        return String.format("StyledText[text=\"%s\", style=%s]", text, style);
     }
 
     @Override
@@ -43,4 +48,6 @@ public class StyledText<S>  {
           text = Codec.STRING_CODEC.decode(is);
           style = styleCodec.decode(is);
     }
+
+
 }
