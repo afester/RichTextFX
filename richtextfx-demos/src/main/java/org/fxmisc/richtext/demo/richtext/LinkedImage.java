@@ -7,6 +7,10 @@ import java.io.IOException;
 
 import org.fxmisc.richtext.model.Codec;
 
+import javafx.scene.Node;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+
 
 /**
  * A custom object which contains a file path to an image file.
@@ -66,17 +70,11 @@ public class LinkedImage<S> extends CustomObject<S> {
         return String.format("LinkedImage[path=%s]", imagePath);
     }
 
-    
-//    @SuppressWarnings("rawtypes")
-//    private static Function<CustomObject, Node> nodeFactory;
-//
-//    @Override
-//    public Node createNode() {
-//        return nodeFactory.apply(this);
-//    }
-//
-//    @SuppressWarnings({ "unchecked", "rawtypes" })
-//    public static <S> void setNodeFactory(Function<LinkedImage<S>, Node> nodeFactory) {
-//        LinkedImage.nodeFactory = (Function<CustomObject, Node>) (Object) nodeFactory;
-//    }
+    @Override
+    public Node createNode() {
+        Image image = new Image("file:" + imagePath); // XXX: No need to create new Image objects each time -
+                                                      // could be cached in the model layer
+        ImageView result = new ImageView(image);
+        return result;
+    }
 }

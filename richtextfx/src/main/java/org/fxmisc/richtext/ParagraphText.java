@@ -19,7 +19,6 @@ import javafx.scene.shape.PathElement;
 import javafx.scene.shape.StrokeLineCap;
 
 import org.fxmisc.richtext.model.Paragraph;
-import org.fxmisc.richtext.model.SegmentOps;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
@@ -49,8 +48,6 @@ class ParagraphText<PS, SEG, S> extends TextFlowExt {
     private final List<Path> backgroundShapes = new ArrayList<>();
     private final List<Path> underlineShapes = new ArrayList<>();
 
-    private final SegmentOps<SEG, S> segmentOps;
-
     // proxy for caretShape.visibleProperty() that implements unbind() correctly.
     // This is necessary due to a bug in BooleanPropertyBase#unbind().
     // See https://bugs.openjdk.java.net/browse/JDK-8130458
@@ -59,10 +56,8 @@ class ParagraphText<PS, SEG, S> extends TextFlowExt {
         caretShape.visibleProperty().bind(caretVisible);
     }
 
-    ParagraphText(Paragraph<PS, SEG, S> par,
-                         SegmentOps<SEG, S> segOps, Function<SEG, Node> nodeFactory) {
+    ParagraphText(Paragraph<PS, SEG, S> par, Function<SEG, Node> nodeFactory) {
         this.paragraph = par;
-        this.segmentOps = segOps;
 
         getStyleClass().add("paragraph-text");
 

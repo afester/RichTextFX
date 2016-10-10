@@ -6,6 +6,8 @@ import java.io.IOException;
 
 import org.fxmisc.richtext.model.Codec;
 
+import javafx.scene.Node;
+
 public abstract class CustomObject<S> {
 
     S style;
@@ -20,4 +22,6 @@ public abstract class CustomObject<S> {
     public abstract void decode(DataInputStream is, Codec<S> styleCodec) throws IOException;
 
     public abstract void encode(DataOutputStream os, Codec<S> styleCodec) throws IOException;
+
+    public abstract Node createNode();
 }

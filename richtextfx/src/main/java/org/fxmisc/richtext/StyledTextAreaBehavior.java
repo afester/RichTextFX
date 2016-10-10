@@ -31,7 +31,7 @@ import org.reactfx.value.Val;
 import org.reactfx.value.Var;
 
 /**
- * Controller for StyledTextArea.
+ * Controller for GenericStyledArea.
  */
 class StyledTextAreaBehavior {
 
@@ -204,7 +204,7 @@ class StyledTextAreaBehavior {
      * Fields                                                                 *
      * ********************************************************************** */
 
-    private final StyledTextArea<?, ?, ?> view;
+    private final GenericStyledArea<?, ?, ?> view;
 
     private final StyledTextAreaModel<?, ?, ?> model;
 
@@ -232,7 +232,7 @@ class StyledTextAreaBehavior {
      * Constructors                                                           *
      * ********************************************************************** */
 
-    StyledTextAreaBehavior(StyledTextArea<?, ?, ?> area) {
+    StyledTextAreaBehavior(GenericStyledArea<?, ?, ?> area) {
         this.view = area;
         this.model = area.getModel();
 

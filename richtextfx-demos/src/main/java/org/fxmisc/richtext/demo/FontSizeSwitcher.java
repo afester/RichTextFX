@@ -10,9 +10,6 @@ import javafx.stage.Stage;
 
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.StyleClassedTextArea;
-import org.fxmisc.richtext.model.SegmentOps;
-
-import java.util.Collection;
 
 public class FontSizeSwitcher extends Application {
 
@@ -22,57 +19,7 @@ public class FontSizeSwitcher extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        StyleClassedTextArea area = new StyleClassedTextArea(new SegmentOps<String, Collection<String>>() {
-            @Override
-            public int length(String s) {
-                return 0;
-            }
-
-            @Override
-            public char charAt(String s, int index) {
-                return 0;
-            }
-
-            @Override
-            public String getText(String s) {
-                return null;
-            }
-
-            @Override
-            public String subSequence(String s, int start, int end) {
-                return null;
-            }
-
-            @Override
-            public String subSequence(String s, int start) {
-                return null;
-            }
-
-            @Override
-            public String append(String s, String str) {
-                return null;
-            }
-
-            @Override
-            public String spliced(String s, int from, int to, CharSequence replacement) {
-                return null;
-            }
-
-            @Override
-            public Collection<String> getStyle(String s) {
-                return null;
-            }
-
-            @Override
-            public String create(String text, Collection<String> style) {
-                return null;
-            }
-
-            @Override
-            public String toString(String s) {
-                return null;
-            }
-        });
+        StyleClassedTextArea area = new StyleClassedTextArea();
         area.setWrapText(true);
         for(int i = 0; i < 10; ++i) {
             area.appendText("Lorem ipsum dolor sit amet, consectetur adipiscing elit.\n");

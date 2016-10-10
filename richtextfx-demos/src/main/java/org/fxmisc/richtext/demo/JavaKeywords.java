@@ -13,7 +13,6 @@ import javafx.stage.Stage;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
-import org.fxmisc.richtext.model.SegmentOps;
 import org.fxmisc.richtext.model.StyleSpans;
 import org.fxmisc.richtext.model.StyleSpansBuilder;
 
@@ -80,57 +79,7 @@ public class JavaKeywords extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        CodeArea codeArea = new CodeArea(new SegmentOps<String, Collection<String>>() {
-            @Override
-            public int length(String s) {
-                return 0;
-            }
-
-            @Override
-            public char charAt(String s, int index) {
-                return 0;
-            }
-
-            @Override
-            public String getText(String s) {
-                return null;
-            }
-
-            @Override
-            public String subSequence(String s, int start, int end) {
-                return null;
-            }
-
-            @Override
-            public String subSequence(String s, int start) {
-                return null;
-            }
-
-            @Override
-            public String append(String s, String str) {
-                return null;
-            }
-
-            @Override
-            public String spliced(String s, int from, int to, CharSequence replacement) {
-                return null;
-            }
-
-            @Override
-            public Collection<String> getStyle(String s) {
-                return null;
-            }
-
-            @Override
-            public String create(String text, Collection<String> style) {
-                return null;
-            }
-
-            @Override
-            public String toString(String s) {
-                return null;
-            }
-        });
+        CodeArea codeArea = new CodeArea();
         codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
 
         codeArea.richChanges()

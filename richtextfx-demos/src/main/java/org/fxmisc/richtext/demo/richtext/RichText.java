@@ -49,6 +49,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import org.fxmisc.flowless.VirtualizedScrollPane;
+import org.fxmisc.richtext.GenericStyledArea;
 import org.fxmisc.richtext.StyledTextArea;
 import org.fxmisc.richtext.TextExt;
 import org.fxmisc.richtext.model.StyledTextOps;
@@ -64,8 +65,8 @@ public class RichText extends Application {
         launch(args);
     }
 
-    private final StyledTextArea<ParStyle, Either<StyledText<TextStyle>, CustomObject<TextStyle>>, TextStyle> area = 
-            new StyledTextArea<>(
+    private final GenericStyledArea<ParStyle, Either<StyledText<TextStyle>, CustomObject<TextStyle>>, TextStyle> area = 
+            new GenericStyledArea<>(
                     ParStyle.EMPTY,                                                 // default paragraph style
                     (paragraph, style) -> paragraph.setStyle(style.toCss()),        // paragraph style setter
 
@@ -265,7 +266,7 @@ public class RichText extends Application {
                 paragraphBackgroundPicker);
         panel2.getChildren().addAll(sizeCombo, familyCombo, textColorPicker, backgroundColorPicker);
 
-        VirtualizedScrollPane<StyledTextArea<ParStyle, Either<StyledText<TextStyle>,CustomObject<TextStyle>>, TextStyle>> vsPane = new VirtualizedScrollPane<>(area);
+        VirtualizedScrollPane<GenericStyledArea<ParStyle, Either<StyledText<TextStyle>,CustomObject<TextStyle>>, TextStyle>> vsPane = new VirtualizedScrollPane<>(area);
         VBox vbox = new VBox();
         VBox.setVgrow(vsPane, Priority.ALWAYS);
         vbox.getChildren().addAll(panel1, panel2, vsPane);
@@ -284,8 +285,7 @@ public class RichText extends Application {
         if (seg.isLeft()) {
             return StyledTextArea.createStyledTextNode(seg, area.getSegOps(), applyStyle);
         } else {
-            System.err.println("CREATE NODE FOR CUSTOM OBJECT");
-            return new Text("[OBJ]");   // dummy - for now ...
+            return seg.asRight().get().createNode();
         }
     }
 
