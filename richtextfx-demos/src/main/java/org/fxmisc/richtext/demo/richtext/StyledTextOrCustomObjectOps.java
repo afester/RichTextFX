@@ -97,10 +97,11 @@ public class StyledTextOrCustomObjectOps { // <S> implements SegmentOps<Either<S
             @Override
             public void encode(Either<StyledText<S>, CustomObject<S>> seg, DataOutputStream os, Codec<S> styleCodec) throws IOException {
                 // we need a type id to be able to recreate the object later
-                Codec.STRING_CODEC.encode(os, seg.getClass().getName());
                 if (seg.isLeft()) {
+                    Codec.STRING_CODEC.encode(os, seg.getLeft().getClass().getName());
                     lOps.encode(seg.getLeft(), os, styleCodec);
                 } else {
+                    Codec.STRING_CODEC.encode(os, seg.getRight().getClass().getName());
                     rOps.encode(seg.getRight(), os, styleCodec);
                 }
             }
@@ -109,9 +110,6 @@ public class StyledTextOrCustomObjectOps { // <S> implements SegmentOps<Either<S
             public Either<StyledText<S>, CustomObject<S>> decode(DataInputStream is, Codec<S> styleCodec) throws IOException {
                 String segmentType = Codec.STRING_CODEC.decode(is);
                 try {
-                    if (segmentType.equals("org.fxmisc.richtext.model.LinkedImage")) {
-                        segmentType = "org.fxmisc.richtext.demo.richtext.LinkedImage";
-                    }
                     Class<?> segmentClass = Class.forName(segmentType);
                     if (segmentClass.isAssignableFrom(StyledText.class)) {
                         return Either.left(lOps.decode(is, styleCodec));
