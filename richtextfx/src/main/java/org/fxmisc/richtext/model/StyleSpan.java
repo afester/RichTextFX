@@ -43,9 +43,4 @@ public class StyleSpan<S> {
     public int hashCode() {
         return Objects.hash(style, length);
     }
-    
-    @Override
-    public String toString() {
-        return String.format("StyleSpan[length=%s, style=%s]", length, style);
-    }
 }

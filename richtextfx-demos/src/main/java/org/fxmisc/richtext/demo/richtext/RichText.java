@@ -16,10 +16,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import org.fxmisc.richtext.model.Codec;
-import org.fxmisc.richtext.model.LinkedImage;
 import org.fxmisc.richtext.model.ReadOnlyStyledDocument;
 import org.fxmisc.richtext.model.StyledDocument;
 import org.reactfx.util.Tuple2;
@@ -28,6 +28,7 @@ import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -47,10 +48,15 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import org.fxmisc.flowless.VirtualizedScrollPane;
+import org.fxmisc.richtext.GenericStyledArea;
 import org.fxmisc.richtext.StyledTextArea;
+import org.fxmisc.richtext.TextExt;
+import org.fxmisc.richtext.model.StyledTextOps;
 import org.fxmisc.richtext.model.Paragraph;
 import org.fxmisc.richtext.model.StyleSpans;
+import org.fxmisc.richtext.model.StyledText;
 import org.reactfx.SuspendableNo;
+import org.reactfx.util.Either;
 
 public class RichText extends Application {
 
@@ -58,10 +64,14 @@ public class RichText extends Application {
         launch(args);
     }
 
-    private final StyledTextArea<ParStyle, TextStyle> area = new StyledTextArea<>(
-                    ParStyle.EMPTY, ( paragraph, style) -> paragraph.setStyle(style.toCss()),
-                    TextStyle.EMPTY.updateFontSize(12).updateFontFamily("Serif").updateTextColor(Color.BLACK),
-                    ( text, style) -> text.setStyle(style.toCss()));
+    private final GenericStyledArea<ParStyle, Either<StyledText<TextStyle>, CustomObject<TextStyle>>, TextStyle> area = 
+            new GenericStyledArea<>(
+                    ParStyle.EMPTY,                                                 // default paragraph style
+                    (paragraph, style) -> paragraph.setStyle(style.toCss()),        // paragraph style setter
+
+                    TextStyle.EMPTY.updateFontSize(12).updateFontFamily("Serif").updateTextColor(Color.BLACK),  // default segment style
+                    StyledTextOrCustomObjectOps.eitherOps(new StyledTextOps<>(), new CustomObjectOps<>()),      // segment operations      
+                    seg -> createNode(seg, (text, style) -> text.setStyle(style.toCss())));                     // Node creator and segment style setter
     {
         area.setWrapText(true);
         area.setStyleCodecs(ParStyle.CODEC, TextStyle.CODEC);
@@ -167,7 +177,7 @@ public class RichText extends Application {
 
                 int startPar = area.offsetToPosition(selection.getStart(), Forward).getMajor();
                 int endPar = area.offsetToPosition(selection.getEnd(), Backward).getMajor();
-                List<Paragraph<ParStyle, TextStyle>> pars = area.getParagraphs().subList(startPar, endPar + 1);
+                List<Paragraph<ParStyle, Either<StyledText<TextStyle>,CustomObject<TextStyle>>, TextStyle>> pars = area.getParagraphs().subList(startPar, endPar + 1);
 
                 @SuppressWarnings("unchecked")
                 Optional<TextAlignment>[] alignments = pars.stream().map(p -> p.getParagraphStyle().alignment).distinct().toArray(Optional[]::new);
@@ -255,7 +265,7 @@ public class RichText extends Application {
                 paragraphBackgroundPicker);
         panel2.getChildren().addAll(sizeCombo, familyCombo, textColorPicker, backgroundColorPicker);
 
-        VirtualizedScrollPane<StyledTextArea<ParStyle, TextStyle>> vsPane = new VirtualizedScrollPane<>(area);
+        VirtualizedScrollPane<GenericStyledArea<ParStyle, Either<StyledText<TextStyle>,CustomObject<TextStyle>>, TextStyle>> vsPane = new VirtualizedScrollPane<>(area);
         VBox vbox = new VBox();
         VBox.setVgrow(vsPane, Priority.ALWAYS);
         vbox.getChildren().addAll(panel1, panel2, vsPane);
@@ -266,6 +276,16 @@ public class RichText extends Application {
         area.requestFocus();
         primaryStage.setTitle("Rich Text Demo");
         primaryStage.show();
+    }
+
+
+    private Node createNode(Either<StyledText<TextStyle>, CustomObject<TextStyle>> seg,
+                            BiConsumer<? super TextExt, TextStyle> applyStyle) {
+        if (seg.isLeft()) {
+            return StyledTextArea.createStyledTextNode(seg, area.getSegOps(), applyStyle);
+        } else {
+            return seg.asRight().get().createNode();
+        }
     }
 
     @Deprecated
@@ -348,12 +368,13 @@ public class RichText extends Application {
     private void load(File file) {
         if(area.getStyleCodecs().isPresent()) {
             Tuple2<Codec<ParStyle>, Codec<TextStyle>> codecs = area.getStyleCodecs().get();
-            Codec<StyledDocument<ParStyle, TextStyle>> codec = ReadOnlyStyledDocument.codec(codecs._1, codecs._2);
+            Codec<StyledDocument<ParStyle, Either<StyledText<TextStyle>, CustomObject<TextStyle>>, TextStyle>> 
+                codec = ReadOnlyStyledDocument.codec(codecs._1, codecs._2, area.getSegOps());
 
             try {
                 FileInputStream fis = new FileInputStream(file);
                 DataInputStream dis = new DataInputStream(fis);
-                StyledDocument<ParStyle, TextStyle> doc = codec.decode(dis);
+                StyledDocument<ParStyle, Either<StyledText<TextStyle>, CustomObject<TextStyle>>, TextStyle> doc = codec.decode(dis);
                 fis.close();
 
                 if(doc != null) {
@@ -380,11 +401,12 @@ public class RichText extends Application {
 
 
     private void save(File file) {
-        StyledDocument<ParStyle, TextStyle> doc = area.getDocument();
+        StyledDocument<ParStyle, Either<StyledText<TextStyle>, CustomObject<TextStyle>>, TextStyle> doc = area.getDocument();
 
         // Use the Codec to save the document in a binary format
         area.getStyleCodecs().ifPresent(codecs -> {
-            Codec<StyledDocument<ParStyle, TextStyle>> codec = ReadOnlyStyledDocument.codec(codecs._1, codecs._2);
+            Codec<StyledDocument<ParStyle, Either<StyledText<TextStyle>, CustomObject<TextStyle>>, TextStyle>> codec = 
+                    ReadOnlyStyledDocument.codec(codecs._1, codecs._2, doc.getSegOps());
             try {
                 FileOutputStream fos = new FileOutputStream(file);
                 DataOutputStream dos = new DataOutputStream(fos);
@@ -401,19 +423,19 @@ public class RichText extends Application {
      * Action listener which inserts a new image at the current caret position.
      */
     private void insertImage() {
-        
-        String initialDir = System.getProperty("user.dir");
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Insert image");
-        fileChooser.setInitialDirectory(new File(initialDir));
-        File selectedFile = fileChooser.showOpenDialog(mainStage);
-        if (selectedFile != null) {
-            String imagePath = selectedFile.getAbsolutePath();
-            ReadOnlyStyledDocument<ParStyle, TextStyle> ros = 
-                    ReadOnlyStyledDocument.from(new LinkedImage<>(imagePath, TextStyle.EMPTY), 
-                                                ParStyle.EMPTY); 
-            area.replaceSelection(ros);
-        }
+//        
+//        String initialDir = System.getProperty("user.dir");
+//        FileChooser fileChooser = new FileChooser();
+//        fileChooser.setTitle("Insert image");
+//        fileChooser.setInitialDirectory(new File(initialDir));
+//        File selectedFile = fileChooser.showOpenDialog(mainStage);
+//        if (selectedFile != null) {
+//            String imagePath = selectedFile.getAbsolutePath();
+//            ReadOnlyStyledDocument<ParStyle, TextStyle> ros = 
+//                    ReadOnlyStyledDocument.from(new LinkedImage<>(imagePath, TextStyle.EMPTY), 
+//                                                ParStyle.EMPTY, TextStyle.EMPTY); 
+//            area.replaceSelection(ros);
+//        }
     }
 
     private void updateStyleInSelection(Function<StyleSpans<TextStyle>, TextStyle> mixinGetter) {
@@ -440,7 +462,7 @@ public class RichText extends Application {
         int startPar = area.offsetToPosition(selection.getStart(), Forward).getMajor();
         int endPar = area.offsetToPosition(selection.getEnd(), Backward).getMajor();
         for(int i = startPar; i <= endPar; ++i) {
-            Paragraph<ParStyle, TextStyle> paragraph = area.getParagraph(i);
+            Paragraph<ParStyle, Either<StyledText<TextStyle>,CustomObject<TextStyle>>, TextStyle> paragraph = area.getParagraph(i);
             area.setParagraphStyle(i, updater.apply(paragraph.getParagraphStyle()));
         }
     }

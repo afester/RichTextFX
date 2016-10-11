@@ -10,10 +10,11 @@ public class ParagraphTest {
     // This relates to merging text changes and issue #216.
     @Test
     public void concatEmptyParagraphsTest() {
-        Paragraph<Void, Boolean> p1 = new Paragraph<>(null, "", true);
-        Paragraph<Void, Boolean> p2 = new Paragraph<>(null, "", false);
+        SegmentOps<StyledText<Boolean>, Boolean> segOps = new StyledTextOps<>();
+        Paragraph<Void, StyledText<Boolean>, Boolean> p1 = new Paragraph<>(null, segOps, "", true);
+        Paragraph<Void, StyledText<Boolean>, Boolean> p2 = new Paragraph<>(null, segOps, "", false);
 
-        Paragraph<Void, Boolean> p = p1.concat(p2);
+        Paragraph<Void, StyledText<Boolean>, Boolean> p = p1.concat(p2);
 
         assertEquals(Boolean.TRUE, p.getStyleAtPosition(0));
     }
