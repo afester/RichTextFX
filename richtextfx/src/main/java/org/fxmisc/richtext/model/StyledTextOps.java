@@ -3,6 +3,7 @@ package org.fxmisc.richtext.model;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Objects;
 
 public final class StyledTextOps<S> implements SegmentOps<StyledText<S>, S> {
 
@@ -81,27 +82,6 @@ public final class StyledTextOps<S> implements SegmentOps<StyledText<S>, S> {
 
     @Override
     public boolean canJoin(StyledText<S> left, StyledText<S> right) {
-        S leftStyle = left.getStyle();
-        S rightStyle = right.getStyle();
-
-        System.err.println("ENTER===================");
-        System.err.printf("LEFT: %s, RIGHT: %s%n", left, right);
-
-//        if (leftStyle == null && rightStyle == null) {
-//            return true;
-//        }
-//        if (leftStyle == null || rightStyle == null) {
-//            return false;
-//        }
-
-        Class<?> rightCl = rightStyle.getClass();
-
-        System.err.printf("CJ: LEFT: %s, RIGHT: %s%n", rightCl, rightStyle.getClass());
-        leftStyle.equals(rightStyle);
-
-        boolean res = leftStyle.equals(rightStyle);
-        System.err.printf("  => %s%n", res);
-
-        return res; // left.getStyle().equals(right.getStyle());
+        return Objects.equals(left.getStyle(), right.getStyle());
     }
 }
