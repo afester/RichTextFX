@@ -1,5 +1,6 @@
 package org.fxmisc.richtext;
 
+import static java.lang.Character.isWhitespace;
 import static javafx.scene.input.KeyCode.*;
 import static javafx.scene.input.KeyCombination.*;
 import static org.fxmisc.richtext.model.TwoDimensional.Bias.*;
@@ -83,8 +84,8 @@ class StyledTextAreaBehavior {
                 consume(
                         anyOf(keyPressed(DOWN), keyPressed(KP_DOWN)),
                         (b, e) -> b.nextLine(SelectionPolicy.CLEAR)),
-                consume(keyPressed(PAGE_UP),    (b, e) -> b.prevPage(SelectionPolicy.CLEAR)),
-                consume(keyPressed(PAGE_DOWN),  (b, e) -> b.nextPage(SelectionPolicy.CLEAR)),
+                consume(keyPressed(PAGE_UP),    (b, e) -> b.view.prevPage(SelectionPolicy.CLEAR)),
+                consume(keyPressed(PAGE_DOWN),  (b, e) -> b.view.nextPage(SelectionPolicy.CLEAR)),
                 // vertical selection
                 consume(
                         anyOf(keyPressed(UP,   SHIFT_DOWN), keyPressed(KP_UP, SHIFT_DOWN)),
@@ -92,8 +93,8 @@ class StyledTextAreaBehavior {
                 consume(
                         anyOf(keyPressed(DOWN, SHIFT_DOWN), keyPressed(KP_DOWN, SHIFT_DOWN)),
                         (b, e) -> b.nextLine(SelectionPolicy.ADJUST)),
-                consume(keyPressed(PAGE_UP,   SHIFT_DOWN),  (b, e) -> b.prevPage(SelectionPolicy.ADJUST)),
-                consume(keyPressed(PAGE_DOWN, SHIFT_DOWN),  (b, e) -> b.nextPage(SelectionPolicy.ADJUST))
+                consume(keyPressed(PAGE_UP,   SHIFT_DOWN),  (b, e) -> b.view.prevPage(SelectionPolicy.ADJUST)),
+                consume(keyPressed(PAGE_DOWN, SHIFT_DOWN),  (b, e) -> b.view.nextPage(SelectionPolicy.ADJUST))
         );
 
         InputMapTemplate<StyledTextAreaBehavior, KeyEvent> otherNavigation = sequence(
@@ -106,12 +107,12 @@ class StyledTextAreaBehavior {
                         anyOf(
                                 keyPressed(RIGHT,    SHORTCUT_DOWN),
                                 keyPressed(KP_RIGHT, SHORTCUT_DOWN)
-                        ), (b, e) -> b.model.wordBreaksForwards(2, SelectionPolicy.CLEAR)),
+                        ), (b, e) -> b.skipToNextWord(SelectionPolicy.CLEAR)),
                 consume(
                         anyOf(
                                 keyPressed(LEFT,     SHORTCUT_DOWN),
                                 keyPressed(KP_LEFT,  SHORTCUT_DOWN)
-                        ), (b, e) -> b.model.wordBreaksBackwards(2, SelectionPolicy.CLEAR)),
+                        ), (b, e) -> b.skipToPrevWord(SelectionPolicy.CLEAR)),
                 consume(keyPressed(HOME, SHORTCUT_DOWN), (b, e) -> b.model.start(SelectionPolicy.CLEAR)),
                 consume(keyPressed(END,  SHORTCUT_DOWN), (b, e) -> b.model.end(SelectionPolicy.CLEAR)),
                 // selection
@@ -133,12 +134,12 @@ class StyledTextAreaBehavior {
                         anyOf(
                                 keyPressed(RIGHT,    SHIFT_DOWN, SHORTCUT_DOWN),
                                 keyPressed(KP_RIGHT, SHIFT_DOWN, SHORTCUT_DOWN)
-                        ), (b, e) -> b.model.wordBreaksForwards(2, selPolicy)),
+                        ), (b, e) -> b.skipToNextWord(selPolicy)),
                 consume(
                         anyOf(
                                 keyPressed(LEFT,     SHIFT_DOWN, SHORTCUT_DOWN),
                                 keyPressed(KP_LEFT,  SHIFT_DOWN, SHORTCUT_DOWN)
-                        ), (b, e) -> b.model.wordBreaksBackwards(2, selPolicy)),
+                        ), (b, e) -> b.skipToPrevWord(selPolicy)),
                 consume(keyPressed(A, SHORTCUT_DOWN), (b, e) -> b.model.selectAll())
         );
 
@@ -164,16 +165,19 @@ class StyledTextAreaBehavior {
         InputMapTemplate<StyledTextAreaBehavior, KeyEvent> charPressConsumer = consume(keyPressed().onlyIf(isChar.and(noControlKeys)));
 
         InputMapTemplate<StyledTextAreaBehavior, ? super KeyEvent> keyPressedTemplate = edits
-                .orElse(otherNavigation).ifConsumed((b, e) -> b.clearTargetCaretOffset())
+                .orElse(otherNavigation).ifConsumed((b, e) -> b.view.clearTargetCaretOffset())
                 .orElse(verticalNavigation)
                 .orElse(copyAction)
+                .ifConsumed((b, e) -> b.view.requestFollowCaret())
+                // no need to add 'ifConsumed' after charPress since
+                // requestFollowCaret is called in keyTypedTemplate
                 .orElse(charPressConsumer);
 
         InputMapTemplate<StyledTextAreaBehavior, KeyEvent> keyTypedBase = consume(
                 // character input
                 EventPattern.keyTyped().onlyIf(noControlKeys.and(e -> isLegal(e.getCharacter()))),
                 StyledTextAreaBehavior::keyTyped
-        );
+        ).ifConsumed((b, e) -> b.view.requestFollowCaret());
         InputMapTemplate<StyledTextAreaBehavior, ? super KeyEvent> keyTypedTemplate = when(b -> b.view.isEditable(), keyTypedBase);
 
         InputMapTemplate<StyledTextAreaBehavior, ? super MouseEvent> mouseEventTemplate = sequence(
@@ -212,19 +216,6 @@ class StyledTextAreaBehavior {
      * Indicates whether selection is being dragged by the user.
      */
     private DragState dragSelection = DragState.NO_DRAG;
-
-    /**
-     * Remembers horizontal position when traversing up / down.
-     */
-    private Optional<CaretOffsetX> targetCaretOffset = Optional.empty();
-    private void clearTargetCaretOffset() {
-        targetCaretOffset = Optional.empty();
-    }
-    private CaretOffsetX getTargetCaretOffset() {
-        if(!targetCaretOffset.isPresent())
-            targetCaretOffset = Optional.of(view.getCaretOffsetX());
-        return targetCaretOffset.get();
-    }
 
     private final Var<Point2D> autoscrollTo = Var.newSimpleVar(null);
 
@@ -358,7 +349,7 @@ class StyledTextAreaBehavior {
         Position targetLine = currentLine.offsetBy(nLines, Forward).clamp();
         if(!currentLine.sameAs(targetLine)) {
             // compute new caret position
-            CharacterHit hit = view.hit(getTargetCaretOffset(), targetLine);
+            CharacterHit hit = view.hit(view.getTargetCaretOffset(), targetLine);
 
             // update model
             model.moveTo(hit.getInsertionIndex(), selectionPolicy);
@@ -373,18 +364,26 @@ class StyledTextAreaBehavior {
         downLines(selectionPolicy, 1);
     }
 
-    private void prevPage(SelectionPolicy selectionPolicy) {
-        view.showCaretAtBottom();
-        CharacterHit hit = view.hit(getTargetCaretOffset(), 1.0);
-        model.moveTo(hit.getInsertionIndex(), selectionPolicy);
+    private void skipToPrevWord(SelectionPolicy selectionPolicy) {
+        int caretPos = model.getCaretPosition();
+
+        // if (0 == caretPos), do nothing as can't move to the left anyway
+        if (1 <= caretPos ) {
+            boolean prevCharIsWhiteSpace = isWhitespace(model.getText(caretPos - 1, caretPos).charAt(0));
+            model.wordBreaksBackwards(prevCharIsWhiteSpace ? 2 : 1, selectionPolicy);
+        }
     }
 
-    private void nextPage(SelectionPolicy selectionPolicy) {
-        view.showCaretAtTop();
-        CharacterHit hit = view.hit(getTargetCaretOffset(), view.getViewportHeight() - 1.0);
-        model.moveTo(hit.getInsertionIndex(), selectionPolicy);
-    }
+    private void skipToNextWord(SelectionPolicy selectionPolicy) {
+        int caretPos = model.getCaretPosition();
+        int length = model.getLength();
 
+        // if (caretPos == length), do nothing as can't move to the right anyway
+        if (caretPos <= length - 1) {
+            boolean nextCharIsWhiteSpace = isWhitespace(model.getText(caretPos, caretPos + 1).charAt(0));
+            model.wordBreaksForwards(nextCharIsWhiteSpace ? 2 : 1, selectionPolicy);
+        }
+    }
 
     /* ********************************************************************** *
      * Mouse handling implementation                                          *
@@ -422,7 +421,7 @@ class StyledTextAreaBehavior {
     }
 
     private void firstLeftPress(CharacterHit hit) {
-        clearTargetCaretOffset();
+        view.clearTargetCaretOffset();
         IndexRange selection = model.getSelection();
         if(view.isEditable() &&
                 selection.getLength() != 0 &&
@@ -493,10 +492,13 @@ class StyledTextAreaBehavior {
                 model.moveTo(hit.getInsertionIndex(), SelectionPolicy.CLEAR);
                 break;
             case DRAG:
-                // move selection to the target position
-                CharacterHit h = view.hit(e.getX(), e.getY());
-                view.getOnSelectionDrop().accept(h.getInsertionIndex());
-                // do nothing, handled by mouseDragReleased
+                // only handle drags if mouse was released inside of view
+                if (view.getLayoutBounds().contains(e.getX(), e.getY())) {
+                    // move selection to the target position
+                    CharacterHit h = view.hit(e.getX(), e.getY());
+                    view.getOnSelectionDrop().accept(h.getInsertionIndex());
+                    // do nothing, handled by mouseDragReleased
+                }
             case NO_DRAG:
                 // do nothing, caret already repositioned in mousePressed
         }

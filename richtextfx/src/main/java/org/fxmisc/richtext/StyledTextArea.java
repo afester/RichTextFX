@@ -106,6 +106,20 @@ import org.reactfx.value.Var;
  * }
  * </pre>
  *
+ * <h3>Auto-Scrolling to the Caret</h3>
+ *
+ * <p>Every time the underlying {@link EditableStyledDocument} changes via user interaction (e.g. typing) through
+ * the {@code StyledTextArea}, the area will scroll to insure the caret is kept in view. However, this does not
+ * occur if changes are done programmatically. For example, let's say the area is displaying the bottom part
+ * of the area's {@link EditableStyledDocument} and some code changes something in the top part of the document
+ * that is not currently visible. If there is no call to {@link #requestFollowCaret()} at the end of that code,
+ * the area will not auto-scroll to that section of the document. The change will occur, and the user will continue
+ * to see the bottom part of the document as before. If such a call is there, then the area will scroll
+ * to the top of the document and no longer display the bottom part of it.</p>
+ *
+ * <p>Additionally, when overriding the default user-interaction behavior, remember to include a call
+ * to {@link #requestFollowCaret()}.</p>
+ *
  * <h3>Overriding keyboard shortcuts</h3>
  *
  * {@code StyledTextArea} uses {@code KEY_TYPED} handler to handle ordinary
@@ -451,6 +465,9 @@ public class StyledTextArea<PS, SEG, S> extends Region
 
     private Subscription subscriptions = () -> {};
 
+    // Remembers horizontal position when traversing up / down.
+    private Optional<ParagraphBox.CaretOffsetX> targetCaretOffset = Optional.empty();
+
     private final Binding<Boolean> caretVisible;
 
     private final Val<UnaryOperator<Point2D>> _popupAnchorAdjustment;
@@ -599,13 +616,19 @@ public class StyledTextArea<PS, SEG, S> extends Region
         IntUnaryOperator cellLength = i -> virtualFlow.getCell(i).getNode().getLineCount();
         navigator = new TwoLevelNavigator(cellCount, cellLength);
 
+        // relayout the popup when any of its settings values change (besides the caret being dirty)
+        EventStream<?> popupAlignmentDirty = invalidationsOf(popupAlignmentProperty());
+        EventStream<?> popupAnchorAdjustmentDirty = invalidationsOf(popupAnchorAdjustmentProperty());
+        EventStream<?> popupAnchorOffsetDirty = invalidationsOf(popupAnchorOffsetProperty());
+        EventStream<?> popupDirty = merge(popupAlignmentDirty, popupAnchorAdjustmentDirty, popupAnchorOffsetDirty);
+        subscribeTo(popupDirty, x -> layoutPopup());
+
         // follow the caret every time the caret position or paragraphs change
         EventStream<?> caretPosDirty = invalidationsOf(caretPositionProperty());
         EventStream<?> paragraphsDirty = invalidationsOf(getParagraphs());
         EventStream<?> selectionDirty = invalidationsOf(selectionProperty());
         // need to reposition popup even when caret hasn't moved, but selection has changed (been deselected)
         EventStream<?> caretDirty = merge(caretPosDirty, paragraphsDirty, selectionDirty);
-        subscribeTo(caretDirty, x -> requestFollowCaret());
 
         // whether or not to display the caret
         EventStream<Boolean> blinkCaret = EventStreams.valuesOf(showCaretProperty())
@@ -948,7 +971,12 @@ public class StyledTextArea<PS, SEG, S> extends Region
         virtualFlow.showAtOffset(parIdx, -y);
     }
 
-    void requestFollowCaret() {
+    /**
+     * If the caret is not visible within the area's view, the area will scroll so that caret
+     * is visible in the next layout pass. Use this method when you wish to "follow the caret"
+     * (i.e. auto-scroll to caret) after making a change (add/remove/modify area's segments).
+     */
+    public void requestFollowCaret() {
         followCaretRequested = true;
         requestLayout();
     }
@@ -960,6 +988,30 @@ public class StyledTextArea<PS, SEG, S> extends Region
         double graphicWidth = cell.getNode().getGraphicPrefWidth();
         Bounds region = extendLeft(caretBounds, graphicWidth);
         virtualFlow.show(parIdx, region);
+    }
+
+    /**
+     * Moves caret to the previous page (i.e. page up)
+     * @param selectionPolicy use {@link SelectionPolicy#CLEAR} when no selection is desired and
+     *                        {@link SelectionPolicy#ADJUST} when a selection from starting point
+     *                        to the place to where the caret is moved is desired.
+     */
+    public void prevPage(SelectionPolicy selectionPolicy) {
+        showCaretAtBottom();
+        CharacterHit hit = hit(getTargetCaretOffset(), 1.0);
+        model.moveTo(hit.getInsertionIndex(), selectionPolicy);
+    }
+
+    /**
+     * Moves caret to the next page (i.e. page down)
+     * @param selectionPolicy use {@link SelectionPolicy#CLEAR} when no selection is desired and
+     *                        {@link SelectionPolicy#ADJUST} when a selection from starting point
+     *                        to the place to where the caret is moved is desired.
+     */
+    public void nextPage(SelectionPolicy selectionPolicy) {
+        showCaretAtTop();
+        CharacterHit hit = hit(getTargetCaretOffset(), getViewportHeight() - 1.0);
+        model.moveTo(hit.getInsertionIndex(), selectionPolicy);
     }
 
     /**
@@ -1100,12 +1152,7 @@ public class StyledTextArea<PS, SEG, S> extends Region
         }
 
         // position popup
-        PopupWindow popup = getPopupWindow();
-        PopupAlignment alignment = getPopupAlignment();
-        UnaryOperator<Point2D> adjustment = _popupAnchorAdjustment.getValue();
-        if(popup != null) {
-            positionPopup(popup, alignment, adjustment);
-        }
+        layoutPopup();
     }
 
     /* ********************************************************************** *
@@ -1204,6 +1251,15 @@ public class StyledTextArea<PS, SEG, S> extends Region
         return position(parIdx, 0).toOffset();
     }
 
+    private void layoutPopup() {
+        PopupWindow popup = getPopupWindow();
+        PopupAlignment alignment = getPopupAlignment();
+        UnaryOperator<Point2D> adjustment = _popupAnchorAdjustment.getValue();
+        if(popup != null) {
+            positionPopup(popup, alignment, adjustment);
+        }
+    }
+
     private void positionPopup(
             PopupWindow popup,
             PopupAlignment alignment,
@@ -1278,6 +1334,16 @@ public class StyledTextArea<PS, SEG, S> extends Region
                     b.getMinX() - w, b.getMinY(),
                     b.getWidth() + w, b.getHeight());
         }
+    }
+
+    void clearTargetCaretOffset() {
+        targetCaretOffset = Optional.empty();
+    }
+
+    ParagraphBox.CaretOffsetX getTargetCaretOffset() {
+        if(!targetCaretOffset.isPresent())
+            targetCaretOffset = Optional.of(getCaretOffsetX());
+        return targetCaretOffset.get();
     }
 
     private static EventStream<Boolean> booleanPulse(javafx.util.Duration javafxDuration, EventStream<?> restartImpulse) {
