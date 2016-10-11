@@ -97,10 +97,7 @@ public final class Paragraph<PS, SEG, S> {
 
         SEG left = segments.get(segments.size() - 1);
         SEG right = p.segments.get(0);
-        System.err.printf("%nXENTER: LEFT: %s, RIGHT: %s%n", left, right);
-        boolean res = segmentOps.canJoin(left, right);
-        System.err.printf("XRES: %s%n", res);
-        if (res) { // segmentOps.canJoin(left, right)) {
+        if (segmentOps.canJoin(left, right)) {
             SEG segment = segmentOps.append(left, segmentOps.getText(right));
             List<SEG> segs = new ArrayList<>(segments.size() + p.segments.size() - 1);
             segs.addAll(segments.subList(0, segments.size()-1));
