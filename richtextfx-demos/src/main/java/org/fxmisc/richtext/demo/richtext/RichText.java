@@ -61,6 +61,9 @@ import org.reactfx.util.Either;
 public class RichText extends Application {
 
     public static void main(String[] args) {
+        // The following properties are required on Linux for improved text rendering
+        //System.setProperty("prism.lcdtext", "false");
+        //System.setProperty("prism.text", "t2k");
         launch(args);
     }
 
