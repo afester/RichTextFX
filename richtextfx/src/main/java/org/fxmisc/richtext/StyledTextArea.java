@@ -19,7 +19,7 @@ import javafx.scene.text.TextFlow;
  *
  * <p>Note: Scroll bars no longer appear when the content spans outside
  * of the viewport. To add scroll bars, the area needs to be wrapped in
- * a {@link VirtualizedScrollPane}. For example, </p>
+ * a {@link org.fxmisc.flowless.VirtualizedScrollPane}. For example, </p>
  * <pre>
  * {@code
  * // shows area without scroll bars

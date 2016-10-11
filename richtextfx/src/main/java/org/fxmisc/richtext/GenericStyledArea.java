@@ -543,16 +543,16 @@ public class GenericStyledArea<PS, SEG, S> extends Region
     /**
      * Creates a text area with empty text content.
      *
-     * @param initialTextStyle style to use in places where no other style is
-     * specified (yet).
-     * @param applyStyle function that, given a {@link Text} node and
-     * a style, applies the style to the text node. This function is
-     * used by the default skin to apply style to text nodes.
      * @param initialParagraphStyle style to use in places where no other style is
      * specified (yet).
      * @param applyParagraphStyle function that, given a {@link TextFlow} node and
      * a style, applies the style to the paragraph node. This function is
      * used by the default skin to apply style to paragraph nodes.
+     * @param initialTextStyle style to use in places where no other style is
+     * specified (yet).
+     * @param segmentOps The operations which are defined on the text segment objects.
+     * @param nodeFactory A function which is used to create the JavaFX scene nodes for a
+     *        particular segment.
      */
     public GenericStyledArea(PS initialParagraphStyle, BiConsumer<TextFlow, PS> applyParagraphStyle,
                              S initialTextStyle, SegmentOps<SEG, S> segmentOps,
@@ -568,8 +568,8 @@ public class GenericStyledArea<PS, SEG, S> extends Region
     }
 
     /**
-     * The same as {@link #StyledTextArea(Object, BiConsumer, Object, SegmentOps, BiConsumer)} except that
-     * this constructor can be used to create another {@code StyledTextArea} object that
+     * The same as {@link #GenericStyledArea(Object, BiConsumer, Object, SegmentOps, Function)} except that
+     * this constructor can be used to create another {@code GenericStyledArea} object that
      * shares the same {@link EditableStyledDocument}.
      */
     public GenericStyledArea(PS initialParagraphStyle, BiConsumer<TextFlow, PS> applyParagraphStyle,
