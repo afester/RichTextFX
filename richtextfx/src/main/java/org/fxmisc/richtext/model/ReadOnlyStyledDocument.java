@@ -86,6 +86,12 @@ public final class ReadOnlyStyledDocument<PS, SEG, S> implements StyledDocument<
         return new ReadOnlyStyledDocument<>(res, segmentOps);
     }
 
+    public static <PS, SEG, S> ReadOnlyStyledDocument<PS, SEG, S> fromSegment(SEG segment,  PS paragraphStyle, S style, SegmentOps<SEG, S> segmentOps) {
+        List<Paragraph<PS, SEG, S>> res = new ArrayList<>(1);
+        res.add(new Paragraph<>(paragraphStyle, segmentOps, segment));
+        return new ReadOnlyStyledDocument<>(res, segmentOps);
+    }
+
     public static <PS, SEG, S> ReadOnlyStyledDocument<PS, SEG, S> from(StyledDocument<PS, SEG, S> doc) {
         if(doc instanceof ReadOnlyStyledDocument) {
             return (ReadOnlyStyledDocument<PS, SEG, S>) doc;
@@ -93,7 +99,8 @@ public final class ReadOnlyStyledDocument<PS, SEG, S> implements StyledDocument<
             return new ReadOnlyStyledDocument<>(doc.getParagraphs(), doc.getSegOps());
         }
     }
-
+        
+    
     public static <PS, SEG, S> Codec<StyledDocument<PS, SEG, S>> codec(Codec<PS> pCodec, Codec<S> tCodec, SegmentOps<SEG, S> segmentOps) {
         return new Codec<StyledDocument<PS, SEG, S>>() {
             private final Codec<List<Paragraph<PS, SEG, S>>> codec = Codec.listCodec(paragraphCodec(pCodec, tCodec, segmentOps));
