@@ -53,14 +53,18 @@ public class LinkedImage<S> extends CustomObject<S> {
 
     @Override
     public void encode(DataOutputStream os, Codec<S> styleCodec) throws IOException {
-        Codec.STRING_CODEC.encode(os, imagePath);
+        // external path rep should use forward slashes only
+        String externalPath = imagePath.replace("\\", "/");
+        Codec.STRING_CODEC.encode(os, externalPath);
         styleCodec.encode(os, style);
     }
 
     
     @Override
     public void decode(DataInputStream is, Codec<S> styleCodec) throws IOException {
+        // Sanitize path - make sure that forward slashes only are used
         imagePath = Codec.STRING_CODEC.decode(is);
+        imagePath = imagePath.replace("\\",  "/");
         style = styleCodec.decode(is);
     }
 
