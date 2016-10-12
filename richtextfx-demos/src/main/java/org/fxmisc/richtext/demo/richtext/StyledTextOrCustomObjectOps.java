@@ -10,7 +10,7 @@ import org.fxmisc.richtext.model.StyledText;
 import org.fxmisc.richtext.model.StyledTextOps;
 import org.reactfx.util.Either;
 
-public class StyledTextOrCustomObjectOps { // <S> implements SegmentOps<Either<StyledText<S>, CustomObject<S>>, S>{
+public class StyledTextOrCustomObjectOps {
 
     public static <L, R, S> SegmentOps<Either<StyledText<S>, CustomObject<S>>, S> eitherOps(StyledTextOps<S> lOps, CustomObjectOps<S> rOps) {
         return new SegmentOps<Either<StyledText<S>, CustomObject<S>>, S>() {
@@ -86,11 +86,7 @@ public class StyledTextOrCustomObjectOps { // <S> implements SegmentOps<Either<S
 
             @Override
             public Either<StyledText<S>, CustomObject<S>> create(String text, S style) {
-                //if (clazz.isAssignableFrom(StyledText.class)) {
-                    return Either.left(lOps.create(text, style));
-                //} else {
-                //    return Either.right(rOps.create(clazz, text, style));
-                //}
+                return Either.left(lOps.create(text, style));
             }
 
 

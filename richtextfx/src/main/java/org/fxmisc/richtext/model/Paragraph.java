@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import javafx.scene.control.IndexRange;
 
@@ -386,4 +387,16 @@ public final class Paragraph<PS, SEG, S> {
         return Objects.hash(paragraphStyle, segments);
     }
 
+    private Optional<ParagraphList> paragraphList = Optional.empty();
+
+    public ParagraphList createParagraphList() {
+        if (!paragraphList.isPresent()) {
+            paragraphList = Optional.of(new ParagraphList());
+        }
+        return paragraphList.get();
+    }
+
+    public Optional<ParagraphList> getParagraphList() {
+        return paragraphList;
+    }
 }

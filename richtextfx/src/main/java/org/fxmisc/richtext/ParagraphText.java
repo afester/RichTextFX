@@ -14,6 +14,7 @@ import javafx.scene.Node;
 import javafx.scene.control.IndexRange;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 import javafx.scene.shape.StrokeLineCap;
@@ -95,6 +96,7 @@ class ParagraphText<PS, SEG, S> extends TextFlowExt {
 //                    text.impl_selectionFillProperty().set(newFill);
 //            }
 //        });
+
 
         // populate with text nodes
         for(SEG segment: par.getSegments()) {

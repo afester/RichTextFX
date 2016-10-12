@@ -103,6 +103,8 @@ public class RichText extends Application {
         Button underlineBtn = createButton("underline", this::toggleUnderline);
         Button strikeBtn = createButton("strikethrough", this::toggleStrikethrough);
         Button insertImageBtn = createButton("insertimage", this::insertImage, "Insert Image");
+        Button increaseIndentBtn = createButton("increaseIndent", this::increaseIndent, "Increase indent");
+        Button decreaseIndentBtn = createButton("decreaseIndent", this::decreaseIndent, "Decrease indent");
         ToggleGroup alignmentGrp = new ToggleGroup();
         ToggleButton alignLeftBtn = createToggleButton(alignmentGrp, "align-left", this::alignLeft);
         ToggleButton alignCenterBtn = createToggleButton(alignmentGrp, "align-center", this::alignCenter);
@@ -264,7 +266,7 @@ public class RichText extends Application {
                 loadBtn, saveBtn,
                 wrapToggle, undoBtn, redoBtn, cutBtn, copyBtn, pasteBtn,
                 boldBtn, italicBtn, underlineBtn, strikeBtn,
-                alignLeftBtn, alignCenterBtn, alignRightBtn, alignJustifyBtn, insertImageBtn,
+                alignLeftBtn, alignCenterBtn, alignRightBtn, alignJustifyBtn, insertImageBtn, increaseIndentBtn, decreaseIndentBtn,
                 paragraphBackgroundPicker);
         panel2.getChildren().addAll(sizeCombo, familyCombo, textColorPicker, backgroundColorPicker);
 
@@ -439,6 +441,19 @@ public class RichText extends Application {
                                                        ParStyle.EMPTY, TextStyle.EMPTY, area.getSegOps());
             area.replaceSelection(ros);
         }
+    }
+
+    
+    private void increaseIndent() {
+        int pIdx = area.getCurrentParagraph();
+
+        area.getDocument().getParagraphs().get(pIdx).createParagraphList();
+        area.layout();
+        //area.getDocument().getParagraphs().get(pIdx - 1);
+        //area.getDocument().getParagraphs().get(pIdx - 1);
+    }
+
+    private void decreaseIndent() {
     }
 
     private void updateStyleInSelection(Function<StyleSpans<TextStyle>, TextStyle> mixinGetter) {

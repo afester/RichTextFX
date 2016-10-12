@@ -23,9 +23,12 @@ import javafx.scene.Node;
 import javafx.scene.control.IndexRange;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Paint;
+import javafx.scene.shape.Circle;
+import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
 import org.fxmisc.richtext.model.Paragraph;
+import org.fxmisc.richtext.model.ParagraphList;
 import org.fxmisc.richtext.util.MouseStationaryHelper;
 import org.reactfx.EventStream;
 import org.reactfx.util.Either;
@@ -58,6 +61,8 @@ class ParagraphBox<PS, SEG, S> extends Region {
 
     private final Val<Node> graphic;
 
+    private Node bullet;
+
     final DoubleProperty graphicOffset = new SimpleDoubleProperty(0.0);
 
     private final BooleanProperty wrapText = new SimpleBooleanProperty(false);
@@ -77,6 +82,14 @@ class ParagraphBox<PS, SEG, S> extends Region {
         this.text = new ParagraphText<>(par, nodeFactory);
         applyParagraphStyle.accept(this.text, par.getParagraphStyle());
         this.index = Var.newSimpleVar(0);
+        
+        // add bullet
+        if (par.getParagraphList().isPresent()) {
+            //bullet = new Circle(2);
+            bullet = new Text("1.2.3.4");
+            getChildren().add(bullet);
+        }
+
         getChildren().add(text);
         graphic = Val.combine(
                 graphicFactory,
@@ -191,16 +204,29 @@ class ParagraphBox<PS, SEG, S> extends Region {
     }
 
     @Override
-    protected
-    void layoutChildren() {
+    protected void layoutChildren() {
         Bounds bounds = getLayoutBounds();
         double w = bounds.getWidth();
         double h = bounds.getHeight();
-        double graphicWidth = getGraphicPrefWidth();
 
-        text.resizeRelocate(graphicWidth, 0, w - graphicWidth, h);
+        // get the indent of this paragraph
+        double indent = 0;
+        Optional<ParagraphList> pList = text.getParagraph().getParagraphList();
+        if (pList.isPresent()) {
+            indent = pList.get().getFormat().getIndent();
+        }
 
-        graphic.ifPresent(g -> g.resizeRelocate(graphicOffset.get(), 0, graphicWidth, h));
+        double textIndent = getGraphicPrefWidth() + indent;
+        text.resizeRelocate(textIndent, 0, w - textIndent, h);
+
+        // position the bullet at the appropriate location
+        if (pList.isPresent()) {
+            double ypos = text.getLineCenter(0);
+            double xpos = textIndent - ((Circle) bullet).getRadius() - 3;
+            bullet.relocate(xpos, ypos);
+        }
+
+        graphic.ifPresent(g -> g.resizeRelocate(graphicOffset.get(), 0, textIndent, h));
     }
 
     double getGraphicPrefWidth() {
