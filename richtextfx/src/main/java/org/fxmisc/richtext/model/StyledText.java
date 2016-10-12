@@ -12,10 +12,6 @@ public class StyledText<S>  {
     private S style;
     public S getStyle() { return style; }
 
-    public void setStyle(S style) {
-        this.style = style;
-    }
-
     StyledText() { }
 
     public StyledText(String text, S style) {

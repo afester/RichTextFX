@@ -46,7 +46,7 @@ public class CustomObjectOps<S> implements SegmentOps<CustomObject<S>, S> {
 
     @Override
     public S getStyle(CustomObject<S> seg) {
-        return seg.style;
+        return seg.getStyle();
     }
 
     @Override
@@ -70,7 +70,8 @@ public class CustomObjectOps<S> implements SegmentOps<CustomObject<S>, S> {
     }
 
     @Override
-    public void setStyle(CustomObject<S> seg, S style) {
+    public CustomObject<S> setStyle(CustomObject<S> seg, S style) {
+        return seg.setStyle(style);
     }
 
     @Override

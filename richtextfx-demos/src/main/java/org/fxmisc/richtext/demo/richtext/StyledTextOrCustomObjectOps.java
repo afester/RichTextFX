@@ -122,12 +122,10 @@ public class StyledTextOrCustomObjectOps { // <S> implements SegmentOps<Either<S
             }
 
             @Override
-            public void setStyle(Either<StyledText<S>, CustomObject<S>> seg, S style) {
-                if (seg.isLeft()) {
-                    lOps.setStyle(seg.getLeft(), style);
-                } else {
-                    rOps.setStyle(seg.getRight(), style);
-                }
+            public Either<StyledText<S>, CustomObject<S>> setStyle(Either<StyledText<S>, CustomObject<S>> seg, S style) {
+                return seg.isLeft()
+                        ? Either.left(lOps.setStyle(seg.getLeft(), style))
+                        : Either.right(rOps.setStyle(seg.getRight(), style));
             }
 
             @Override

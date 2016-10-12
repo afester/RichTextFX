@@ -76,8 +76,8 @@ public final class StyledTextOps<S> implements SegmentOps<StyledText<S>, S> {
     }
 
     @Override
-    public void setStyle(StyledText<S> seg, S style) {
-        seg.setStyle(style);
+    public StyledText<S> setStyle(StyledText<S> seg, S style) {
+        return new StyledText<>(seg.getText(), style);
     }
 
     @Override
