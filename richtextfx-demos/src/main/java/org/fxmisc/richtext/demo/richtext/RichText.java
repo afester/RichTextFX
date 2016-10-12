@@ -61,6 +61,9 @@ import org.reactfx.util.Either;
 public class RichText extends Application {
 
     public static void main(String[] args) {
+        // The following properties are required on Linux for improved text rendering
+        //System.setProperty("prism.lcdtext", "false");
+        //System.setProperty("prism.text", "t2k");
         launch(args);
     }
 
@@ -423,19 +426,19 @@ public class RichText extends Application {
      * Action listener which inserts a new image at the current caret position.
      */
     private void insertImage() {
-//        
-//        String initialDir = System.getProperty("user.dir");
-//        FileChooser fileChooser = new FileChooser();
-//        fileChooser.setTitle("Insert image");
-//        fileChooser.setInitialDirectory(new File(initialDir));
-//        File selectedFile = fileChooser.showOpenDialog(mainStage);
-//        if (selectedFile != null) {
-//            String imagePath = selectedFile.getAbsolutePath();
-//            ReadOnlyStyledDocument<ParStyle, TextStyle> ros = 
-//                    ReadOnlyStyledDocument.from(new LinkedImage<>(imagePath, TextStyle.EMPTY), 
-//                                                ParStyle.EMPTY, TextStyle.EMPTY); 
-//            area.replaceSelection(ros);
-//        }
+        String initialDir = System.getProperty("user.dir");
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Insert image");
+        fileChooser.setInitialDirectory(new File(initialDir));
+        File selectedFile = fileChooser.showOpenDialog(mainStage);
+        if (selectedFile != null) {
+            String imagePath = selectedFile.getAbsolutePath();
+            imagePath = imagePath.replace('\\',  '/'); 
+            ReadOnlyStyledDocument<ParStyle, Either<StyledText<TextStyle>, CustomObject<TextStyle>>, TextStyle> ros = 
+                    ReadOnlyStyledDocument.fromSegment(Either.right(new LinkedImage<>(imagePath, TextStyle.EMPTY)), 
+                                                       ParStyle.EMPTY, TextStyle.EMPTY, area.getSegOps());
+            area.replaceSelection(ros);
+        }
     }
 
     private void updateStyleInSelection(Function<StyleSpans<TextStyle>, TextStyle> mixinGetter) {
