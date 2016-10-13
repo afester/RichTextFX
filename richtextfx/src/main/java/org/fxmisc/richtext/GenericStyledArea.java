@@ -36,7 +36,6 @@ import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
-import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.control.IndexRange;
 import javafx.scene.layout.Background;
@@ -45,7 +44,6 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
-import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.PopupWindow;
 
@@ -1353,19 +1351,5 @@ public class GenericStyledArea<PS, SEG, S> extends Region
                 .on(restartImpulse.withDefaultEvent(null)).transition((state, impulse) -> true)
                 .on(ticks).transition((state, tick) -> !state)
                 .toStateStream();
-    }
-
-
-    public static <SEG, S> Node createStyledTextNode(SEG seg, SegmentOps<SEG, S> segOps, BiConsumer<? super TextExt, S> applyStyle) {
-
-        TextExt t = new TextExt(segOps.getText(seg));
-        t.setTextOrigin(VPos.TOP);
-        t.getStyleClass().add("text");
-        applyStyle.accept(t, segOps.getStyle(seg));
-
-        // XXX: binding selectionFill to textFill,
-        // see the note at highlightTextFill
-        t.impl_selectionFillProperty().bind(t.fillProperty());
-        return t;
     }
 }

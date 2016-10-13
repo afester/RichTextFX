@@ -7,6 +7,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
@@ -87,8 +88,8 @@ public final class ReadOnlyStyledDocument<PS, SEG, S> implements StyledDocument<
     }
 
     public static <PS, SEG, S> ReadOnlyStyledDocument<PS, SEG, S> fromSegment(SEG segment,  PS paragraphStyle, S style, SegmentOps<SEG, S> segmentOps) {
-        List<Paragraph<PS, SEG, S>> res = new ArrayList<>(1);
-        res.add(new Paragraph<>(paragraphStyle, segmentOps, segment));
+        Paragraph<PS, SEG, S> content = new Paragraph<PS, SEG, S>(paragraphStyle, segmentOps, Arrays.asList(segment));
+        List<Paragraph<PS, SEG, S>> res = Arrays.asList(content);
         return new ReadOnlyStyledDocument<>(res, segmentOps);
     }
 

@@ -67,13 +67,16 @@ public class RichText extends Application {
         launch(args);
     }
 
+    private final StyledTextOps<TextStyle> styledTextOps = new StyledTextOps<>();
+    private final CustomObjectOps<TextStyle> customObjectOps = new CustomObjectOps<>();
+
     private final GenericStyledArea<ParStyle, Either<StyledText<TextStyle>, CustomObject<TextStyle>>, TextStyle> area = 
             new GenericStyledArea<>(
                     ParStyle.EMPTY,                                                 // default paragraph style
                     (paragraph, style) -> paragraph.setStyle(style.toCss()),        // paragraph style setter
 
                     TextStyle.EMPTY.updateFontSize(12).updateFontFamily("Serif").updateTextColor(Color.BLACK),  // default segment style
-                    StyledTextOrCustomObjectOps.eitherOps(new StyledTextOps<>(), new CustomObjectOps<>()),      // segment operations      
+                    StyledTextOrCustomObjectOps.eitherOps(styledTextOps, customObjectOps),                      // segment operations
                     seg -> createNode(seg, (text, style) -> text.setStyle(style.toCss())));                     // Node creator and segment style setter
     {
         area.setWrapText(true);
@@ -285,9 +288,9 @@ public class RichText extends Application {
     private Node createNode(Either<StyledText<TextStyle>, CustomObject<TextStyle>> seg,
                             BiConsumer<? super TextExt, TextStyle> applyStyle) {
         if (seg.isLeft()) {
-            return StyledTextArea.createStyledTextNode(seg, area.getSegOps(), applyStyle);
+            return StyledTextArea.createStyledTextNode(seg.getLeft(), styledTextOps, applyStyle);
         } else {
-            return seg.asRight().get().createNode();
+            return seg.getRight().createNode();
         }
     }
 

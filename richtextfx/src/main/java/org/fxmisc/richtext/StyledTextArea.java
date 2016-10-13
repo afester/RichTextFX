@@ -3,10 +3,13 @@ package org.fxmisc.richtext;
 import java.util.function.BiConsumer;
 
 import org.fxmisc.richtext.model.EditableStyledDocument;
+import org.fxmisc.richtext.model.SegmentOps;
 import org.fxmisc.richtext.model.SimpleEditableStyledDocument;
 import org.fxmisc.richtext.model.StyledText;
 import org.fxmisc.richtext.model.StyledTextOps;
 
+import javafx.geometry.VPos;
+import javafx.scene.Node;
 import javafx.scene.text.TextFlow;
 
 /**
@@ -87,5 +90,19 @@ public class StyledTextArea<PS, S> extends GenericStyledArea<PS, StyledText<S>, 
                           S initialTextStyle, BiConsumer<? super TextExt, S> applyStyle) {
         this(initialParagraphStyle, applyParagraphStyle,
              initialTextStyle, applyStyle, true);
+    }
+
+    public static <S> Node createStyledTextNode(StyledText<S> seg, SegmentOps<StyledText<S>, S> segOps,
+            BiConsumer<? super TextExt, S> applyStyle) {
+
+        TextExt t = new TextExt(segOps.getText(seg));
+        t.setTextOrigin(VPos.TOP);
+        t.getStyleClass().add("text");
+        applyStyle.accept(t, segOps.getStyle(seg));
+
+        // XXX: binding selectionFill to textFill,
+        // see the note at highlightTextFill
+        t.impl_selectionFillProperty().bind(t.fillProperty());
+        return t;
     }
 }
