@@ -28,7 +28,7 @@ public interface SegmentOps<SEG, S> {
 
     public S getStyle(SEG seg);
 
-    public void setStyle(SEG seg, S style);
+    public SEG setStyle(SEG seg, S style);
 
     public String toString(SEG seg);
 
