@@ -1,6 +1,7 @@
 package org.fxmisc.richtext.model;
 
 import static org.junit.Assert.*;
+
 import org.junit.Test;
 
 public class SimpleEditableStyledDocumentTest {
@@ -10,14 +11,14 @@ public class SimpleEditableStyledDocumentTest {
      * The style of the inserted text will be the style at position
      * {@code start} in the current document.
      */
-    private <PS, SEG, S> void replaceText(EditableStyledDocument<PS, SEG, S> doc, int start, int end, String text, SegmentOps<SEG, S> segOps) {
+    private <PS, SEG, S> void replaceText(EditableStyledDocument<PS, SEG, S> doc, int start, int end, String text, TextOps<SEG, S> segOps) {
         StyledDocument<PS, SEG, S> styledDoc = ReadOnlyStyledDocument.fromString(
                 text, doc.getParagraphStyleAtPosition(start), doc.getStyleAtPosition(start), segOps);
         doc.replace(start, end, styledDoc);
     }
 
 
-    private final SegmentOps<StyledText<String>, String> segOps = new StyledTextOps<>();
+    private final TextOps<StyledText<String>, String> segOps = StyledText.textOps();
 
     @Test
     public void testConsistencyOfTextWithLength() {

@@ -94,8 +94,8 @@ public final class SimpleEditableStyledDocument<PS, SEG, S> implements EditableS
     /**
      * Creates an empty {@link EditableStyledDocument}
      */
-    public SimpleEditableStyledDocument(PS initialParagraphStyle, S initialStyle, SegmentOps<SEG, S> segmentOps) {
-        this(new Paragraph<>(initialParagraphStyle, segmentOps, "", initialStyle), segmentOps);
+    public SimpleEditableStyledDocument(PS initialParagraphStyle, S initialStyle, TextOps<SEG, S> segmentOps) {
+        this(new Paragraph<>(initialParagraphStyle, segmentOps, segmentOps.create("", initialStyle)), segmentOps);
     }
 
 

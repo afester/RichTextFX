@@ -67,7 +67,7 @@ public final class ReadOnlyStyledDocument<PS, SEG, S> implements StyledDocument<
     private static final BiFunction<Summary, Integer, Either<Integer, Integer>> NAVIGATE =
             (s, i) -> i <= s.length() ? left(i) : right(i - (s.length() + 1));
 
-    public static <PS, SEG, S> ReadOnlyStyledDocument<PS, SEG, S> fromString(String str, PS paragraphStyle, S style, SegmentOps<SEG, S> segmentOps) {
+    public static <PS, SEG, S> ReadOnlyStyledDocument<PS, SEG, S> fromString(String str, PS paragraphStyle, S style, TextOps<SEG, S> segmentOps) {
         Matcher m = LINE_TERMINATOR.matcher(str);
 
         int n = 1;
@@ -78,11 +78,11 @@ public final class ReadOnlyStyledDocument<PS, SEG, S> implements StyledDocument<
         m.reset();
         while(m.find()) {
             String s = str.substring(start, m.start());
-            res.add(new Paragraph<>(paragraphStyle, segmentOps, s, style));
+            res.add(new Paragraph<>(paragraphStyle, segmentOps, segmentOps.create(s, style)));
             start = m.end();
         }
         String last = str.substring(start);
-        res.add(new Paragraph<>(paragraphStyle, segmentOps, last, style));
+        res.add(new Paragraph<>(paragraphStyle, segmentOps, segmentOps.create(last, style)));
 
         return new ReadOnlyStyledDocument<>(res, segmentOps);
     }
@@ -100,15 +100,15 @@ public final class ReadOnlyStyledDocument<PS, SEG, S> implements StyledDocument<
             return new ReadOnlyStyledDocument<>(doc.getParagraphs(), doc.getSegOps());
         }
     }
-        
-    
-    public static <PS, SEG, S> Codec<StyledDocument<PS, SEG, S>> codec(Codec<PS> pCodec, Codec<S> tCodec, SegmentOps<SEG, S> segmentOps) {
+
+
+    public static <PS, SEG, S> Codec<StyledDocument<PS, SEG, S>> codec(Codec<PS> pCodec, Codec<SEG> segCodec, SegmentOps<SEG, S> segmentOps) {
         return new Codec<StyledDocument<PS, SEG, S>>() {
-            private final Codec<List<Paragraph<PS, SEG, S>>> codec = Codec.listCodec(paragraphCodec(pCodec, tCodec, segmentOps));
+            private final Codec<List<Paragraph<PS, SEG, S>>> codec = Codec.listCodec(paragraphCodec(pCodec, segCodec, segmentOps));
 
             @Override
             public String getName() {
-                return "application/richtextfx-styled-document<" + tCodec.getName() + ";" + pCodec.getName() + ">";
+                return "application/richtextfx-styled-document<" + pCodec.getName() + ";" + segCodec.getName() + ">";
             }
 
             @Override
@@ -124,13 +124,13 @@ public final class ReadOnlyStyledDocument<PS, SEG, S> implements StyledDocument<
         };
     }
 
-    private static <PS, SEG, S> Codec<Paragraph<PS, SEG, S>> paragraphCodec(Codec<PS> pCodec, Codec<S> tCodec, SegmentOps<SEG, S> segmentOps) {
+    private static <PS, SEG, S> Codec<Paragraph<PS, SEG, S>> paragraphCodec(Codec<PS> pCodec, Codec<SEG> segCodec, SegmentOps<SEG, S> segmentOps) {
         return new Codec<Paragraph<PS, SEG, S>>() {
-            private final Codec<List<SEG>> segmentsCodec = Codec.listCodec(segmentCodec(tCodec, segmentOps));
+            private final Codec<List<SEG>> segmentsCodec = Codec.listCodec(segCodec);
 
             @Override
             public String getName() {
-                return "paragraph<" + tCodec.getName() + ";" + pCodec.getName() + ">";
+                return "paragraph<" + pCodec.getName() + ";" + segCodec.getName() + ">";
             }
 
             @Override
@@ -148,30 +148,6 @@ public final class ReadOnlyStyledDocument<PS, SEG, S> implements StyledDocument<
         };
     }
 
-    private static <SEG, S> Codec<SEG> segmentCodec(Codec<S> styleCodec, SegmentOps<SEG, S> segmentOps) {
-        return new Codec<SEG>() {
-
-            @Override
-            public String getName() {
-                return "segment<" + styleCodec.getName() + ">";
-            }
-
-            @Override
-            public void encode(DataOutputStream os, SEG t) throws IOException {
-                segmentOps.encode(t, os, styleCodec);
-            }
-
-            @Override
-            public SEG decode(DataInputStream is) throws IOException {
-                // SEG seg = segmentOps.create(clazz); // , text, style);
-                // here we do not know anything about the actual encode/decode algorithm.
-                // delegate the whole decode process, including object creation, to SegmentOps
-                return segmentOps.decode(is, styleCodec);
-            }
-
-        };
-    }
-
 
     private final NonEmptyFingerTree<Paragraph<PS, SEG, S>, Summary> tree;
 
@@ -179,6 +155,7 @@ public final class ReadOnlyStyledDocument<PS, SEG, S> implements StyledDocument<
     private List<Paragraph<PS, SEG, S>> paragraphs = null;
 
     private final SegmentOps<SEG, S> segmentOps;
+    @Override
     public final SegmentOps<SEG, S> getSegOps() { return segmentOps; }
 
     private ReadOnlyStyledDocument(NonEmptyFingerTree<Paragraph<PS, SEG, S>, Summary> tree, SegmentOps<SEG, S> segmentOps) {
