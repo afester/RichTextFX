@@ -12,7 +12,7 @@ public class StyledTextAreaModelTest {
 
     @Test
     public void testUndoWithWinNewlines() {
-        final SegmentOps<StyledText<Collection<String>>, Collection<String>> segOps = new StyledTextOps<>();
+        final TextOps<StyledText<Collection<String>>, Collection<String>> segOps = StyledText.textOps();
 
         String text1 = "abc\r\ndef";
         String text2 = "A\r\nB\r\nC";
@@ -33,12 +33,12 @@ public class StyledTextAreaModelTest {
 
     @Test
     public void testForBug216() {
-        final SegmentOps<StyledText<Boolean>, Boolean> segOps = new StyledTextOps<>();
+        final TextOps<StyledText<Boolean>, Boolean> segOps = StyledText.textOps();
 
         // set up area with some styled text content
         boolean initialStyle = false;
         StyledTextAreaModel<String, StyledText<Boolean>, Boolean> model = new StyledTextAreaModel<>(
-                "", initialStyle, new SimpleEditableStyledDocument<>("", initialStyle, segOps), true);
+                "", initialStyle, new SimpleEditableStyledDocument<>("", initialStyle, segOps), segOps, true);
         model.replaceText("testtest");
         model.setStyle(0, 8, true);
 

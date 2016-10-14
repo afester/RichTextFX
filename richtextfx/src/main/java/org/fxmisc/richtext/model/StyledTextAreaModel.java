@@ -173,6 +173,8 @@ public class StyledTextAreaModel<PS, SEG, S>
      *                                                                        *
      * ********************************************************************** */
 
+    private final TextOps<SEG, S> textOps;
+
     private Subscription subscriptions = () -> {};
 
     private Position selectionStart2D;
@@ -225,30 +227,36 @@ public class StyledTextAreaModel<PS, SEG, S>
      * @param initialParagraphStyle style to use in places where no other style is
      * specified (yet).
      */
-    public StyledTextAreaModel(PS initialParagraphStyle, S initialTextStyle, SegmentOps<SEG, S> segmentOps) {
+    public StyledTextAreaModel(PS initialParagraphStyle, S initialTextStyle, TextOps<SEG, S> segmentOps) {
         this(initialParagraphStyle, initialTextStyle, segmentOps, true);
     }
 
-    public StyledTextAreaModel(PS initialParagraphStyle, S initialTextStyle, SegmentOps<SEG, S> segmentOps, boolean preserveStyle
+    public StyledTextAreaModel(PS initialParagraphStyle, S initialTextStyle, TextOps<SEG, S> segmentOps, boolean preserveStyle
     ) {
         this(initialParagraphStyle, initialTextStyle,
-                new SimpleEditableStyledDocument<>(initialParagraphStyle, initialTextStyle, segmentOps), preserveStyle);
+                new SimpleEditableStyledDocument<>(initialParagraphStyle, initialTextStyle, segmentOps),
+                segmentOps, preserveStyle);
     }
 
     /**
-     * The same as {@link #StyledTextAreaModel(Object, Object, SegmentOps)} except that
+     * The same as {@link #StyledTextAreaModel(Object, Object, TextOps)} except that
      * this constructor can be used to create another {@code StyledTextArea} object that
      * shares the same {@link EditableStyledDocument}.
      */
     public StyledTextAreaModel(PS initialParagraphStyle, S initialTextStyle,
-                               EditableStyledDocument<PS, SEG, S> document
+                               EditableStyledDocument<PS, SEG, S> document, TextOps<SEG, S> textOps
     ) {
-        this(initialParagraphStyle, initialTextStyle, document, true);
+        this(initialParagraphStyle, initialTextStyle, document, textOps, true);
     }
 
-    public StyledTextAreaModel(PS initialParagraphStyle, S initialTextStyle,
-                               EditableStyledDocument<PS, SEG, S> document, boolean preserveStyle
+    public StyledTextAreaModel(
+            PS initialParagraphStyle,
+            S initialTextStyle,
+            EditableStyledDocument<PS, SEG, S> document,
+            TextOps<SEG, S> textOps,
+            boolean preserveStyle
     ) {
+        this.textOps = textOps;
         this.initialTextStyle = initialTextStyle;
         this.initialParagraphStyle = initialParagraphStyle;
         this.preserveStyle = preserveStyle;
@@ -507,6 +515,7 @@ public class StyledTextAreaModel<PS, SEG, S>
         return getStyleSpans(paragraph, range.getStart(), range.getEnd());
     }
 
+    @Override
     public int getAbsolutePosition(int paragraphIndex, int columnIndex) {
         return content.getAbsolutePosition(paragraphIndex, columnIndex);
     }
@@ -619,7 +628,7 @@ public class StyledTextAreaModel<PS, SEG, S>
     @Override
     public void replaceText(int start, int end, String text) {
         StyledDocument<PS, SEG, S> doc = ReadOnlyStyledDocument.fromString(
-                text, getParagraphStyleForInsertionAt(start), getStyleForInsertionAt(start), content.getSegOps());
+                text, getParagraphStyleForInsertionAt(start), getStyleForInsertionAt(start), textOps);
         replace(start, end, doc);
     }
 

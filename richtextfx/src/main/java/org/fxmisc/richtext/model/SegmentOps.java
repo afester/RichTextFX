@@ -1,9 +1,8 @@
 package org.fxmisc.richtext.model;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.util.Optional;
 
+import org.reactfx.util.Either;
 
 /**
  * Defines the operations which are supported on a specific segment type.
@@ -22,21 +21,79 @@ public interface SegmentOps<SEG, S> {
 
     public SEG subSequence(SEG seg, int start);
 
-    public SEG append(SEG seg, String str);
-
-    public SEG spliced(SEG seg, int from, int to, CharSequence replacement);
-
     public S getStyle(SEG seg);
 
-    public void setStyle(SEG seg, S style);
+    public SEG setStyle(SEG seg, S style);
 
-    public String toString(SEG seg);
+    public Optional<SEG> join(SEG currentSeg, SEG nextSeg);
 
-    public SEG create(/*Class<?> clazz, */String text, S style);
+    public default <R> SegmentOps<Either<SEG, R>, S> or(SegmentOps<R, S> rOps) {
+        return either(this, rOps);
+    }
 
-    public void encode(SEG seg, DataOutputStream os, Codec<S> styleCodec) throws IOException;
+    public default <R> TextOps<Either<SEG, R>, S> or_(TextOps<R, S> rOps) {
+        return TextOps.eitherR(this, rOps);
+    }
 
-    public SEG decode(DataInputStream is, Codec<S> styleCodec) throws IOException;
+    public static <L, R, S> SegmentOps<Either<L, R>, S> either(SegmentOps<L, S> lOps, SegmentOps<R, S> rOps) {
+        return new EitherSegmentOps<L, R, S>(lOps, rOps);
+    }
+}
 
-    public boolean canJoin(SEG currentSeg, SEG nextSeg);
+class EitherSegmentOps<L, R, S> implements SegmentOps<Either<L, R>, S> {
+
+    private final SegmentOps<L, S> lOps;
+    private final SegmentOps<R, S> rOps;
+
+    EitherSegmentOps(SegmentOps<L, S> lOps, SegmentOps<R, S> rOps) {
+        this.lOps = lOps;
+        this.rOps = rOps;
+    }
+
+
+    @Override
+    public int length(Either<L, R> seg) {
+        return seg.unify(lOps::length, rOps::length);
+    }
+
+    @Override
+    public char charAt(Either<L, R> seg, int index) {
+        return seg.unify(l -> lOps.charAt(l, index),
+                         r -> rOps.charAt(r, index));
+    }
+
+    @Override
+    public String getText(Either<L, R> seg) {
+        return seg.unify(lOps::getText, rOps::getText);
+    }
+
+    @Override
+    public Either<L, R> subSequence(Either<L, R> seg, int start, int end) {
+        return seg.map(l -> lOps.subSequence(l, start, end),
+                       r -> rOps.subSequence(r, start, end));
+    }
+
+    @Override
+    public Either<L, R> subSequence(Either<L, R> seg, int start) {
+        return seg.map(l -> lOps.subSequence(l, start),
+                       r -> rOps.subSequence(r, start));
+    }
+
+    @Override
+    public S getStyle(Either<L, R> seg) {
+        return seg.unify(l -> lOps.getStyle(l),
+                         r -> rOps.getStyle(r));
+    }
+
+    @Override
+    public Either<L, R> setStyle(Either<L, R> seg, S style) {
+        return seg.map(l -> lOps.setStyle(l, style),
+                       r -> rOps.setStyle(r, style));
+    }
+
+    @Override
+    public Optional<Either<L, R>> join(Either<L, R> left, Either<L, R> right) {
+        return left.unify(ll -> right.unify(rl -> lOps.join(ll, rl).map(Either::left), rr -> Optional.empty()),
+                          lr -> right.unify(rl -> Optional.empty(), rr -> rOps.join(lr, rr).map(Either::right)));
+    }
 }

@@ -66,6 +66,7 @@ import org.fxmisc.richtext.model.StyleSpans;
 import org.fxmisc.richtext.model.StyledDocument;
 import org.fxmisc.richtext.model.StyledTextAreaModel;
 import org.fxmisc.richtext.model.TextEditingArea;
+import org.fxmisc.richtext.model.TextOps;
 import org.fxmisc.richtext.model.TwoDimensional;
 import org.fxmisc.richtext.model.TwoLevelNavigator;
 import org.fxmisc.richtext.model.UndoActions;
@@ -335,16 +336,16 @@ public class GenericStyledArea<PS, SEG, S> extends Region
     public void setUseInitialStyleForInsertion(boolean value) { model.setUseInitialStyleForInsertion(value); }
     public boolean getUseInitialStyleForInsertion() { return model.getUseInitialStyleForInsertion(); }
 
-    private Optional<Tuple2<Codec<PS>, Codec<S>>> styleCodecs = Optional.empty();
+    private Optional<Tuple2<Codec<PS>, Codec<SEG>>> styleCodecs = Optional.empty();
     /**
      * Sets codecs to encode/decode style information to/from binary format.
      * Providing codecs enables clipboard actions to retain the style information.
      */
-    public void setStyleCodecs(Codec<PS> paragraphStyleCodec, Codec<S> textStyleCodec) {
+    public void setStyleCodecs(Codec<PS> paragraphStyleCodec, Codec<SEG> textStyleCodec) {
         styleCodecs = Optional.of(t(paragraphStyleCodec, textStyleCodec));
     }
     @Override
-    public Optional<Tuple2<Codec<PS>, Codec<S>>> getStyleCodecs() {
+    public Optional<Tuple2<Codec<PS>, Codec<SEG>>> getStyleCodecs() {
         return styleCodecs;
     }
 
@@ -459,8 +460,6 @@ public class GenericStyledArea<PS, SEG, S> extends Region
      *                                                                        *
      * ********************************************************************** */
 
-    private final StyledTextAreaBehavior behavior;
-
     private Subscription subscriptions = () -> {};
 
     // Remembers horizontal position when traversing up / down.
@@ -553,35 +552,43 @@ public class GenericStyledArea<PS, SEG, S> extends Region
      *        particular segment.
      */
     public GenericStyledArea(PS initialParagraphStyle, BiConsumer<TextFlow, PS> applyParagraphStyle,
-                             S initialTextStyle, SegmentOps<SEG, S> segmentOps,
+                             S initialTextStyle, TextOps<SEG, S> segmentOps,
                              Function<SEG, Node> nodeFactory) {
         this(initialParagraphStyle, applyParagraphStyle, initialTextStyle, segmentOps, true, nodeFactory);
     }
 
     public GenericStyledArea(PS initialParagraphStyle, BiConsumer<TextFlow, PS> applyParagraphStyle,
-                          S initialTextStyle, SegmentOps<SEG, S> segmentOps,
+                          S initialTextStyle, TextOps<SEG, S> segmentOps,
                           boolean preserveStyle, Function<SEG, Node> nodeFactory) {
         this(initialParagraphStyle, applyParagraphStyle, initialTextStyle,
-                new SimpleEditableStyledDocument<>(initialParagraphStyle, initialTextStyle, segmentOps), preserveStyle, nodeFactory);
+                new SimpleEditableStyledDocument<>(initialParagraphStyle, initialTextStyle, segmentOps), segmentOps, preserveStyle, nodeFactory);
     }
 
     /**
-     * The same as {@link #GenericStyledArea(Object, BiConsumer, Object, SegmentOps, Function)} except that
+     * The same as {@link #GenericStyledArea(Object, BiConsumer, Object, TextOps, Function)} except that
      * this constructor can be used to create another {@code GenericStyledArea} object that
      * shares the same {@link EditableStyledDocument}.
      */
-    public GenericStyledArea(PS initialParagraphStyle, BiConsumer<TextFlow, PS> applyParagraphStyle,
-                          S initialTextStyle,
-                          EditableStyledDocument<PS, SEG, S> document, Function<SEG, Node> nodeFactory) {
-        this(initialParagraphStyle, applyParagraphStyle, initialTextStyle, document, true, nodeFactory);
+    public GenericStyledArea(
+            PS initialParagraphStyle,
+            BiConsumer<TextFlow, PS> applyParagraphStyle,
+            S initialTextStyle,
+            EditableStyledDocument<PS, SEG, S> document,
+            TextOps<SEG, S> textOps,
+            Function<SEG, Node> nodeFactory) {
+        this(initialParagraphStyle, applyParagraphStyle, initialTextStyle, document, textOps, true, nodeFactory);
 
     }
 
-    public GenericStyledArea(PS initialParagraphStyle, BiConsumer<TextFlow, PS> applyParagraphStyle,
-                          S initialTextStyle,
-                          EditableStyledDocument<PS, SEG, S> document, boolean preserveStyle,
-                          Function<SEG, Node> nodeFactory) {
-        this.model = new StyledTextAreaModel<>(initialParagraphStyle, initialTextStyle, document, preserveStyle);
+    public GenericStyledArea(
+            PS initialParagraphStyle,
+            BiConsumer<TextFlow, PS> applyParagraphStyle,
+            S initialTextStyle,
+            EditableStyledDocument<PS, SEG, S> document,
+            TextOps<SEG, S> textOps,
+            boolean preserveStyle,
+            Function<SEG, Node> nodeFactory) {
+        this.model = new StyledTextAreaModel<>(initialParagraphStyle, initialTextStyle, document, textOps, preserveStyle);
         this.applyParagraphStyle = applyParagraphStyle;
 
         // allow tab traversal into area
@@ -682,7 +689,7 @@ public class GenericStyledArea<PS, SEG, S> extends Region
                         : EventStreams.never())
                 .subscribe(evt -> Event.fireEvent(this, evt));
 
-        behavior = new StyledTextAreaBehavior(this);
+        new StyledTextAreaBehavior(this);
     }
 
 
