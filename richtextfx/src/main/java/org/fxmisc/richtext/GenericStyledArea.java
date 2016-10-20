@@ -57,7 +57,7 @@ import org.fxmisc.richtext.model.Codec;
 import org.fxmisc.richtext.model.EditActions;
 import org.fxmisc.richtext.model.EditableStyledDocument;
 import org.fxmisc.richtext.model.GenericEditableStyledDocument;
-import org.fxmisc.richtext.model.GenericStyledTextAreaModel;
+import org.fxmisc.richtext.model.StyledTextAreaModel;
 import org.fxmisc.richtext.model.NavigationActions;
 import org.fxmisc.richtext.model.Paragraph;
 import org.fxmisc.richtext.model.PlainTextChange;
@@ -65,7 +65,6 @@ import org.fxmisc.richtext.model.RichTextChange;
 import org.fxmisc.richtext.model.SegmentOps;
 import org.fxmisc.richtext.model.StyleSpans;
 import org.fxmisc.richtext.model.StyledDocument;
-import org.fxmisc.richtext.model.StyledTextAreaModel;
 import org.fxmisc.richtext.model.TextEditingArea;
 import org.fxmisc.richtext.model.TextOps;
 import org.fxmisc.richtext.model.TwoDimensional;
@@ -481,12 +480,12 @@ public class GenericStyledArea<PS, SEG, S> extends Region
     /**
      * model
      */
-    private final GenericStyledTextAreaModel<PS, SEG, S> model;
+    private final StyledTextAreaModel<PS, SEG, S> model;
 
     /**
      * @return this area's {@link StyledTextAreaModel}
      */
-    final GenericStyledTextAreaModel<PS, SEG, S> getModel() {
+    final StyledTextAreaModel<PS, SEG, S> getModel() {
         return model;
     }
 
@@ -590,7 +589,7 @@ public class GenericStyledArea<PS, SEG, S> extends Region
             TextOps<SEG, S> textOps,
             boolean preserveStyle,
             Function<SEG, Node> nodeFactory) {
-        this.model = new GenericStyledTextAreaModel<>(initialParagraphStyle, initialTextStyle, document, textOps, preserveStyle);
+        this.model = new StyledTextAreaModel<>(initialParagraphStyle, initialTextStyle, document, textOps, preserveStyle);
         this.applyParagraphStyle = applyParagraphStyle;
         this.segmentOps = textOps;
 
