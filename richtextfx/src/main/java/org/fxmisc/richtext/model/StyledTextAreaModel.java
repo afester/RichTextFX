@@ -234,7 +234,7 @@ public class StyledTextAreaModel<PS, SEG, S>
     public StyledTextAreaModel(PS initialParagraphStyle, S initialTextStyle, TextOps<SEG, S> segmentOps, boolean preserveStyle
     ) {
         this(initialParagraphStyle, initialTextStyle,
-                new GenericEditableStyledDocument<>(initialParagraphStyle, initialTextStyle, segmentOps),
+                new GenericEditableStyledDocumentBase<>(initialParagraphStyle, initialTextStyle, segmentOps),
                 segmentOps, preserveStyle);
     }
 
