@@ -20,7 +20,6 @@ import javafx.scene.input.MouseEvent;
 
 import org.fxmisc.richtext.model.GenericStyledTextAreaModel;
 import org.fxmisc.richtext.model.NavigationActions.SelectionPolicy;
-import org.fxmisc.richtext.model.StyledTextAreaModel;
 import org.fxmisc.richtext.model.TwoDimensional.Position;
 import org.fxmisc.wellbehaved.event.EventPattern;
 import org.fxmisc.wellbehaved.event.template.InputMapTemplate;

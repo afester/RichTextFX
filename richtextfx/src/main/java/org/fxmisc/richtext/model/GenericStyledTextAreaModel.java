@@ -239,7 +239,7 @@ public class GenericStyledTextAreaModel<PS, SEG, S>
     }
 
     /**
-     * The same as {@link #StyledTextAreaModel(Object, Object, TextOps)} except that
+     * The same as {@link #GenericStyledTextAreaModel(Object, Object, TextOps)} except that
      * this constructor can be used to create another {@code StyledTextArea} object that
      * shares the same {@link EditableStyledDocument}.
      */
