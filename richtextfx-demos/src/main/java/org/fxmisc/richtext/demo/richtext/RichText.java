@@ -47,6 +47,8 @@ import org.fxmisc.richtext.GenericStyledArea;
 import org.fxmisc.richtext.StyledTextArea;
 import org.fxmisc.richtext.TextExt;
 import org.fxmisc.richtext.model.Codec;
+import org.fxmisc.richtext.model.EditableStyledDocument;
+import org.fxmisc.richtext.model.GenericEditableStyledDocument;
 import org.fxmisc.richtext.model.Paragraph;
 import org.fxmisc.richtext.model.ReadOnlyStyledDocument;
 import org.fxmisc.richtext.model.StyleSpans;
@@ -451,8 +453,19 @@ public class RichText extends Application {
     private void increaseIndent() {
         int pIdx = area.getCurrentParagraph();
 
-        area.getDocument().getParagraphs().get(pIdx).createParagraphList();
-        area.layout();
+        //area.getDocument().getParagraphs().get(pIdx).createParagraphList();
+
+        area.indentParagraph(pIdx);
+        // updateParagraphStyleInSelection( e -> area.getDocument().getParagraphStyle(pIdx) );
+        // updateFontSize(12);
+        //((ReadOnlyStyledDocument<ParStyle, Either<StyledText<TextStyle>, LinkedImage<TextStyle>>, TextStyle>) area.getDocument())
+        //    .setParagraphStyle(pIdx, area.getDocument().getParagraphs().get(pIdx).getParagraphStyle());
+        //((EditableStyledDocument) area.getDocument());
+
+        //.getParagraphs().get(pIdx).setParagraphStyle(
+        //        area.getDocument().getParagraphs().get(pIdx).getParagraphStyle());
+        // ((GenericEditableStyledDocument) area.getDocument()).update();
+        // area.layout();
         //area.getDocument().getParagraphs().get(pIdx - 1);
         //area.getDocument().getParagraphs().get(pIdx - 1);
     }

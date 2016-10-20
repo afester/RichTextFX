@@ -78,4 +78,6 @@ public interface EditableStyledDocument<PS, SEG, S> extends StyledDocument<PS, S
 
     void setParagraphStyle(int parIdx, PS style);
 
+    void indentParagraph(int pIdx);
+
 }

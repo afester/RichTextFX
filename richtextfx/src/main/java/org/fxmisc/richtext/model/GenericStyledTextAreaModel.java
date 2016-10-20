@@ -719,4 +719,8 @@ public class GenericStyledTextAreaModel<PS, SEG, S>
     private Guard suspend(Suspendable... suspendables) {
         return Suspendable.combine(beingUpdated, Suspendable.combine(suspendables)).suspend();
     }
+
+    public void indentParagraph(int pIdx) {
+        content.indentParagraph(pIdx);
+    }
 }

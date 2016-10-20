@@ -353,4 +353,11 @@ public final class Paragraph<PS, SEG, S> {
     public Optional<ParagraphList> getParagraphList() {
         return paragraphList;
     }
+
+
+    public Paragraph<PS, SEG, S> setIndent(int i) {
+        Paragraph<PS, SEG, S> result =new Paragraph<>(paragraphStyle, segmentOps, segments);
+        result.createParagraphList();
+        return result;
+    }
 }

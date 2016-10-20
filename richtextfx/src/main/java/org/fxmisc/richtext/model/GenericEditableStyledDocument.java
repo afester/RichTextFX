@@ -196,14 +196,23 @@ public class GenericEditableStyledDocument<PS, SEG, S> implements EditableStyled
         return doc.getParagraph(par).length() + (par == n-1 ? 0 : 1);
     }
 
-    private void update(
+    public void update(
             ReadOnlyStyledDocument<PS, SEG, S> newValue,
             RichTextChange<PS, SEG, S> change,
             MaterializedListModification<Paragraph<PS, SEG, S>> parChange) {
+        System.err.println("update()!!!!!");
         this.doc = newValue;
         beingUpdated.suspendWhile(() -> {
             richChanges.push(change);
             parChanges.push(parChange);
         });
+    }
+    @Override
+    public void indentParagraph(int pIdx) {
+        ensureValidParagraphIndex(pIdx);
+        doc.replaceParagraph(pIdx, p -> p.setIndent(1)).exec(this::update);
+
+        // TODO Auto-generated method stub
+        
     }
 }

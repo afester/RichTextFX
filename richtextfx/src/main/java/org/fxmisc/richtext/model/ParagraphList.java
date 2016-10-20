@@ -12,6 +12,10 @@ public class ParagraphList {
 
     private ParagraphListFormat theFormat;
     
+    public ParagraphList() {
+        theFormat = new ParagraphListFormat();
+    }
+    
     public ParagraphListFormat getFormat() {
         return theFormat;
     }

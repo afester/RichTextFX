@@ -78,6 +78,8 @@ class ParagraphBox<PS, SEG, S> extends Region {
 
     ParagraphBox(Paragraph<PS, SEG, S> par, BiConsumer<TextFlow, PS> applyParagraphStyle, 
                  Function<SEG, Node> nodeFactory) {
+        System.err.println("CREATE ParagraphBox");
+
         this.getStyleClass().add("paragraph-box");
         this.text = new ParagraphText<>(par, nodeFactory);
         applyParagraphStyle.accept(this.text, par.getParagraphStyle());
@@ -219,8 +221,11 @@ class ParagraphBox<PS, SEG, S> extends Region {
         double textIndent = getGraphicPrefWidth() + indent;
         text.resizeRelocate(textIndent, 0, w - textIndent, h);
 
+        System.err.println("UPDATE BULLET...");
+
         // position the bullet at the appropriate location
         if (pList.isPresent()) {
+            System.err.println("  BULLET IS PRESENT!");
             double ypos = text.getLineCenter(0);
             double xpos = textIndent - ((Circle) bullet).getRadius() - 3;
             bullet.relocate(xpos, ypos);

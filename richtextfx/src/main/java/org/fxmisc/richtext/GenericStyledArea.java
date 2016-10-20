@@ -1362,4 +1362,7 @@ public class GenericStyledArea<PS, SEG, S> extends Region
                 .on(ticks).transition((state, tick) -> !state)
                 .toStateStream();
     }
+    public void indentParagraph(int pIdx) {
+        model.indentParagraph(pIdx);
+    }
 }
