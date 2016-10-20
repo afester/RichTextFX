@@ -2,12 +2,14 @@ package org.fxmisc.richtext;
 
 import java.util.function.BiConsumer;
 
+import javafx.geometry.VPos;
+import javafx.scene.Node;
+import javafx.scene.text.TextFlow;
+
 import org.fxmisc.richtext.model.EditableStyledDocument;
+import org.fxmisc.richtext.model.SegmentOps;
 import org.fxmisc.richtext.model.SimpleEditableStyledDocument;
 import org.fxmisc.richtext.model.StyledText;
-import org.fxmisc.richtext.model.StyledTextOps;
-
-import javafx.scene.text.TextFlow;
 
 /**
  * Text editing control. Accepts user input (keyboard, mouse) and
@@ -59,33 +61,51 @@ import javafx.scene.text.TextFlow;
  */
 public class StyledTextArea<PS, S> extends GenericStyledArea<PS, StyledText<S>, S> {
 
-    public StyledTextArea(PS initialParagraphStyle, BiConsumer<TextFlow, PS> applyParagraphStyle, 
+    public StyledTextArea(PS initialParagraphStyle, BiConsumer<TextFlow, PS> applyParagraphStyle,
                           S initialTextStyle, BiConsumer<? super TextExt, S> applyStyle,
                           EditableStyledDocument<PS, StyledText<S>, S> document, boolean preserveStyle) {
-        super(initialParagraphStyle, applyParagraphStyle, 
+        super(initialParagraphStyle, applyParagraphStyle,
               initialTextStyle,
-              document, preserveStyle, 
-              seg -> createStyledTextNode(seg, document.getSegOps(), applyStyle));
+              document, StyledText.textOps(), preserveStyle,
+              seg -> createStyledTextNode(seg, StyledText.textOps(), applyStyle));
     }
 
     public StyledTextArea(PS initialParagraphStyle, BiConsumer<TextFlow, PS> applyParagraphStyle,
                           S initialTextStyle, BiConsumer<? super TextExt, S> applyStyle,
                           EditableStyledDocument<PS, StyledText<S>, S> document) {
-        this(initialParagraphStyle, applyParagraphStyle, 
-             initialTextStyle, applyStyle, document, true); 
+        this(initialParagraphStyle, applyParagraphStyle,
+             initialTextStyle, applyStyle, document, true);
     }
 
-    public StyledTextArea(PS initialParagraphStyle, BiConsumer<TextFlow, PS> applyParagraphStyle, 
+    public StyledTextArea(PS initialParagraphStyle, BiConsumer<TextFlow, PS> applyParagraphStyle,
                           S initialTextStyle, BiConsumer<? super TextExt, S> applyStyle,
                           boolean preserveStyle) {
-        this(initialParagraphStyle, applyParagraphStyle, 
-             initialTextStyle, applyStyle, new SimpleEditableStyledDocument<>(initialParagraphStyle, initialTextStyle, 
-                                                                              new StyledTextOps<>()), preserveStyle); 
+        this(
+                initialParagraphStyle,
+                applyParagraphStyle,
+                initialTextStyle,
+                applyStyle,
+                new SimpleEditableStyledDocument<>(initialParagraphStyle, initialTextStyle),
+                preserveStyle);
     }
 
-    public StyledTextArea(PS initialParagraphStyle, BiConsumer<TextFlow, PS> applyParagraphStyle, 
+    public StyledTextArea(PS initialParagraphStyle, BiConsumer<TextFlow, PS> applyParagraphStyle,
                           S initialTextStyle, BiConsumer<? super TextExt, S> applyStyle) {
         this(initialParagraphStyle, applyParagraphStyle,
              initialTextStyle, applyStyle, true);
+    }
+
+    public static <S> Node createStyledTextNode(StyledText<S> seg, SegmentOps<StyledText<S>, S> segOps,
+            BiConsumer<? super TextExt, S> applyStyle) {
+
+        TextExt t = new TextExt(segOps.getText(seg));
+        t.setTextOrigin(VPos.TOP);
+        t.getStyleClass().add("text");
+        applyStyle.accept(t, segOps.getStyle(seg));
+
+        // XXX: binding selectionFill to textFill,
+        // see the note at highlightTextFill
+        t.impl_selectionFillProperty().bind(t.fillProperty());
+        return t;
     }
 }

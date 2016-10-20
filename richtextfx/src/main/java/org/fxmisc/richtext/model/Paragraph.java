@@ -33,10 +33,6 @@ public final class Paragraph<PS, SEG, S> {
 
     private final SegmentOps<SEG, S> segmentOps;
 
-    public Paragraph(PS paragraphStyle, SegmentOps<SEG, S> segmentOps, String text, S style) {
-        this(paragraphStyle, segmentOps, segmentOps.create(text, style));
-    }
-
     @SafeVarargs
     public Paragraph(PS paragraphStyle, SegmentOps<SEG, S> segmentOps, SEG text, SEG... texts) {
         this(paragraphStyle, segmentOps, list(text, texts));
@@ -44,7 +40,7 @@ public final class Paragraph<PS, SEG, S> {
 
     Paragraph(PS paragraphStyle, SegmentOps<SEG, S> segmentOps, List<SEG> segments) {
         assert !segments.isEmpty();
-        
+
         this.segmentOps = segmentOps;
         this.segments = segments;
         this.paragraphStyle = paragraphStyle;
@@ -98,8 +94,9 @@ public final class Paragraph<PS, SEG, S> {
 
         SEG left = segments.get(segments.size() - 1);
         SEG right = p.segments.get(0);
-        if (segmentOps.canJoin(left, right)) {
-            SEG segment = segmentOps.append(left, segmentOps.getText(right));
+        Optional<SEG> joined = segmentOps.join(left, right);
+        if(joined.isPresent()) {
+            SEG segment = joined.get();
             List<SEG> segs = new ArrayList<>(segments.size() + p.segments.size() - 1);
             segs.addAll(segments.subList(0, segments.size()-1));
             segs.add(segment);
@@ -121,32 +118,6 @@ public final class Paragraph<PS, SEG, S> {
         return this.length() == 0 && that.length() == 0
             ? that
             : concat(that);
-    }
-
-    public Paragraph<PS, SEG, S> append(String str) {
-        if(str.length() == 0) {
-            return this;
-        }
-
-        List<SEG> segs = new ArrayList<>(segments);
-        int lastIdx = segments.size() - 1;
-        segs.set(lastIdx, segmentOps.append(segments.get(lastIdx), str));
-        return new Paragraph<>(paragraphStyle, segmentOps, segs);
-    }
-
-    public Paragraph<PS, SEG, S> insert(int offset, CharSequence str) {
-        if(offset < 0 || offset > length()) {
-            throw new IndexOutOfBoundsException(String.valueOf(offset));
-        }
-
-        Position pos = navigator.offsetToPosition(offset, Backward);
-        int segIdx = pos.getMajor();
-        int segPos = pos.getMinor();
-        SEG seg = segments.get(segIdx);
-        SEG replacement = segmentOps.spliced(seg, segPos, segPos, str);
-        List<SEG> segs = new ArrayList<>(segments);
-        segs.set(segIdx, replacement);
-        return new Paragraph<>(paragraphStyle, segmentOps, segs);
     }
 
     public Paragraph<PS, SEG, S> subSequence(int start, int end) {
@@ -188,7 +159,20 @@ public final class Paragraph<PS, SEG, S> {
     }
 
     public Paragraph<PS, SEG, S> restyle(S style) {
-        return new Paragraph<>(paragraphStyle, segmentOps, getText(), style);
+        List<SEG> segs = new ArrayList<>();
+        Iterator<SEG> it = segments.iterator();
+        segs.add(segmentOps.setStyle(it.next(), style));
+        while (it.hasNext()) {
+            SEG prev = segs.get(segs.size() - 1);
+            SEG cur = segmentOps.setStyle(it.next(), style);
+            Optional<SEG> joined = segmentOps.join(prev, cur);
+            if(joined.isPresent()) {
+                segs.set(segs.size() - 1, joined.get());
+            } else {
+                segs.add(cur);
+            }
+        }
+        return new Paragraph<>(paragraphStyle, segmentOps, segs);
     }
 
     public Paragraph<PS, SEG, S> restyle(int from, int to, S style) {
@@ -197,63 +181,33 @@ public final class Paragraph<PS, SEG, S> {
         } else {
             to = Math.min(to, length());
             Paragraph<PS, SEG, S> left = subSequence(0, from);
-            Paragraph<PS, SEG, S> middle = new Paragraph<>(paragraphStyle, segmentOps, substring(from, to), style);
+            Paragraph<PS, SEG, S> middle = subSequence(from, to).restyle(style);
             Paragraph<PS, SEG, S> right = subSequence(to);
             return left.concat(middle).concat(right);
         }
     }
 
-    public Paragraph<PS, SEG, S> restyle(int from, StyleSpans</*? extends*/S> styleSpans) {
+    public Paragraph<PS, SEG, S> restyle(int from, StyleSpans<? extends S> styleSpans) {
         int len = styleSpans.length();
         if(styleSpans.equals(getStyleSpans(from, from + len))) {
             return this;
         }
 
-        // Step 1: Restyle all segments according to the corresponding style span
-        //
-        // Assumptions:
-        // * borders of segments are aligned to borders of spans
-        // * One style span can span multiple segments
-        // * One segment can (obviously) not span multiple StyleSpans
-        List<SEG> intermediateSegs = new ArrayList<>(segments.size());
-        int segOff = 0;
-        Iterator<StyleSpan<S>> spans = styleSpans.iterator();
-        StyleSpan<S> span = spans.next();
-        int spanEnd = span.getLength();
-        for (SEG seg : segments) {
-            segmentOps.setStyle(seg, span.getStyle());
-
-            intermediateSegs.add(seg);
-
-            segOff = segOff + segmentOps.length(seg);
-            if (segOff >= spanEnd && spans.hasNext()) {
-                span = (StyleSpan<S>) spans.next();
-                spanEnd += span.getLength();
-            }
-        }
-
-        // Step 2: Join segments with the same style
-        //
-        // Assumptions:
-        // * There is at least one segment available
-        List<SEG> middleSegs = new ArrayList<>(intermediateSegs.size());
-        Iterator<SEG>  segs = intermediateSegs.iterator();
-        SEG currentSeg = segs.next();
-        while(segs.hasNext()) {
-            SEG nextSeg = segs.next();
-            if (segmentOps.canJoin(currentSeg, nextSeg)) {
-                currentSeg = segmentOps.append(currentSeg, segmentOps.getText(nextSeg));
-            } else {
-                middleSegs.add(currentSeg);
-                currentSeg = nextSeg;
-            }
-        }
-        middleSegs.add(currentSeg);
-
-        Paragraph<PS, SEG, S> middle = new Paragraph<>(paragraphStyle, segmentOps, middleSegs);
         Paragraph<PS, SEG, S> left = trim(from);
         Paragraph<PS, SEG, S> right = subSequence(from + len);
-        return left.concat(middle).concat(right);
+
+        Paragraph<PS, SEG, S> middle = subSequence(from, from + len);
+        List<SEG> middleSegs = new ArrayList<>(styleSpans.getSpanCount());
+        int offset = 0;
+        for(StyleSpan<? extends S> span: styleSpans) {
+            int end = offset + span.getLength();
+            Paragraph<PS, SEG, S> text = middle.subSequence(offset, end);
+            middleSegs.addAll(text.restyle(span.getStyle()).segments);
+            offset = end;
+        }
+        Paragraph<PS, SEG, S> newMiddle = new Paragraph<>(paragraphStyle, segmentOps, middleSegs);
+
+        return left.concat(newMiddle).concat(right);
     }
 
     public Paragraph<PS, SEG, S> setParagraphStyle(PS paragraphStyle) {
@@ -310,7 +264,7 @@ public final class Paragraph<PS, SEG, S> {
     public StyleSpans<S> getStyleSpans() {
         StyleSpansBuilder<S> builder = new StyleSpansBuilder<>(segments.size());
         for(SEG seg: segments) {
-            builder.add(segmentOps.getStyle(seg), 
+            builder.add(segmentOps.getStyle(seg),
                         segmentOps.length(seg));
         }
         return builder.create();
@@ -336,7 +290,7 @@ public final class Paragraph<PS, SEG, S> {
 
             for(int i = startSegIdx + 1; i < endSegIdx; ++i) {
                 SEG seg = segments.get(i);
-                builder.add(segmentOps.getStyle(seg), 
+                builder.add(segmentOps.getStyle(seg),
                             segmentOps.length(seg));
             }
 
@@ -366,7 +320,7 @@ public final class Paragraph<PS, SEG, S> {
     public String toString() {
         return
                 "Par[" + paragraphStyle  + "; " +
-                segments.stream().map(segmentOps::toString)
+                segments.stream().map(Object::toString)
                         .reduce((s1, s2) -> s1 + "," + s2).orElse("") +
                 "]";
     }

@@ -27,7 +27,7 @@ import org.reactfx.util.Tuple2;
  */
 public interface ClipboardActions<PS, SEG, S> extends EditActions<PS, SEG, S> {
 
-    Optional<Tuple2<Codec<PS>, Codec<S>>> getStyleCodecs();
+    Optional<Tuple2<Codec<PS>, Codec<SEG>>> getStyleCodecs();
 
     SegmentOps<SEG, S> getSegOps();
 
@@ -80,7 +80,7 @@ public interface ClipboardActions<PS, SEG, S> extends EditActions<PS, SEG, S> {
         Clipboard clipboard = Clipboard.getSystemClipboard();
 
         if(getStyleCodecs().isPresent()) {
-            Tuple2<Codec<PS>, Codec<S>> codecs = getStyleCodecs().get();
+            Tuple2<Codec<PS>, Codec<SEG>> codecs = getStyleCodecs().get();
             Codec<StyledDocument<PS, SEG, S>> codec = ReadOnlyStyledDocument.codec(codecs._1, codecs._2, getSegOps());
             DataFormat format = dataFormat(codec.getName());
             if(clipboard.hasContent(format)) {
