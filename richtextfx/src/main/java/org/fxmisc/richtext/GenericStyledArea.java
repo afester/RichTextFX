@@ -58,6 +58,7 @@ import org.fxmisc.richtext.model.EditActions;
 import org.fxmisc.richtext.model.EditableStyledDocument;
 import org.fxmisc.richtext.model.GenericEditableStyledDocument;
 import org.fxmisc.richtext.model.GenericStyledTextAreaModel;
+import org.fxmisc.richtext.model.ListItem;
 import org.fxmisc.richtext.model.NavigationActions;
 import org.fxmisc.richtext.model.Paragraph;
 import org.fxmisc.richtext.model.PlainTextChange;
@@ -1078,6 +1079,10 @@ public class GenericStyledArea<PS, SEG, S> extends Region
         model.setParagraphStyle(paragraph, paragraphStyle);
     }
 
+    public void setParagraphList(int pIdx, ListItem listItem) {
+        model.setParagraphList(pIdx, listItem);
+    }
+
     /**
      * Resets the style of the given range to the initial style.
      */
@@ -1361,8 +1366,5 @@ public class GenericStyledArea<PS, SEG, S> extends Region
                 .on(restartImpulse.withDefaultEvent(null)).transition((state, impulse) -> true)
                 .on(ticks).transition((state, tick) -> !state)
                 .toStateStream();
-    }
-    public void indentParagraph(int pIdx) {
-        model.indentParagraph(pIdx);
     }
 }

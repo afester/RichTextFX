@@ -13,6 +13,14 @@ import javafx.scene.control.IndexRange;
 
 import org.fxmisc.richtext.model.TwoDimensional.Position;
 
+/**
+ * A paragraph with segments.
+ * This class is immutable.
+ *
+ * @param <PS>
+ * @param <SEG>
+ * @param <S>
+ */
 public final class Paragraph<PS, SEG, S> {
 
     @SafeVarargs
@@ -30,20 +38,24 @@ public final class Paragraph<PS, SEG, S> {
     private final List<SEG> segments;
     private final TwoLevelNavigator navigator;
     private final PS paragraphStyle;
+    private ListItem listItem;
 
     private final SegmentOps<SEG, S> segmentOps;
 
     @SafeVarargs
     public Paragraph(PS paragraphStyle, SegmentOps<SEG, S> segmentOps, SEG text, SEG... texts) {
-        this(paragraphStyle, segmentOps, list(text, texts));
+        this(paragraphStyle, segmentOps, list(text, texts), null);
     }
 
-    Paragraph(PS paragraphStyle, SegmentOps<SEG, S> segmentOps, List<SEG> segments) {
+    Paragraph(PS paragraphStyle, SegmentOps<SEG, S> segmentOps, List<SEG> segments, ListItem listItem) {
         assert !segments.isEmpty();
 
+       // new Throwable().printStackTrace(System.err);
+        
         this.segmentOps = segmentOps;
         this.segments = segments;
         this.paragraphStyle = paragraphStyle;
+        this.listItem = listItem;
         navigator = new TwoLevelNavigator(segments::size,
                 i -> segmentOps.length(segments.get(i)));
     }
@@ -101,12 +113,12 @@ public final class Paragraph<PS, SEG, S> {
             segs.addAll(segments.subList(0, segments.size()-1));
             segs.add(segment);
             segs.addAll(p.segments.subList(1, p.segments.size()));
-            return new Paragraph<>(paragraphStyle, segmentOps, segs);
+            return new Paragraph<>(paragraphStyle, segmentOps, segs, null);
         } else {
             List<SEG> segs = new ArrayList<>(segments.size() + p.segments.size());
             segs.addAll(segments);
             segs.addAll(p.segments);
-            return new Paragraph<>(paragraphStyle, segmentOps, segs);
+            return new Paragraph<>(paragraphStyle, segmentOps, segs, null);
         }
     }
 
@@ -133,7 +145,7 @@ public final class Paragraph<PS, SEG, S> {
             List<SEG> segs = new ArrayList<>(segIdx + 1);
             segs.addAll(segments.subList(0, segIdx));
             segs.add(segmentOps.subSequence(segments.get(segIdx), 0, pos.getMinor()));
-            return new Paragraph<>(paragraphStyle, segmentOps, segs);
+            return new Paragraph<>(paragraphStyle, segmentOps, segs, null);
         }
     }
 
@@ -148,7 +160,7 @@ public final class Paragraph<PS, SEG, S> {
             List<SEG> segs = new ArrayList<>(segments.size() - segIdx);
             segs.add(segmentOps.subSequence(segments.get(segIdx), pos.getMinor()));
             segs.addAll(segments.subList(segIdx + 1, segments.size()));
-            return new Paragraph<>(paragraphStyle, segmentOps, segs);
+            return new Paragraph<>(paragraphStyle, segmentOps, segs, null);
         } else {
             throw new IndexOutOfBoundsException(start + " not in [0, " + length() + "]");
         }
@@ -172,7 +184,7 @@ public final class Paragraph<PS, SEG, S> {
                 segs.add(cur);
             }
         }
-        return new Paragraph<>(paragraphStyle, segmentOps, segs);
+        return new Paragraph<>(paragraphStyle, segmentOps, segs, listItem);
     }
 
     public Paragraph<PS, SEG, S> restyle(int from, int to, S style) {
@@ -205,13 +217,13 @@ public final class Paragraph<PS, SEG, S> {
             middleSegs.addAll(text.restyle(span.getStyle()).segments);
             offset = end;
         }
-        Paragraph<PS, SEG, S> newMiddle = new Paragraph<>(paragraphStyle, segmentOps, middleSegs);
+        Paragraph<PS, SEG, S> newMiddle = new Paragraph<>(paragraphStyle, segmentOps, middleSegs, listItem);
 
         return left.concat(newMiddle).concat(right);
     }
 
     public Paragraph<PS, SEG, S> setParagraphStyle(PS paragraphStyle) {
-        return new Paragraph<>(paragraphStyle, segmentOps, segments);
+        return new Paragraph<>(paragraphStyle, segmentOps, segments, listItem);
     }
 
     /**
@@ -341,23 +353,33 @@ public final class Paragraph<PS, SEG, S> {
         return Objects.hash(paragraphStyle, segments);
     }
 
-    private Optional<ParagraphList> paragraphList = Optional.empty();
-
-    public ParagraphList createParagraphList() {
-        if (!paragraphList.isPresent()) {
-            paragraphList = Optional.of(new ParagraphList());
-        }
-        return paragraphList.get();
-    }
-
-    public Optional<ParagraphList> getParagraphList() {
-        return paragraphList;
-    }
+    
+    
+    
+//    private Optional<ParagraphList> paragraphList = Optional.empty();
+//
+//    public Optional<ParagraphList> getParagraphList() {
+//        return paragraphList;
+//    }
 
 
-    public Paragraph<PS, SEG, S> setIndent(int i) {
-        Paragraph<PS, SEG, S> result =new Paragraph<>(paragraphStyle, segmentOps, segments);
-        result.createParagraphList();
+    public Paragraph<PS, SEG, S> setListItem(ListItem li) {
+        Paragraph<PS, SEG, S> result = new Paragraph<>(paragraphStyle, segmentOps, segments, li);
+//        result.createParagraphList();
         return result;
     }
+    
+    public Optional<ListItem> getListItem() {
+        return Optional.ofNullable(listItem);
+    }
+
+//
+//    private ParagraphList createParagraphList() {
+//        if (!paragraphList.isPresent()) {
+//            paragraphList = Optional.of(new ParagraphList());
+//        }
+//        return paragraphList.get();
+//    }
+
+
 }

@@ -88,7 +88,7 @@ public final class ReadOnlyStyledDocument<PS, SEG, S> implements StyledDocument<
     }
 
     public static <PS, SEG, S> ReadOnlyStyledDocument<PS, SEG, S> fromSegment(SEG segment,  PS paragraphStyle, S style, SegmentOps<SEG, S> segmentOps) {
-        Paragraph<PS, SEG, S> content = new Paragraph<PS, SEG, S>(paragraphStyle, segmentOps, Arrays.asList(segment));
+        Paragraph<PS, SEG, S> content = new Paragraph<PS, SEG, S>(paragraphStyle, segmentOps, Arrays.asList(segment), null);
         List<Paragraph<PS, SEG, S>> res = Arrays.asList(content);
         return new ReadOnlyStyledDocument<>(res);
     }
@@ -143,7 +143,7 @@ public final class ReadOnlyStyledDocument<PS, SEG, S> implements StyledDocument<
             public Paragraph<PS, SEG, S> decode(DataInputStream is) throws IOException {
                 PS paragraphStyle = pCodec.decode(is);
                 List<SEG> segments = segmentsCodec.decode(is);
-                return new Paragraph<>(paragraphStyle, segmentOps, segments);
+                return new Paragraph<>(paragraphStyle, segmentOps, segments, null);
             }
         };
     }

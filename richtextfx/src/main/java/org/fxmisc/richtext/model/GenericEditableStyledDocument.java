@@ -162,6 +162,12 @@ public class GenericEditableStyledDocument<PS, SEG, S> implements EditableStyled
     }
 
     @Override
+    public void setParagraphList(int parIdx, ListItem li) {
+        ensureValidParagraphIndex(parIdx);
+        doc.replaceParagraph(parIdx, p -> p.setListItem(li)).exec(this::update);
+    }
+
+    @Override
     public StyledDocument<PS, SEG, S> concat(StyledDocument<PS, SEG, S> that) {
         return doc.concat(that);
     }
@@ -206,13 +212,5 @@ public class GenericEditableStyledDocument<PS, SEG, S> implements EditableStyled
             richChanges.push(change);
             parChanges.push(parChange);
         });
-    }
-    @Override
-    public void indentParagraph(int pIdx) {
-        ensureValidParagraphIndex(pIdx);
-        doc.replaceParagraph(pIdx, p -> p.setIndent(1)).exec(this::update);
-
-        // TODO Auto-generated method stub
-        
     }
 }

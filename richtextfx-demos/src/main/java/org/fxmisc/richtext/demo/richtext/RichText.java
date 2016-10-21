@@ -49,6 +49,7 @@ import org.fxmisc.richtext.TextExt;
 import org.fxmisc.richtext.model.Codec;
 import org.fxmisc.richtext.model.EditableStyledDocument;
 import org.fxmisc.richtext.model.GenericEditableStyledDocument;
+import org.fxmisc.richtext.model.ListItem;
 import org.fxmisc.richtext.model.Paragraph;
 import org.fxmisc.richtext.model.ReadOnlyStyledDocument;
 import org.fxmisc.richtext.model.StyleSpans;
@@ -449,28 +450,40 @@ public class RichText extends Application {
         }
     }
 
-    
     private void increaseIndent() {
         int pIdx = area.getCurrentParagraph();
+        Paragraph<ParStyle, Either<StyledText<TextStyle>,LinkedImage<TextStyle>>, TextStyle> paragraph = area.getParagraph(pIdx);
+        Optional<ListItem> li = paragraph.getListItem();
 
-        //area.getDocument().getParagraphs().get(pIdx).createParagraphList();
+        int level = 1;
+        if (li.isPresent()) {
+            level = li.get().getLevel() + 1;
+        }
+        area.setParagraphList(pIdx, new ListItem(level));
 
-        area.indentParagraph(pIdx);
-        // updateParagraphStyleInSelection( e -> area.getDocument().getParagraphStyle(pIdx) );
-        // updateFontSize(12);
-        //((ReadOnlyStyledDocument<ParStyle, Either<StyledText<TextStyle>, LinkedImage<TextStyle>>, TextStyle>) area.getDocument())
-        //    .setParagraphStyle(pIdx, area.getDocument().getParagraphs().get(pIdx).getParagraphStyle());
-        //((EditableStyledDocument) area.getDocument());
-
-        //.getParagraphs().get(pIdx).setParagraphStyle(
-        //        area.getDocument().getParagraphs().get(pIdx).getParagraphStyle());
-        // ((GenericEditableStyledDocument) area.getDocument()).update();
-        // area.layout();
-        //area.getDocument().getParagraphs().get(pIdx - 1);
-        //area.getDocument().getParagraphs().get(pIdx - 1);
+        // Force recreation of the ParagraphBox ...
+        updateParagraphStyleInSelection(ParStyle.backgroundColor(Color.YELLOW));
+        updateParagraphStyleInSelection(ParStyle.backgroundColor(Color.WHITE));
     }
 
     private void decreaseIndent() {
+        int pIdx = area.getCurrentParagraph();
+        Paragraph<ParStyle, Either<StyledText<TextStyle>,LinkedImage<TextStyle>>, TextStyle> paragraph = area.getParagraph(pIdx);
+        Optional<ListItem> li = paragraph.getListItem();
+
+        if (li.isPresent()) {
+            ListItem newItem = null;
+            int level = li.get().getLevel() - 1;
+            if (level != 0) {
+                newItem = new ListItem(level);
+            }
+
+            area.setParagraphList(pIdx, newItem);
+    
+            // Force recreation of the ParagraphBox ...
+            updateParagraphStyleInSelection(ParStyle.backgroundColor(Color.YELLOW));
+            updateParagraphStyleInSelection(ParStyle.backgroundColor(Color.WHITE));
+        }
     }
 
     private void updateStyleInSelection(Function<StyleSpans<TextStyle>, TextStyle> mixinGetter) {

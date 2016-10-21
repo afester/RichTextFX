@@ -22,11 +22,14 @@ import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.control.IndexRange;
 import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
+import org.fxmisc.richtext.model.ListItem;
 import org.fxmisc.richtext.model.Paragraph;
 import org.fxmisc.richtext.model.ParagraphList;
 import org.fxmisc.richtext.util.MouseStationaryHelper;
@@ -62,7 +65,9 @@ class ParagraphBox<PS, SEG, S> extends Region {
     private final Val<Node> graphic;
 
     private Node bullet;
+    private double bOffset;
 
+    
     final DoubleProperty graphicOffset = new SimpleDoubleProperty(0.0);
 
     private final BooleanProperty wrapText = new SimpleBooleanProperty(false);
@@ -78,17 +83,33 @@ class ParagraphBox<PS, SEG, S> extends Region {
 
     ParagraphBox(Paragraph<PS, SEG, S> par, BiConsumer<TextFlow, PS> applyParagraphStyle, 
                  Function<SEG, Node> nodeFactory) {
-        System.err.println("CREATE ParagraphBox");
+        System.err.println("CREATE ParagraphBox: " + System.identityHashCode(par) + "/"  + par.getListItem().isPresent());
 
         this.getStyleClass().add("paragraph-box");
         this.text = new ParagraphText<>(par, nodeFactory);
         applyParagraphStyle.accept(this.text, par.getParagraphStyle());
         this.index = Var.newSimpleVar(0);
-        
-        // add bullet
-        if (par.getParagraphList().isPresent()) {
-            //bullet = new Circle(2);
-            bullet = new Text("1.2.3.4");
+
+        // add bullet (TODO: => BulletFactory)
+        if (par.getListItem().isPresent()) {
+            int level = par.getListItem().get().getLevel();
+            if (level == 1) {
+                Circle c = new Circle(3);
+                c.setFill(Color.BLACK);
+                c.setStroke(Color.BLACK);
+                bullet = c;
+                bOffset = c.getRadius() + 5;
+            } else if (level == 2) {
+                Circle c = new Circle(3);
+                c.setFill(Color.WHITE);
+                c.setStroke(Color.BLACK);
+                bullet = c;
+                bOffset = c.getRadius() + 5;
+            } else {
+                bullet = new Rectangle(5,5);
+                bOffset = 5;
+            }
+            //bullet = new Text("1.2.3.4");
             getChildren().add(bullet);
         }
 
@@ -213,21 +234,21 @@ class ParagraphBox<PS, SEG, S> extends Region {
 
         // get the indent of this paragraph
         double indent = 0;
-        Optional<ParagraphList> pList = text.getParagraph().getParagraphList();
+        Optional<ListItem> pList = text.getParagraph().getListItem();
         if (pList.isPresent()) {
-            indent = pList.get().getFormat().getIndent();
+            indent = pList.get().getLevel() * 15; // pList.get().getFormat().getIndent();
         }
 
         double textIndent = getGraphicPrefWidth() + indent;
         text.resizeRelocate(textIndent, 0, w - textIndent, h);
 
-        System.err.println("UPDATE BULLET...");
+        System.err.println("UPDATE BULLET... indent=" + indent);
 
         // position the bullet at the appropriate location
         if (pList.isPresent()) {
             System.err.println("  BULLET IS PRESENT!");
             double ypos = text.getLineCenter(0);
-            double xpos = textIndent - ((Circle) bullet).getRadius() - 3;
+            double xpos = textIndent - bOffset;
             bullet.relocate(xpos, ypos);
         }
 

@@ -596,6 +596,10 @@ public class GenericStyledTextAreaModel<PS, SEG, S>
         content.setParagraphStyle(paragraph, paragraphStyle);
     }
 
+    public void setParagraphList(int parIdx, ListItem li) {
+        content.setParagraphList(parIdx, li);
+    }
+
     /**
      * Resets the style of the given range to the initial style.
      */
@@ -720,7 +724,4 @@ public class GenericStyledTextAreaModel<PS, SEG, S>
         return Suspendable.combine(beingUpdated, Suspendable.combine(suspendables)).suspend();
     }
 
-    public void indentParagraph(int pIdx) {
-        content.indentParagraph(pIdx);
-    }
 }
