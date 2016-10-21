@@ -1052,7 +1052,7 @@ public class GenericStyledArea<PS, SEG, S> extends Region
      * </pre>
      * but the actual implementation is more efficient.
      */
-    public void setStyleSpans(int from, StyleSpans</*? extends */ S> styleSpans) {
+    public void setStyleSpans(int from, StyleSpans<? extends S> styleSpans) {
         model.setStyleSpans(from, styleSpans);
     }
 
@@ -1066,7 +1066,7 @@ public class GenericStyledArea<PS, SEG, S> extends Region
      * </pre>
      * but the actual implementation is more efficient.
      */
-    public void setStyleSpans(int paragraph, int from, StyleSpans</*? extends*/ S> styleSpans) {
+    public void setStyleSpans(int paragraph, int from, StyleSpans<? extends S> styleSpans) {
         model.setStyleSpans(paragraph, from, styleSpans);
     }
 
