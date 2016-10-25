@@ -17,9 +17,9 @@ public interface SegmentOps<SEG, S> {
 
     public String getText(SEG seg);
 
-    public SEG subSequence(SEG seg, int start, int end);
+    public Optional<SEG> subSequence(SEG seg, int start, int end);
 
-    public SEG subSequence(SEG seg, int start);
+    public Optional<SEG> subSequence(SEG seg, int start);
 
     public S getStyle(SEG seg);
 
@@ -68,15 +68,19 @@ class EitherSegmentOps<L, R, S> implements SegmentOps<Either<L, R>, S> {
     }
 
     @Override
-    public Either<L, R> subSequence(Either<L, R> seg, int start, int end) {
-        return seg.map(l -> lOps.subSequence(l, start, end),
-                       r -> rOps.subSequence(r, start, end));
+    public Optional<Either<L, R>> subSequence(Either<L, R> seg, int start, int end) {
+        return seg.unify(ll -> seg.unify(l -> lOps.subSequence(l, start, end).map(Either::left),
+                                         e -> Optional.empty()),
+                         rr -> seg.unify(e -> Optional.empty(),
+                                         r -> rOps.subSequence(r, start, end).map(Either::right)));
     }
 
     @Override
-    public Either<L, R> subSequence(Either<L, R> seg, int start) {
-        return seg.map(l -> lOps.subSequence(l, start),
-                       r -> rOps.subSequence(r, start));
+    public Optional<Either<L, R>> subSequence(Either<L, R> seg, int start) {
+        return seg.unify(ll -> seg.unify(l -> lOps.subSequence(l, start).map(Either::left),
+                                         e -> Optional.empty()),
+                         rr -> seg.unify(e -> Optional.empty(),
+                                         r -> rOps.subSequence(r, start).map(Either::right)));
     }
 
     @Override

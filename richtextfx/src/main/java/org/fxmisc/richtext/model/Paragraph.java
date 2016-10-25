@@ -132,7 +132,8 @@ public final class Paragraph<PS, SEG, S> {
             int segIdx = pos.getMajor();
             List<SEG> segs = new ArrayList<>(segIdx + 1);
             segs.addAll(segments.subList(0, segIdx));
-            segs.add(segmentOps.subSequence(segments.get(segIdx), 0, pos.getMinor()));
+            segmentOps.subSequence(segments.get(segIdx), 0, pos.getMinor())
+                            .ifPresent(seg -> segs.add(seg));
             return new Paragraph<>(paragraphStyle, segmentOps, segs);
         }
     }
@@ -146,7 +147,8 @@ public final class Paragraph<PS, SEG, S> {
             Position pos = navigator.offsetToPosition(start, Forward);
             int segIdx = pos.getMajor();
             List<SEG> segs = new ArrayList<>(segments.size() - segIdx);
-            segs.add(segmentOps.subSequence(segments.get(segIdx), pos.getMinor()));
+            segmentOps.subSequence(segments.get(segIdx), pos.getMinor())
+                            .ifPresent(seg -> segs.add(seg));
             segs.addAll(segments.subList(segIdx + 1, segments.size()));
             return new Paragraph<>(paragraphStyle, segmentOps, segs);
         } else {
