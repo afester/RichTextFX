@@ -148,7 +148,7 @@ public final class Paragraph<PS, SEG, S> {
             int segIdx = pos.getMajor();
             List<SEG> segs = new ArrayList<>(segments.size() - segIdx);
             segmentOps.subSequence(segments.get(segIdx), pos.getMinor())
-                            .ifPresent(seg -> segs.add(seg));
+                            .ifPresent(segs::add);
             segs.addAll(segments.subList(segIdx + 1, segments.size()));
             return new Paragraph<>(paragraphStyle, segmentOps, segs);
         } else {
