@@ -21,6 +21,8 @@ public interface SegmentOps<SEG, S> {
 
     public Optional<SEG> subSequence(SEG seg, int start);
 
+    public S defaultStyle();
+
     public S getStyle(SEG seg);
 
     public SEG setStyle(SEG seg, S style);
@@ -28,26 +30,33 @@ public interface SegmentOps<SEG, S> {
     public Optional<SEG> join(SEG currentSeg, SEG nextSeg);
 
     public default <R> SegmentOps<Either<SEG, R>, S> or(SegmentOps<R, S> rOps) {
-        return either(this, rOps);
+        return either(this, rOps, EitherSegmentOps.StyleChoice.LEFT);
     }
 
-    public default <R> TextOps<Either<SEG, R>, S> or_(TextOps<R, S> rOps) {
-        return TextOps.eitherR(this, rOps);
+    public default <R> TextOps<Either<SEG, R>, S> or_(TextOps<R, S> rOps, EitherSegmentOps.StyleChoice choice) {
+        return TextOps.eitherR(this, rOps, choice);
     }
 
-    public static <L, R, S> SegmentOps<Either<L, R>, S> either(SegmentOps<L, S> lOps, SegmentOps<R, S> rOps) {
-        return new EitherSegmentOps<L, R, S>(lOps, rOps);
+    public static <L, R, S> SegmentOps<Either<L, R>, S> either(SegmentOps<L, S> lOps, SegmentOps<R, S> rOps, EitherSegmentOps.StyleChoice choice) {
+        return new EitherSegmentOps<>(lOps, rOps, choice);
     }
 }
 
 class EitherSegmentOps<L, R, S> implements SegmentOps<Either<L, R>, S> {
 
+    public static enum StyleChoice {
+        LEFT,
+        RIGHT
+    }
+
     private final SegmentOps<L, S> lOps;
     private final SegmentOps<R, S> rOps;
+    private final StyleChoice choice;
 
-    EitherSegmentOps(SegmentOps<L, S> lOps, SegmentOps<R, S> rOps) {
+    EitherSegmentOps(SegmentOps<L, S> lOps, SegmentOps<R, S> rOps, StyleChoice choice) {
         this.lOps = lOps;
         this.rOps = rOps;
+        this.choice = choice;
     }
 
 
@@ -81,6 +90,13 @@ class EitherSegmentOps<L, R, S> implements SegmentOps<Either<L, R>, S> {
                                          e -> Optional.empty()),
                          rr -> seg.unify(e -> Optional.empty(),
                                          r -> rOps.subSequence(r, start).map(Either::right)));
+    }
+
+    @Override
+    public S defaultStyle() {
+        return choice == StyleChoice.LEFT
+                ? lOps.defaultStyle()
+                : rOps.defaultStyle();
     }
 
     @Override

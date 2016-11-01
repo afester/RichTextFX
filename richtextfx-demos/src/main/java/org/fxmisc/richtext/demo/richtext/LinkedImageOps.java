@@ -6,6 +6,12 @@ import org.fxmisc.richtext.model.SegmentOps;
 
 public class LinkedImageOps<S> implements SegmentOps<LinkedImage<S>, S> {
 
+    private final S defaultStyle;
+
+    public LinkedImageOps(S defaultStyle) {
+        this.defaultStyle = defaultStyle;
+    }
+
     @Override
     public int length(LinkedImage<S> seg) {
         return 1;
@@ -33,6 +39,10 @@ public class LinkedImageOps<S> implements SegmentOps<LinkedImage<S>, S> {
         return start < length(linkedImage)
                 ? Optional.of(linkedImage)
                 : Optional.empty();
+    }
+
+    public S defaultStyle() {
+        return defaultStyle;
     }
 
     @Override
