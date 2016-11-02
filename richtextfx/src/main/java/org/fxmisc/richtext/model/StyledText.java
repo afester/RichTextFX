@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public class StyledText<S>  {
 
-    public static <S> TextOps<StyledText<S>, S> textOps() {
+    public static <S> TextOps<StyledText<S>, S> textOps(S defaultStyle) {
         return new TextOps<StyledText<S>, S>() {
 
             @Override
@@ -34,6 +34,11 @@ public class StyledText<S>  {
             @Override
             public Optional<StyledText<S>> subSequence(StyledText<S> styledText, int start) {
                  return Optional.of(new StyledText<>(styledText.getText().substring(start), styledText.getStyle()));
+            }
+
+            @Override
+            public S defaultStyle() {
+                return defaultStyle;
             }
 
             @Override
