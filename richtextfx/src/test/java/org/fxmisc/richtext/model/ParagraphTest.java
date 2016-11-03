@@ -1,12 +1,8 @@
 package org.fxmisc.richtext.model;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.hamcrest.core.IsInstanceOf.*;
-import static org.hamcrest.MatcherAssert.*;
 
 import org.junit.Test;
-import org.reactfx.util.Either;
 
 public class ParagraphTest {
 
