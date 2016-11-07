@@ -78,17 +78,24 @@ public final class ReadOnlyStyledDocument<PS, SEG, S> implements StyledDocument<
         m.reset();
         while(m.find()) {
             String s = str.substring(start, m.start());
-            res.add(new NonEmptyParagraph<>(paragraphStyle, segmentOps, segmentOps.create(s, style)));
+            res.add(s.isEmpty()
+                ? new EmptyParagraph<>(paragraphStyle, style)
+                : new NonEmptyParagraph<>(paragraphStyle, segmentOps, segmentOps.create(s, style))
+            );
             start = m.end();
         }
         String last = str.substring(start);
-        res.add(new NonEmptyParagraph<>(paragraphStyle, segmentOps, segmentOps.create(last, style)));
+        res.add(last.isEmpty()
+                ? new EmptyParagraph<>(paragraphStyle, style)
+                : new NonEmptyParagraph<>(paragraphStyle, segmentOps, segmentOps.create(last, style)));
 
         return new ReadOnlyStyledDocument<>(res);
     }
 
     public static <PS, SEG, S> ReadOnlyStyledDocument<PS, SEG, S> fromSegment(SEG segment,  PS paragraphStyle, S style, SegmentOps<SEG, S> segmentOps) {
-        Paragraph<PS, SEG, S> content = new NonEmptyParagraph<>(paragraphStyle, segmentOps, Arrays.asList(segment));
+        Paragraph<PS, SEG, S> content = segmentOps.length(segment) == 0
+                ? new EmptyParagraph<>(paragraphStyle, style)
+                : new NonEmptyParagraph<>(paragraphStyle, segmentOps, Arrays.asList(segment));
         List<Paragraph<PS, SEG, S>> res = Arrays.asList(content);
         return new ReadOnlyStyledDocument<>(res);
     }
@@ -143,7 +150,9 @@ public final class ReadOnlyStyledDocument<PS, SEG, S> implements StyledDocument<
             public Paragraph<PS, SEG, S> decode(DataInputStream is) throws IOException {
                 PS paragraphStyle = pCodec.decode(is);
                 List<SEG> segments = segmentsCodec.decode(is);
-                return new NonEmptyParagraph<>(paragraphStyle, segmentOps, segments);
+                return segments.isEmpty()
+                        ? new EmptyParagraph<>(paragraphStyle, segmentOps.defaultStyle())
+                        : new NonEmptyParagraph<>(paragraphStyle, segmentOps, segments);
             }
         };
     }
