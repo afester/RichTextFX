@@ -78,4 +78,38 @@ public class ReadOnlyStyledDocumentTest {
         assertThat(result.get(2).getText(), equalTo(" World"));
     }
 
+    @Test
+    public void testCreationWithEmptyParagraphs() {
+        TextOps<StyledText<String>, String> segOps = StyledText.textOps("");
+
+        // test fromString
+        String[] lines = new String[]{
+                "aaaa",
+                "",
+                "bbbb",
+                "",
+                "",
+                "ccc"
+        };
+        String multiLineText = String.join("\n", lines);
+
+        ReadOnlyStyledDocument<String, StyledText<String>, String> doc = fromString(multiLineText, "", "", segOps);
+        assertEquals(lines.length, doc.getParagraphCount());
+        for (int i = 0; i < lines.length; i++) {
+            Paragraph<String, StyledText<String>, String> par = doc.getParagraph(i);
+            if (par.getText().isEmpty()) {
+                assertTrue(par instanceof EmptyParagraph);
+            } else {
+                assertTrue(par instanceof NonEmptyParagraph);
+            }
+        }
+
+        // test fromSegment
+        doc = ReadOnlyStyledDocument.fromSegment(new StyledText<>("", ""), "", "", segOps);
+        assertTrue(doc.getParagraph(0) instanceof EmptyParagraph);
+
+        doc = ReadOnlyStyledDocument.fromSegment(new StyledText<>("some text", ""), "", "", segOps);
+        assertTrue(doc.getParagraph(0) instanceof NonEmptyParagraph);
+    }
+
 }
