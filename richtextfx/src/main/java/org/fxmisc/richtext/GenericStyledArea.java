@@ -562,7 +562,7 @@ public class GenericStyledArea<PS, SEG, S> extends Region
                           S initialTextStyle, TextOps<SEG, S> segmentOps,
                           boolean preserveStyle, Function<SEG, Node> nodeFactory) {
         this(initialParagraphStyle, applyParagraphStyle, initialTextStyle,
-                new GenericEditableStyledDocument<>(initialParagraphStyle, initialTextStyle, segmentOps), segmentOps, preserveStyle, nodeFactory);
+                new GenericEditableStyledDocument<>(initialParagraphStyle, initialTextStyle), segmentOps, preserveStyle, nodeFactory);
     }
 
     /**

@@ -83,15 +83,13 @@ class GenericEditableStyledDocumentBase<PS, SEG, S> implements EditableStyledDoc
     @Override public final SuspendableNo beingUpdatedProperty() { return beingUpdated; }
     @Override public final boolean isBeingUpdated() { return beingUpdated.get(); }
 
-    GenericEditableStyledDocumentBase(Paragraph<PS, SEG, S> initialParagraph/*, SegmentOps<SEG, S> segmentOps*/) {
-        this.doc = new ReadOnlyStyledDocument<>(Collections.singletonList(initialParagraph));
-    }
-
     /**
      * Creates an empty {@link EditableStyledDocument}
      */
-    public GenericEditableStyledDocumentBase(PS initialParagraphStyle, S initialStyle, TextOps<SEG, S> segmentOps) {
-        this(new NonEmptyParagraph<>(initialParagraphStyle, segmentOps, segmentOps.create("", initialStyle)));
+    public GenericEditableStyledDocumentBase(PS initialParagraphStyle, S initialStyle) {
+        this.doc = new ReadOnlyStyledDocument<>(
+                Collections.singletonList(new EmptyParagraph<PS, SEG, S>(initialParagraphStyle, initialStyle))
+        );
     }
 
 
