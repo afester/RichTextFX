@@ -78,11 +78,15 @@ public final class ReadOnlyStyledDocument<PS, SEG, S> implements StyledDocument<
         m.reset();
         while(m.find()) {
             String s = str.substring(start, m.start());
-            res.add(new NonEmptyParagraph<>(paragraphStyle, segmentOps, segmentOps.create(s, style)));
+            res.add(s.isEmpty()
+                    ? new EmptyParagraph<>(paragraphStyle, style)
+                    : new NonEmptyParagraph<>(paragraphStyle, segmentOps, segmentOps.create(s, style)));
             start = m.end();
         }
         String last = str.substring(start);
-        res.add(new NonEmptyParagraph<>(paragraphStyle, segmentOps, segmentOps.create(last, style)));
+        res.add(last.isEmpty()
+                ? new EmptyParagraph<>(paragraphStyle, style)
+                : new NonEmptyParagraph<>(paragraphStyle, segmentOps, segmentOps.create(last, style)));
 
         return new ReadOnlyStyledDocument<>(res);
     }
