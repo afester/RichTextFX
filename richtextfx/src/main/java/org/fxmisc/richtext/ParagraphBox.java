@@ -26,12 +26,10 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
 import org.fxmisc.richtext.model.ListItem;
 import org.fxmisc.richtext.model.Paragraph;
-import org.fxmisc.richtext.model.ParagraphList;
 import org.fxmisc.richtext.util.MouseStationaryHelper;
 import org.reactfx.EventStream;
 import org.reactfx.util.Either;
@@ -83,7 +81,7 @@ class ParagraphBox<PS, SEG, S> extends Region {
 
     ParagraphBox(Paragraph<PS, SEG, S> par, BiConsumer<TextFlow, PS> applyParagraphStyle, 
                  Function<SEG, Node> nodeFactory) {
-        System.err.println("CREATE ParagraphBox: " + System.identityHashCode(par) + "/"  + par.getListItem().isPresent());
+//        System.err.println("CREATE ParagraphBox: " + System.identityHashCode(par) + "/"  + par.getListItem().isPresent());
 
         this.getStyleClass().add("paragraph-box");
         this.text = new ParagraphText<>(par, nodeFactory);
@@ -242,11 +240,11 @@ class ParagraphBox<PS, SEG, S> extends Region {
         double textIndent = getGraphicPrefWidth() + indent;
         text.resizeRelocate(textIndent, 0, w - textIndent, h);
 
-        System.err.println("UPDATE BULLET... indent=" + indent);
+//        System.err.println("UPDATE BULLET... indent=" + indent);
 
         // position the bullet at the appropriate location
         if (pList.isPresent()) {
-            System.err.println("  BULLET IS PRESENT!");
+//            System.err.println("  BULLET IS PRESENT!");
             double ypos = text.getLineCenter(0);
             double xpos = textIndent - bOffset;
             bullet.relocate(xpos, ypos);
