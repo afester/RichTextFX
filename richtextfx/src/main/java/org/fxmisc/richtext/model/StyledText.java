@@ -11,6 +11,8 @@ public class StyledText<S>  {
     public static <S> TextOps<StyledText<S>, S> textOps() {
         return new TextOps<StyledText<S>, S>() {
 
+            private final StyledText<S> emptySeg = new StyledText<>("", null);
+
             @Override
             public int length(StyledText<S> styledText) {
                 return styledText.getText().length();
@@ -18,7 +20,7 @@ public class StyledText<S>  {
 
             @Override
             public char charAt(StyledText<S> styledText, int index) {
-                return styledText.getText().charAt(index);
+                return styledText == emptySeg ? '\0' : styledText.getText().charAt(index);
             }
 
             @Override
@@ -28,12 +30,12 @@ public class StyledText<S>  {
 
             @Override
             public StyledText<S> subSequence(StyledText<S> styledText, int start, int end) {
-                return new StyledText<>(styledText.getText().substring(start, end), styledText.getStyle());
+                return styledText == emptySeg ? emptySeg : new StyledText<>(styledText.getText().substring(start, end), styledText.getStyle());
             }
 
             @Override
             public StyledText<S> subSequence(StyledText<S> styledText, int start) {
-                return new StyledText<>(styledText.getText().substring(start), styledText.getStyle());
+                return styledText == emptySeg ? emptySeg : new StyledText<>(styledText.getText().substring(start), styledText.getStyle());
             }
 
             @Override
@@ -43,7 +45,7 @@ public class StyledText<S>  {
 
             @Override
             public StyledText<S> setStyle(StyledText<S> seg, S style) {
-                return seg.setStyle(style);
+                return seg == emptySeg ? emptySeg : seg.setStyle(style);
             }
 
             @Override
@@ -51,6 +53,11 @@ public class StyledText<S>  {
                 return Objects.equals(left.getStyle(), right.getStyle())
                         ? Optional.of(new StyledText<>(left.getText() + right.getText(), left.getStyle()))
                         : Optional.empty();
+            }
+
+            @Override
+            public StyledText<S> createEmpty() {
+                return emptySeg;
             }
 
             @Override

@@ -13,14 +13,6 @@ import javafx.scene.control.IndexRange;
 
 import org.fxmisc.richtext.model.TwoDimensional.Position;
 
-/**
- * A paragraph with segments.
- * This class is immutable.
- *
- * @param <PS>
- * @param <SEG>
- * @param <S>
- */
 public final class Paragraph<PS, SEG, S> {
 
     @SafeVarargs
@@ -50,8 +42,6 @@ public final class Paragraph<PS, SEG, S> {
     Paragraph(PS paragraphStyle, SegmentOps<SEG, S> segmentOps, List<SEG> segments, ListItem listItem) {
         assert !segments.isEmpty();
 
-       // new Throwable().printStackTrace(System.err);
-        
         this.segmentOps = segmentOps;
         this.segments = segments;
         this.paragraphStyle = paragraphStyle;
@@ -145,6 +135,9 @@ public final class Paragraph<PS, SEG, S> {
             List<SEG> segs = new ArrayList<>(segIdx + 1);
             segs.addAll(segments.subList(0, segIdx));
             segs.add(segmentOps.subSequence(segments.get(segIdx), 0, pos.getMinor()));
+            if (segs.isEmpty()) {
+                segs.add(segmentOps.createEmpty());
+            }
             return new Paragraph<>(paragraphStyle, segmentOps, segs, null);
         }
     }
@@ -160,6 +153,9 @@ public final class Paragraph<PS, SEG, S> {
             List<SEG> segs = new ArrayList<>(segments.size() - segIdx);
             segs.add(segmentOps.subSequence(segments.get(segIdx), pos.getMinor()));
             segs.addAll(segments.subList(segIdx + 1, segments.size()));
+            if (segs.isEmpty()) {
+                segs.add(segmentOps.createEmpty());
+            }
             return new Paragraph<>(paragraphStyle, segmentOps, segs, null);
         } else {
             throw new IndexOutOfBoundsException(start + " not in [0, " + length() + "]");

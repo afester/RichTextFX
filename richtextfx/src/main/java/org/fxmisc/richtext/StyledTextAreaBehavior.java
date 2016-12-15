@@ -18,7 +18,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 
-import org.fxmisc.richtext.model.GenericStyledTextAreaModel;
+import org.fxmisc.richtext.model.StyledTextAreaModel;
 import org.fxmisc.richtext.model.NavigationActions.SelectionPolicy;
 import org.fxmisc.richtext.model.TwoDimensional.Position;
 import org.fxmisc.wellbehaved.event.EventPattern;
@@ -206,7 +206,7 @@ class StyledTextAreaBehavior {
 
     private final GenericStyledArea<?, ?, ?> view;
 
-    private final GenericStyledTextAreaModel<?, ?, ?> model;
+    private final StyledTextAreaModel<?, ?, ?> model;
 
     /**
      * Indicates whether selection is being dragged by the user.
