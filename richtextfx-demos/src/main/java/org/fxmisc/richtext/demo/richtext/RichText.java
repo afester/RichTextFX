@@ -458,10 +458,6 @@ public class RichText extends Application {
             level = li.get().getLevel() + 1;
         }
         area.setParagraphList(pIdx, new ListItem(level));
-
-        // Force recreation of the ParagraphBox ...
-        updateParagraphStyleInSelection(ParStyle.backgroundColor(Color.YELLOW));
-        updateParagraphStyleInSelection(ParStyle.backgroundColor(Color.WHITE));
     }
 
     private void decreaseIndent() {
@@ -475,12 +471,7 @@ public class RichText extends Application {
             if (level != 0) {
                 newItem = new ListItem(level);
             }
-
             area.setParagraphList(pIdx, newItem);
-    
-            // Force recreation of the ParagraphBox ...
-            updateParagraphStyleInSelection(ParStyle.backgroundColor(Color.YELLOW));
-            updateParagraphStyleInSelection(ParStyle.backgroundColor(Color.WHITE));
         }
     }
 

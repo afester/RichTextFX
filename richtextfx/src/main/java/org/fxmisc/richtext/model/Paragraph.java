@@ -338,7 +338,8 @@ public final class Paragraph<PS, SEG, S> {
         if(other instanceof Paragraph) {
             Paragraph<?, ?, ?> that = (Paragraph<?, ?, ?>) other;
             return Objects.equals(this.paragraphStyle, that.paragraphStyle)
-                && Objects.equals(this.segments, that.segments);
+                && Objects.equals(this.segments, that.segments)
+                && Objects.equals(this.listItem, that.listItem);
         } else {
             return false;
         }
@@ -346,36 +347,16 @@ public final class Paragraph<PS, SEG, S> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(paragraphStyle, segments);
+        return Objects.hash(paragraphStyle, segments, listItem);
     }
-
-    
-    
-    
-//    private Optional<ParagraphList> paragraphList = Optional.empty();
-//
-//    public Optional<ParagraphList> getParagraphList() {
-//        return paragraphList;
-//    }
 
 
     public Paragraph<PS, SEG, S> setListItem(ListItem li) {
-        Paragraph<PS, SEG, S> result = new Paragraph<>(paragraphStyle, segmentOps, segments, li);
-//        result.createParagraphList();
-        return result;
+        return new Paragraph<>(paragraphStyle, segmentOps, segments, li);
     }
     
     public Optional<ListItem> getListItem() {
         return Optional.ofNullable(listItem);
     }
-
-//
-//    private ParagraphList createParagraphList() {
-//        if (!paragraphList.isPresent()) {
-//            paragraphList = Optional.of(new ParagraphList());
-//        }
-//        return paragraphList.get();
-//    }
-
-
 }
+
