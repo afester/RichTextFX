@@ -68,6 +68,11 @@ public final class ReadOnlyStyledDocument<PS, SEG, S> implements StyledDocument<
             (s, i) -> i <= s.length() ? left(i) : right(i - (s.length() + 1));
 
     public static <PS, SEG, S> ReadOnlyStyledDocument<PS, SEG, S> fromString(String str, PS paragraphStyle, S style, TextOps<SEG, S> segmentOps) {
+        return fromString(str, paragraphStyle, style, segmentOps, null);
+    }
+
+
+    public static <PS, SEG, S> ReadOnlyStyledDocument<PS, SEG, S> fromString(String str, PS paragraphStyle, S style, TextOps<SEG, S> segmentOps, ListItem item) {
         Matcher m = LINE_TERMINATOR.matcher(str);
 
         int n = 1;
@@ -78,11 +83,13 @@ public final class ReadOnlyStyledDocument<PS, SEG, S> implements StyledDocument<
         m.reset();
         while(m.find()) {
             String s = str.substring(start, m.start());
-            res.add(new Paragraph<>(paragraphStyle, segmentOps, segmentOps.create(s, style)));
+            SEG segment = segmentOps.create(s, style);
+            res.add(new Paragraph<>(paragraphStyle, segmentOps, Arrays.asList(segment), item));
             start = m.end();
         }
         String last = str.substring(start);
-        res.add(new Paragraph<>(paragraphStyle, segmentOps, segmentOps.create(last, style)));
+        SEG segment = segmentOps.create(last, style);
+        res.add(new Paragraph<>(paragraphStyle, segmentOps, Arrays.asList(segment), item));
 
         return new ReadOnlyStyledDocument<>(res);
     }

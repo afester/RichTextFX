@@ -63,8 +63,6 @@ class ParagraphBox<PS, SEG, S> extends Region {
     private final Val<Node> graphic;
 
     private Node bullet;
-    private double bOffset;
-
     
     final DoubleProperty graphicOffset = new SimpleDoubleProperty(0.0);
 
@@ -81,33 +79,15 @@ class ParagraphBox<PS, SEG, S> extends Region {
 
     ParagraphBox(Paragraph<PS, SEG, S> par, BiConsumer<TextFlow, PS> applyParagraphStyle, 
                  Function<SEG, Node> nodeFactory) {
-//        System.err.println("CREATE ParagraphBox: " + System.identityHashCode(par) + "/"  + par.getListItem().isPresent());
-
         this.getStyleClass().add("paragraph-box");
         this.text = new ParagraphText<>(par, nodeFactory);
         applyParagraphStyle.accept(this.text, par.getParagraphStyle());
         this.index = Var.newSimpleVar(0);
 
-        // add bullet (TODO: => BulletFactory)
+        // add bullet
         if (par.getListItem().isPresent()) {
             int level = par.getListItem().get().getLevel();
-            if (level == 1) {
-                Circle c = new Circle(3);
-                c.setFill(Color.BLACK);
-                c.setStroke(Color.BLACK);
-                bullet = c;
-                bOffset = c.getRadius() + 5;
-            } else if (level == 2) {
-                Circle c = new Circle(3);
-                c.setFill(Color.WHITE);
-                c.setStroke(Color.BLACK);
-                bullet = c;
-                bOffset = c.getRadius() + 5;
-            } else {
-                bullet = new Rectangle(5,5);
-                bOffset = 5;
-            }
-            //bullet = new Text("1.2.3.4");
+            bullet = createBullet(level);
             getChildren().add(bullet);
         }
 
@@ -127,6 +107,44 @@ class ParagraphBox<PS, SEG, S> extends Region {
         graphicOffset.addListener(obs -> requestLayout());
     }
 
+    private Node createBullet(int level) {
+        Node result;
+        switch(level) {
+            case 1 : {
+                    Circle c = new Circle(2);
+                    c.setFill(Color.BLACK);
+                    c.setStroke(Color.BLACK);
+                    result = c;
+                }
+                break;
+
+            case 2 : {
+                    Circle c = new Circle(2);
+                    c.setFill(Color.WHITE);
+                    c.setStroke(Color.BLACK);
+                    result = c;
+                }
+                break;
+
+            case 3 : {
+                    Rectangle r = new Rectangle(5, 5);
+                    r.setFill(Color.BLACK);
+                    r.setStroke(Color.BLACK);
+                    result = r;
+                }
+                break;
+
+            default : {
+                    Rectangle r = new Rectangle(5, 5);
+                    r.setFill(Color.WHITE);
+                    r.setStroke(Color.BLACK);
+                    result = r;
+                }
+                break;
+        }
+
+        return result;
+    }
     @Override
     public String toString() {
         return graphic.isPresent()
@@ -234,21 +252,15 @@ class ParagraphBox<PS, SEG, S> extends Region {
         double indent = 0;
         Optional<ListItem> pList = text.getParagraph().getListItem();
         if (pList.isPresent()) {
-            indent = pList.get().getLevel() * 15; // pList.get().getFormat().getIndent();
+            indent = pList.get().getLevel() * 15;   // TODO: make factor configurable
         }
 
         double textIndent = getGraphicPrefWidth() + indent;
         text.resizeRelocate(textIndent, 0, w - textIndent, h);
 
-//        System.err.println("UPDATE BULLET... indent=" + indent);
-
         // position the bullet at the appropriate location
-        if (pList.isPresent()) {
-//            System.err.println("  BULLET IS PRESENT!");
-            double ypos = text.getLineCenter(0);
-            double xpos = textIndent - bOffset;
-            bullet.relocate(xpos, ypos);
-        }
+        pList.ifPresent(l -> bullet.relocate(textIndent - bullet.getLayoutBounds().getWidth(),
+                                             text.getLineCenter(0) - bullet.getLayoutBounds().getHeight() / 2) );
 
         graphic.ifPresent(g -> g.resizeRelocate(graphicOffset.get(), 0, textIndent, h));
     }

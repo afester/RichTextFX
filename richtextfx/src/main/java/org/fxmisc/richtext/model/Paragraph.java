@@ -42,6 +42,8 @@ public final class Paragraph<PS, SEG, S> {
     Paragraph(PS paragraphStyle, SegmentOps<SEG, S> segmentOps, List<SEG> segments, ListItem listItem) {
         assert !segments.isEmpty();
 
+//        System.err.println("LIST ITEM:" + listItem);
+//        new Throwable().printStackTrace(System.err);
         this.segmentOps = segmentOps;
         this.segments = segments;
         this.paragraphStyle = paragraphStyle;
@@ -103,12 +105,12 @@ public final class Paragraph<PS, SEG, S> {
             segs.addAll(segments.subList(0, segments.size()-1));
             segs.add(segment);
             segs.addAll(p.segments.subList(1, p.segments.size()));
-            return new Paragraph<>(paragraphStyle, segmentOps, segs, null);
+            return new Paragraph<>(paragraphStyle, segmentOps, segs, listItem);
         } else {
             List<SEG> segs = new ArrayList<>(segments.size() + p.segments.size());
             segs.addAll(segments);
             segs.addAll(p.segments);
-            return new Paragraph<>(paragraphStyle, segmentOps, segs, null);
+            return new Paragraph<>(paragraphStyle, segmentOps, segs, listItem);
         }
     }
 
@@ -138,7 +140,7 @@ public final class Paragraph<PS, SEG, S> {
             if (segs.isEmpty()) {
                 segs.add(segmentOps.createEmpty());
             }
-            return new Paragraph<>(paragraphStyle, segmentOps, segs, null);
+            return new Paragraph<>(paragraphStyle, segmentOps, segs, listItem);
         }
     }
 
@@ -156,7 +158,7 @@ public final class Paragraph<PS, SEG, S> {
             if (segs.isEmpty()) {
                 segs.add(segmentOps.createEmpty());
             }
-            return new Paragraph<>(paragraphStyle, segmentOps, segs, null);
+            return new Paragraph<>(paragraphStyle, segmentOps, segs, listItem);
         } else {
             throw new IndexOutOfBoundsException(start + " not in [0, " + length() + "]");
         }

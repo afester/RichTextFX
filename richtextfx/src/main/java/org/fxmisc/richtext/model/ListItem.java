@@ -11,5 +11,10 @@ public class ListItem {
     public int getLevel() {
         return indent;
     }
+    
+    @Override
+    public String toString() {
+        return String.format("ListItem[indent=%s]", indent);
+    }
 
 }
