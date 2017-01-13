@@ -85,7 +85,7 @@ class ParagraphBox<PS, SEG, S> extends Region {
         this.index = Var.newSimpleVar(0);
 
         // add bullet
-        if (par.getListItem().isPresent()) {
+        if (par.getListItem().isPresent() && par.getListItem().get().isShowBullet()) {
             int level = par.getListItem().get().getLevel();
             bullet = createBullet(level);
             getChildren().add(bullet);
@@ -259,8 +259,10 @@ class ParagraphBox<PS, SEG, S> extends Region {
         text.resizeRelocate(textIndent, 0, w - textIndent, h);
 
         // position the bullet at the appropriate location
-        pList.ifPresent(l -> bullet.relocate(textIndent - bullet.getLayoutBounds().getWidth(),
-                                             text.getLineCenter(0) - bullet.getLayoutBounds().getHeight() / 2) );
+        if (pList.isPresent() && pList.get().isShowBullet()) { 
+            bullet.relocate(textIndent - bullet.getLayoutBounds().getWidth(),
+                            text.getLineCenter(0) - bullet.getLayoutBounds().getHeight() / 2);
+        }
 
         graphic.ifPresent(g -> g.resizeRelocate(graphicOffset.get(), 0, textIndent, h));
     }
