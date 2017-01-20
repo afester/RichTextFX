@@ -63,6 +63,8 @@ class StyledTextAreaBehavior {
                         (b, e) -> b.view.paste()),
                 // tab & newline
                 consume(keyPressed(ENTER), (b, e) -> b.model.replaceSelection("\n")),
+                consume(keyPressed(ENTER, SHIFT_DOWN), (b, e) -> b.model.replaceSelection("...")),
+                consume(keyPressed(TAB, SHIFT_DOWN), (b, e) -> b.model.replaceSelection("<<<")),
                 consume(keyPressed(TAB),   (b, e) -> b.model.replaceSelection("\t")),
                 // undo/redo
                 consume(keyPressed(Z, SHORTCUT_DOWN), (b, e) -> b.model.undo()),

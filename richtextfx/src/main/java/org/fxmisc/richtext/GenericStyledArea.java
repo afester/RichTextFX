@@ -66,6 +66,7 @@ import org.fxmisc.richtext.model.RichTextChange;
 import org.fxmisc.richtext.model.SegmentOps;
 import org.fxmisc.richtext.model.StyleSpans;
 import org.fxmisc.richtext.model.StyledDocument;
+import org.fxmisc.richtext.model.StyledText;
 import org.fxmisc.richtext.model.TextEditingArea;
 import org.fxmisc.richtext.model.TextOps;
 import org.fxmisc.richtext.model.TwoDimensional;
@@ -78,6 +79,7 @@ import org.reactfx.EventStreams;
 import org.reactfx.StateMachine;
 import org.reactfx.Subscription;
 import org.reactfx.collection.LiveList;
+import org.reactfx.util.Either;
 import org.reactfx.util.Tuple2;
 import org.reactfx.value.Val;
 import org.reactfx.value.Var;
@@ -1365,5 +1367,22 @@ public class GenericStyledArea<PS, SEG, S> extends Region
                 .on(restartImpulse.withDefaultEvent(null)).transition((state, impulse) -> true)
                 .on(ticks).transition((state, tick) -> !state)
                 .toStateStream();
+    }
+
+
+    public void outdent() {
+        int pIdx = getCurrentParagraph();
+        Paragraph<PS, SEG, S> paragraph = getParagraph(pIdx);
+        Optional<ListItem> li = paragraph.getListItem();
+
+        if (li.isPresent()) {
+            ListItem newItem = null;
+            int level = li.get().getLevel() - 1;
+            if (level != 0) {
+                newItem = new ListItem(level, true);
+            }
+
+            model.setParagraphList(pIdx, newItem);
+        }
     }
 }
