@@ -94,8 +94,8 @@ public final class ReadOnlyStyledDocument<PS, SEG, S> implements StyledDocument<
         return new ReadOnlyStyledDocument<>(res);
     }
 
-    public static <PS, SEG, S> ReadOnlyStyledDocument<PS, SEG, S> fromSegment(SEG segment,  PS paragraphStyle, S style, SegmentOps<SEG, S> segmentOps) {
-        Paragraph<PS, SEG, S> content = new Paragraph<PS, SEG, S>(paragraphStyle, segmentOps, Arrays.asList(segment), null);
+    public static <PS, SEG, S> ReadOnlyStyledDocument<PS, SEG, S> fromSegment(SEG segment,  PS paragraphStyle, S style, SegmentOps<SEG, S> segmentOps, ListItem item) {
+        Paragraph<PS, SEG, S> content = new Paragraph<PS, SEG, S>(paragraphStyle, segmentOps, Arrays.asList(segment), item);
         List<Paragraph<PS, SEG, S>> res = Arrays.asList(content);
         return new ReadOnlyStyledDocument<>(res);
     }
