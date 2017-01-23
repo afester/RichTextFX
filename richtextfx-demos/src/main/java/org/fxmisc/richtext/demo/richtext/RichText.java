@@ -452,27 +452,14 @@ public class RichText extends Application {
         int pIdx = area.getCurrentParagraph();
         Paragraph<ParStyle, Either<StyledText<TextStyle>,LinkedImage<TextStyle>>, TextStyle> paragraph = area.getParagraph(pIdx);
         Optional<ListItem> li = paragraph.getListItem();
-
-        int level = 1;
-        if (li.isPresent()) {
-            level = li.get().getLevel() + 1;
-        }
-        area.setParagraphList(pIdx, new ListItem(level));
+        area.setParagraphList(pIdx, li.orElse(new ListItem(0, true)).nextLevel());
     }
 
     private void decreaseIndent() {
         int pIdx = area.getCurrentParagraph();
         Paragraph<ParStyle, Either<StyledText<TextStyle>,LinkedImage<TextStyle>>, TextStyle> paragraph = area.getParagraph(pIdx);
         Optional<ListItem> li = paragraph.getListItem();
-
-        if (li.isPresent()) {
-            ListItem newItem = null;
-            int level = li.get().getLevel() - 1;
-            if (level != 0) {
-                newItem = new ListItem(level);
-            }
-            area.setParagraphList(pIdx, newItem);
-        }
+        area.setParagraphList(pIdx, li.orElse(null).prevLevel());
     }
 
     private void updateStyleInSelection(Function<StyleSpans<TextStyle>, TextStyle> mixinGetter) {

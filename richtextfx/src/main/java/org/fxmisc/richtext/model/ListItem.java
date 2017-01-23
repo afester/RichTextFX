@@ -23,4 +23,23 @@ public class ListItem {
         return String.format("ListItem[indent=%s, showBullet=%s]", indent, showBullet);
     }
 
+
+    public ListItem prevLevel() {
+        ListItem newItem = null;
+
+        int level = indent - 1;
+        if (level != 0) {
+            newItem = new ListItem(level, showBullet);
+        }
+
+        return newItem;
+    }
+
+    /**
+     * 
+     * @return
+     */
+    public ListItem nextLevel() {
+        return new ListItem(indent + 1, showBullet);
+    }
 }
