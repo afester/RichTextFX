@@ -164,7 +164,7 @@ class GenericEditableStyledDocumentBase<PS, SEG, S> implements EditableStyledDoc
     @Override
     public void setParagraphList(int parIdx, ListItem li) {
         ensureValidParagraphIndex(parIdx);
-        doc.replaceParagraph(parIdx, p -> p.setListItem(li)).exec(this::update);
+        doc.replaceParagraph(parIdx, p -> p.createWithListItem(li)).exec(this::update);
     }
 
     @Override

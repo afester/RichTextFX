@@ -42,8 +42,6 @@ public final class Paragraph<PS, SEG, S> {
     Paragraph(PS paragraphStyle, SegmentOps<SEG, S> segmentOps, List<SEG> segments, ListItem listItem) {
         assert !segments.isEmpty();
 
-//        System.err.println("LIST ITEM:" + listItem);
-//        new Throwable().printStackTrace(System.err);
         this.segmentOps = segmentOps;
         this.segments = segments;
         this.paragraphStyle = paragraphStyle;
@@ -353,7 +351,7 @@ public final class Paragraph<PS, SEG, S> {
     }
 
 
-    public Paragraph<PS, SEG, S> setListItem(ListItem li) {
+    public Paragraph<PS, SEG, S> createWithListItem(ListItem li) {
         return new Paragraph<>(paragraphStyle, segmentOps, segments, li);
     }
     

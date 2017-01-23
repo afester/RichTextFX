@@ -631,8 +631,12 @@ public class StyledTextAreaModel<PS, SEG, S>
 
     @Override
     public void replaceText(int start, int end, String text) {
+        
+        Optional<ListItem> li = getParagraphListItemForInsertionAt(start);
+
         StyledDocument<PS, SEG, S> doc = ReadOnlyStyledDocument.fromString(
-                text, getParagraphStyleForInsertionAt(start), getStyleForInsertionAt(start), textOps);
+                text, getParagraphStyleForInsertionAt(start), getStyleForInsertionAt(start), textOps, 
+                li.orElseGet(() -> null));
         replace(start, end, doc);
     }
 
@@ -698,6 +702,10 @@ public class StyledTextAreaModel<PS, SEG, S>
         } else {
             return content.getParagraphStyleAtPosition(pos);
         }
+    }
+
+    private Optional<ListItem> getParagraphListItemForInsertionAt(int pos) {
+        return content.getParagraphListItemAtPosition(pos);
     }
 
     private <T> void subscribeTo(EventStream<T> src, Consumer<T> consumer) {

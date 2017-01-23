@@ -5,6 +5,7 @@ import static org.fxmisc.richtext.model.TwoDimensional.Bias.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import javafx.scene.control.IndexRange;
 
@@ -69,6 +70,15 @@ public interface StyledDocument<PS, SEG, S> extends TwoDimensional {
     default PS getParagraphStyleAtPosition(int position) {
         Position pos = offsetToPosition(position, Forward);
         return getParagraphStyle(pos.getMajor());
+    }
+
+    default Optional<ListItem> getParagraphListItem(int paragraph) {
+        return getParagraphs().get(paragraph).getListItem();
+    }
+
+    default Optional<ListItem> getParagraphListItemAtPosition(int position) {
+        Position pos = offsetToPosition(position, Forward);
+        return getParagraphListItem(pos.getMajor());
     }
 
     default IndexRange getStyleRangeAtPosition(int position) {
