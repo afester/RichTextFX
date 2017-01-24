@@ -188,12 +188,23 @@ class ParagraphBox<PS, SEG, S> extends Region {
     public CharacterHit hit(double x, double y) {
         Point2D onScreen = this.localToScreen(x, y);
         Point2D inText = text.screenToLocal(onScreen);
-        return text.hit(inText.getX(), inText.getY());
+        Insets textInsets = text.getInsets();
+        return text.hit(inText.getX() - textInsets.getLeft(), inText.getY() - textInsets.getTop());
     }
 
     public CaretOffsetX getCaretOffsetX() {
         layout(); // ensure layout, is a no-op if not dirty
         return new CaretOffsetX(text.getCaretOffsetX());
+    }
+
+    public int getCurrentLineStartPosition() {
+        layout(); // ensure layout, is a no-op if not dirty
+        return text.getCurrentLineStartPosition();
+    }
+
+    public int getCurrentLineEndPosition() {
+        layout(); // ensure layout, is a no-op if not dirty
+        return text.getCurrentLineEndPosition();
     }
 
     public int getLineCount() {

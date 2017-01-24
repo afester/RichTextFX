@@ -157,8 +157,16 @@ class ParagraphText<PS, SEG, S> extends TextFlowExt {
         } else {
             layout(); // ensure layout, is a no-op if not dirty
             Bounds localBounds = selectionShape.getBoundsInLocal();
-            return Optional.of(selectionShape.localToScreen(localBounds));
+            return Optional.ofNullable(selectionShape.localToScreen(localBounds));
         }
+    }
+
+    public int getCurrentLineStartPosition() {
+        return getLineStartPosition(clampedCaretPosition.getValue());
+    }
+
+    public int getCurrentLineEndPosition() {
+        return getLineEndPosition(clampedCaretPosition.getValue());
     }
 
     public int currentLineIndex() {

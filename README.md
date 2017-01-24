@@ -22,9 +22,9 @@ RichTextFX provides a text area for JavaFX with API to style ranges of text. It 
   * [Snapshot](#snapshot-releases)
 * API Documentation (Javadoc)
   - [0.6.10](http://fxmisc.github.io/richtext/javadoc/0.6.10/org/fxmisc/richtext/package-summary.html)
-  - [0.7-M2](http://fxmisc.github.io/richtext/javadoc/0.7-M2/org/fxmisc/richtext/package-summary.html)
+  - [0.7-M3](http://fxmisc.github.io/richtext/javadoc/0.7-M3/org/fxmisc/richtext/package-summary.html)
 * [License](#license)
-* [How can I contribute?](#how-can-i-contribute)
+* [Contributing](./CONTRIBUTING.md)
 
 
 Who uses RichTextFX?
@@ -35,7 +35,7 @@ Who uses RichTextFX?
 [mqtt-spy](http://kamilfb.github.io/mqtt-spy/)  
 [Alt.Text](http://alttexting.com/)  
 [Xanthic](https://github.com/jrguenther/Xanthic)  
-[Arduino Harp](http://www.avrharp.org/)  
+[Arduino Harp](https://www.youtube.com/watch?v=rv5raLcsPNs)  
 [Markdown Writer FX](https://github.com/JFormDesigner/markdown-writer-fx)  
 [OmniEditor](https://github.com/giancosta86/OmniEditor), which is then used by [Chronos IDE](https://github.com/giancosta86/Chronos-IDE)
 
@@ -261,31 +261,31 @@ Download [the JAR file](https://github.com/TomasMikula/RichTextFX/releases/downl
 
 ### Milestone release
 
-Milestone version of the upcoming release is 0.7-M2.
+Milestone version of the upcoming release is 0.7-M3.
 
 #### Maven coordinates
 
 | Group ID            | Artifact ID | Version |
 | :-----------------: | :---------: | :-----: |
-| org.fxmisc.richtext | richtextfx  | 0.7-M2  |
+| org.fxmisc.richtext | richtextfx  | 0.7-M3  |
 
 #### Gradle example
 
 ```groovy
 dependencies {
-    compile group: 'org.fxmisc.richtext', name: 'richtextfx', version: '0.7-M2'
+    compile group: 'org.fxmisc.richtext', name: 'richtextfx', version: '0.7-M3'
 }
 ```
 
 #### Sbt example
 
 ```scala
-libraryDependencies += "org.fxmisc.richtext" % "richtextfx" % "0.7-M2"
+libraryDependencies += "org.fxmisc.richtext" % "richtextfx" % "0.7-M3"
 ```
 
 #### Manual download
 
-Download [the JAR file](https://github.com/TomasMikula/RichTextFX/releases/download/0.7-M2/richtextfx-0.7-M2.jar) or [the fat JAR file (including dependencies)](https://github.com/TomasMikula/RichTextFX/releases/download/0.7-M2/richtextfx-fat-0.7-M2.jar) and place it on your classpath.
+Download [the JAR file](https://github.com/TomasMikula/RichTextFX/releases/download/0.7-M3/richtextfx-0.7-M3.jar) or [the fat JAR file (including dependencies)](https://github.com/TomasMikula/RichTextFX/releases/download/0.7-M3/richtextfx-fat-0.7-M3.jar) and place it on your classpath.
 
 
 ### Snapshot releases
@@ -325,16 +325,3 @@ License
 -------
 
 Dual-licensed under [BSD 2-Clause License](http://opensource.org/licenses/BSD-2-Clause) and [GPLv2 with the Classpath Exception](http://openjdk.java.net/legal/gplv2+ce.html).
-
-
-How can I contribute?
----------------------
-
-There are many ways how you can contribute:
-
-* Report bugs.
-* Fix bugs ;)
-* Spread the word: write blog posts, tutorials, ...
-* Implement features. There are plenty of [feature requests](https://github.com/TomasMikula/RichTextFX/issues?q=is%3Aopen+is%3Aissue+label%3Aenhancement).
-* [Create a bounty](https://www.bountysource.com/trackers/503734-tomasmikula-richtextfx) for a feature.
-* [Support the author](https://gratipay.com/TomasMikula/).
