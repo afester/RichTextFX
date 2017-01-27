@@ -94,6 +94,35 @@ public final class ReadOnlyStyledDocument<PS, SEG, S> implements StyledDocument<
         return new ReadOnlyStyledDocument<>(res);
     }
 
+    
+    public static <PS, SEG, S> ReadOnlyStyledDocument<PS, SEG, S> fromStringEx(String str, PS paragraphStyle, S style, TextOps<SEG, S> segmentOps, ListItem item) {
+        
+        List<Paragraph<PS, SEG, S>> res = new ArrayList<>(1);
+        SEG segment = segmentOps.create(str, style);
+        res.add(new Paragraph<>(paragraphStyle, segmentOps, Arrays.asList(segment), item));
+        
+//        Matcher m = LINE_TERMINATOR.matcher(str);
+//
+//        int n = 1;
+//        while(m.find()) ++n;
+//        List<Paragraph<PS, SEG, S>> res = new ArrayList<>(n);
+//
+//        int start = 0;
+//        m.reset();
+//        while(m.find()) {
+//            String s = str.substring(start, m.start());
+//            SEG segment = segmentOps.create(s, style);
+//            res.add(new Paragraph<>(paragraphStyle, segmentOps, Arrays.asList(segment), item));
+//            start = m.end();
+//        }
+//        String last = str.substring(start);
+//        SEG segment = segmentOps.create(last, style);
+//        res.add(new Paragraph<>(paragraphStyle, segmentOps, Arrays.asList(segment), item));
+
+        return new ReadOnlyStyledDocument<>(res);
+    }
+
+    
     public static <PS, SEG, S> ReadOnlyStyledDocument<PS, SEG, S> fromSegment(SEG segment,  PS paragraphStyle, S style, SegmentOps<SEG, S> segmentOps, ListItem item) {
         Paragraph<PS, SEG, S> content = new Paragraph<PS, SEG, S>(paragraphStyle, segmentOps, Arrays.asList(segment), item);
         List<Paragraph<PS, SEG, S>> res = Arrays.asList(content);
