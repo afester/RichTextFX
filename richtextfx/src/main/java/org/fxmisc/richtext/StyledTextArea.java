@@ -105,7 +105,7 @@ public class StyledTextArea<PS, S> extends GenericStyledArea<PS, StyledText<S>, 
 
         // XXX: binding selectionFill to textFill,
         // see the note at highlightTextFill
-        t.impl_selectionFillProperty().bind(t.fillProperty());
+        t.selectionFillProperty().bind(t.fillProperty());
         return t;
     }
 }

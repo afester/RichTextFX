@@ -3,8 +3,8 @@ package org.fxmisc.richtext;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.sun.javafx.css.converters.EnumConverter;
-import com.sun.javafx.css.converters.SizeConverter;
+import javafx.css.converter.EnumConverter;
+//import javafx.css.converter.SizeConverter;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.css.CssMetaData;
@@ -208,7 +208,7 @@ public class TextExt extends Text {
 
         private static final CssMetaData<TextExt, Number[]> UNDERLINE_DASH_ARRAY = new CssMetaData<TextExt, Number[]>(
                 "-rtfx-underline-dash-array",
-                SizeConverter.SequenceConverter.getInstance(),
+                null, //SizeConverter.SequenceConverter.getInstance(),
                 new Double[0]) {
 
             @Override

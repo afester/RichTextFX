@@ -15,8 +15,9 @@ import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 
 import com.sun.javafx.geom.RectBounds;
-import com.sun.javafx.scene.text.HitInfo;
+//import com.sun.javafx.scene.text.HitInfo;
 import com.sun.javafx.scene.text.TextLayout;
+import com.sun.javafx.scene.text.TextLayout.Hit;
 import com.sun.javafx.text.PrismTextLayout;
 import com.sun.javafx.text.TextLine;
 
@@ -130,7 +131,7 @@ class TextFlowExt extends TextFlow {
     }
 
     CharacterHit hit(double x, double y) {
-        HitInfo hit = textLayout().getHitInfo((float) x, (float) y);
+        Hit hit = textLayout().getHitInfo((float) x, (float) y);
         int charIdx = hit.getCharIndex();
 
         int lineIdx = getLineIndex((float) y);
