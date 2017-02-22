@@ -248,21 +248,21 @@ class ParagraphText<PS, SEG, S> extends TextFlowExt {
             // get the dash array - JavaFX CSS parser seems to return either a Number[] array
             // or a single value, depending on whether only one or more than one value has been
             // specified in the CSS
-            Double[] underlineDashArray = null;
-            Object underlineDashArrayProp = text.underlineDashArrayProperty().get();
-            if (underlineDashArrayProp != null) {
-                if (underlineDashArrayProp.getClass().isArray()) {
-                    Number[] numberArray = (Number[]) underlineDashArrayProp;
-                    underlineDashArray = new Double[numberArray.length];
-                    int idx = 0;
-                    for (Number d : numberArray) {
-                        underlineDashArray[idx++] = (Double) d;
-                    }
-                } else {
-                    underlineDashArray = new Double[1];
-                    underlineDashArray[0] = ((Double) underlineDashArrayProp).doubleValue();
-                }
-            }
+//            Double[] underlineDashArray = null;
+//            Object underlineDashArrayProp = text.underlineDashArrayProperty().get();
+//            if (underlineDashArrayProp != null) {
+//                if (underlineDashArrayProp.getClass().isArray()) {
+//                    Number[] numberArray = (Number[]) underlineDashArrayProp;
+//                    underlineDashArray = new Double[numberArray.length];
+//                    int idx = 0;
+//                    for (Number d : numberArray) {
+//                        underlineDashArray[idx++] = (Double) d;
+//                    }
+//                } else {
+//                    underlineDashArray = new Double[1];
+//                    underlineDashArray[0] = ((Double) underlineDashArrayProp).doubleValue();
+//                }
+//            }
     
             StrokeLineCap underlineCap = text.underlineCapProperty().get();
     
@@ -270,9 +270,9 @@ class ParagraphText<PS, SEG, S> extends TextFlowExt {
             if (underlineColor != null) {
                 underlineShape.setStroke(underlineColor);
             }
-            if (underlineDashArray != null) {
-                underlineShape.getStrokeDashArray().addAll(underlineDashArray);
-            }
+//            if (underlineDashArray != null) {
+//                underlineShape.getStrokeDashArray().addAll(underlineDashArray);
+//            }
             if (underlineCap != null) {
                 underlineShape.setStrokeLineCap(underlineCap);
             }
