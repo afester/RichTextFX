@@ -3,15 +3,14 @@ package org.fxmisc.richtext;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.css.converter.EnumConverter;
-//import javafx.css.converter.SizeConverter;
-
 import javafx.beans.property.ObjectProperty;
 import javafx.css.CssMetaData;
 import javafx.css.StyleConverter;
 import javafx.css.Styleable;
 import javafx.css.StyleableObjectProperty;
 import javafx.css.StyleableProperty;
+import javafx.css.converter.EnumConverter;
+import javafx.css.converter.SizeConverter;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.StrokeLineCap;
@@ -70,22 +69,22 @@ public class TextExt extends Text {
         }
     };
 
-//    private final StyleableObjectProperty<Number[]> underlineDashArray = new StyleableObjectProperty<Number[]>(null) {
-//        @Override
-//        public Object getBean() {
-//            return TextExt.this;
-//        }
-//
-//        @Override
-//        public String getName() {
-//            return "underlineDashArray";
-//        }
-//
-//        @Override
-//        public CssMetaData<TextExt, Number[]> getCssMetaData() {
-//            return StyleableProperties.UNDERLINE_DASH_ARRAY;
-//        }
-//    };
+    private final StyleableObjectProperty<Number[]> underlineDashArray = new StyleableObjectProperty<Number[]>(null) {
+        @Override
+        public Object getBean() {
+            return TextExt.this;
+        }
+
+        @Override
+        public String getName() {
+            return "underlineDashArray";
+        }
+
+        @Override
+        public CssMetaData<TextExt, Number[]> getCssMetaData() {
+            return StyleableProperties.UNDERLINE_DASH_ARRAY;
+        }
+    };
 
 
     private final StyleableObjectProperty<StrokeLineCap> underlineCap = new StyleableObjectProperty<StrokeLineCap>(null) {
@@ -118,7 +117,7 @@ public class TextExt extends Text {
         styleables.add(StyleableProperties.BACKGROUND_COLOR);
         styleables.add(StyleableProperties.UNDERLINE_COLOR);
         styleables.add(StyleableProperties.UNDERLINE_WIDTH);
-//        styleables.add(StyleableProperties.UNDERLINE_DASH_ARRAY);
+        styleables.add(StyleableProperties.UNDERLINE_DASH_ARRAY);
         styleables.add(StyleableProperties.UNDERLINE_CAP);
 
         // Return list value
@@ -148,9 +147,9 @@ public class TextExt extends Text {
     public ObjectProperty<Number> underlineWidthProperty() { return underlineWidth; }
 
     // Dash array for the text underline 
-//    public Number[] getUnderlineDashArray() { return underlineDashArray.get(); }
-//    public void setUnderlineDashArray(Number[] dashArray) { underlineDashArray.set(dashArray); }
-//    public ObjectProperty<Number[]> underlineDashArrayProperty() { return underlineDashArray; }
+    public Number[] getUnderlineDashArray() { return underlineDashArray.get(); }
+    public void setUnderlineDashArray(Number[] dashArray) { underlineDashArray.set(dashArray); }
+    public ObjectProperty<Number[]> underlineDashArrayProperty() { return underlineDashArray; }
 
     // The end cap style of each dash in a dashed underline
     public StrokeLineCap getUnderlineCap() { return underlineCap.get(); }
@@ -206,21 +205,21 @@ public class TextExt extends Text {
             }
         };
 
-//        private static final CssMetaData<TextExt, Number[]> UNDERLINE_DASH_ARRAY = new CssMetaData<TextExt, Number[]>(
-//                "-rtfx-underline-dash-array",
-//                SizeConverter.SequenceConverter.getInstance(),
-//                new Double[0]) {
-//
-//            @Override
-//            public boolean isSettable(TextExt node) {
-//                return !node.underlineDashArray.isBound();
-//            }
-//
-//            @Override
-//            public StyleableProperty<Number[]> getStyleableProperty(TextExt node) {
-//                return node.underlineDashArray;
-//            }
-//        };
+        private static final CssMetaData<TextExt, Number[]> UNDERLINE_DASH_ARRAY = new CssMetaData<TextExt, Number[]>(
+                "-rtfx-underline-dash-array",
+                SizeConverter.SequenceConverter.getInstance(),
+                new Double[0]) {
+
+            @Override
+            public boolean isSettable(TextExt node) {
+                return !node.underlineDashArray.isBound();
+            }
+
+            @Override
+            public StyleableProperty<Number[]> getStyleableProperty(TextExt node) {
+                return node.underlineDashArray;
+            }
+        };
 
         private static final CssMetaData<TextExt, StrokeLineCap> UNDERLINE_CAP = new CssMetaData<TextExt, StrokeLineCap>(
                 "-rtfx-underline-cap",
