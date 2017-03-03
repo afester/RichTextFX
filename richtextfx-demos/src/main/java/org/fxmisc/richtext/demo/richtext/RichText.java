@@ -93,7 +93,7 @@ public class RichText extends Application {
             // they will be layed out in a later step
 
             System.err.println("  !! " + para + "/" + (area.getParagraphs().size()));
-            WhiteSpaceOverlayPane result = new WhiteSpaceOverlayPane();
+            WhiteSpaceOverlayPane result = new WhiteSpaceOverlayPane(para >= area.getParagraphs().size() - 1);
 
             WhiteSpaceOverlayFactory fac = new WhiteSpaceOverlayFactory();
             List<Node> nodes = fac.createOverlayNodes(area, para);
