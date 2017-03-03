@@ -37,6 +37,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
@@ -82,6 +83,24 @@ public class RichText extends Application {
         area.setStyleCodecs(
                 ParStyle.CODEC,
                 Codec.eitherCodec(StyledText.codec(TextStyle.CODEC), LinkedImage.codec(TextStyle.CODEC)));
+
+        area.setParagraphGraphicFactory(line -> { 
+            return new HBox(new Rectangle(10, 10)); 
+        } );
+
+        area.setParagraphOverlayFactory(para -> {
+            // create the nodes for each segment
+            // they will be layed out in a later step
+
+            System.err.println("  !! " + para + "/" + (area.getParagraphs().size()));
+            WhiteSpaceOverlayPane result = new WhiteSpaceOverlayPane();
+
+            WhiteSpaceOverlayFactory fac = new WhiteSpaceOverlayFactory();
+            List<Node> nodes = fac.createOverlayNodes(area, para);
+            result.getChildren().addAll(nodes);
+
+            return result;
+        });
     }
 
     private Stage mainStage;

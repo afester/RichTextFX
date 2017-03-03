@@ -50,6 +50,7 @@ class ParagraphBox<PS, SEG, S> extends Region {
 
     private final ParagraphText<PS, SEG, S> text;
 
+    // A factory to produce a node which shall be rendered in front of the paragraph
     private final ObjectProperty<IntFunction<? extends Node>> graphicFactory
             = new SimpleObjectProperty<>(null);
     public ObjectProperty<IntFunction<? extends Node>> graphicFactoryProperty() {
@@ -57,6 +58,16 @@ class ParagraphBox<PS, SEG, S> extends Region {
     }
 
     private final Val<Node> graphic;
+
+    // A factory to produce a node which shall be rendered on top of the paragraph
+    private final ObjectProperty<IntFunction<? extends Node>> overlayFactory
+        = new SimpleObjectProperty<>(null);
+    public ObjectProperty<IntFunction<? extends Node>> overlayFactoryProperty() {
+        return overlayFactory;
+    }
+
+    // an overlay node for the paragraph
+    private final Val<Node> overlay;
 
     final DoubleProperty graphicOffset = new SimpleDoubleProperty(0.0);
 
@@ -78,6 +89,8 @@ class ParagraphBox<PS, SEG, S> extends Region {
         applyParagraphStyle.accept(this.text, par.getParagraphStyle());
         this.index = Var.newSimpleVar(0);
         getChildren().add(text);
+
+        // setup graphic node to display in front of the paragraph
         graphic = Val.combine(
                 graphicFactory,
                 this.index,
@@ -91,6 +104,21 @@ class ParagraphBox<PS, SEG, S> extends Region {
             }
         });
         graphicOffset.addListener(obs -> requestLayout());
+
+        // setup overlay node to display on top of the paragraph
+        overlay = Val.combine(
+                overlayFactory,
+                this.index,
+                (f, i) -> f != null ? f.apply(i) : null);
+        overlay.addListener((obs, oldG, newG) -> {
+            if(oldG != null) {
+                getChildren().remove(oldG);
+            }
+            if(newG != null) {
+                getChildren().add(newG);
+            }
+        });
+
     }
 
     @Override
@@ -210,7 +238,7 @@ class ParagraphBox<PS, SEG, S> extends Region {
         double graphicWidth = getGraphicPrefWidth();
 
         text.resizeRelocate(graphicWidth, 0, w - graphicWidth, h);
-
+        overlay.ifPresent(g -> g.relocate(graphicWidth, 0));
         graphic.ifPresent(g -> g.resizeRelocate(graphicOffset.get(), 0, graphicWidth, h));
     }
 

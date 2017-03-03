@@ -23,7 +23,7 @@ import com.sun.javafx.text.TextLine;
 /**
  * Adds additional API to {@link TextFlow}.
  */
-class TextFlowExt extends TextFlow {
+public class TextFlowExt extends TextFlow {
 
     private static Method mGetTextLayout;
     private static Method mGetLines;
@@ -89,7 +89,13 @@ class TextFlowExt extends TextFlow {
         return textLayout().getCaretShape(charIdx, isLeading, 0.0f, 0.0f);
     }
 
-    PathElement[] getRangeShape(int from, int to) {
+    /**
+     * @param from The index of the first character.
+     * @param to The index of the last character.
+     * @return An array with the PathElement objects which define the shape of a specific 
+     *         text range from the first to the last character.
+     */
+    public PathElement[] getRangeShape(int from, int to) {
         return textLayout().getRange(from, to, TextLayout.TYPE_TEXT, 0, 0);
     }
 

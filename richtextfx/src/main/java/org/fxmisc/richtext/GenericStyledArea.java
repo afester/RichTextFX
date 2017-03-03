@@ -271,10 +271,22 @@ public class GenericStyledArea<PS, SEG, S> extends Region
     public final void setOnSelectionDrop(IntConsumer consumer) { onSelectionDrop.setValue(consumer); }
     public final IntConsumer getOnSelectionDrop() { return onSelectionDrop.getValue(); }
 
+    /**
+     * Defines a factory for nodes which should be displayed left to each paragraph.
+     * The editing area begins to the right of those nodes.
+     */
     private final ObjectProperty<IntFunction<? extends Node>> paragraphGraphicFactory = new SimpleObjectProperty<>(null);
     public void setParagraphGraphicFactory(IntFunction<? extends Node> factory) { paragraphGraphicFactory.set(factory); }
     public IntFunction<? extends Node> getParagraphGraphicFactory() { return paragraphGraphicFactory.get(); }
     public ObjectProperty<IntFunction<? extends Node>> paragraphGraphicFactoryProperty() { return paragraphGraphicFactory; }
+
+    /**
+     * Defines a factory for nodes which should be displayed on top of paragraphs.
+     */
+    private final ObjectProperty<IntFunction<? extends Node>> paragraphOverlayFactory = new SimpleObjectProperty<>(null);
+    public void setParagraphOverlayFactory(IntFunction<? extends Node> factory) { paragraphOverlayFactory.set(factory); }
+    public IntFunction<? extends Node> getParagraphOverlayFactory() { return paragraphOverlayFactory.get(); }
+    public ObjectProperty<IntFunction<? extends Node>> paragraphOverlayFactoryProperty() { return paragraphOverlayFactory; }
 
     /** The {@link ContextMenu} for the area, which is by default null. */
     private ObjectProperty<ContextMenu> contextMenu = new SimpleObjectProperty<>(null);
@@ -1273,6 +1285,7 @@ public class GenericStyledArea<PS, SEG, S> extends Region
         box.highlightTextFillProperty().bind(highlightTextFill);
         box.wrapTextProperty().bind(wrapTextProperty());
         box.graphicFactoryProperty().bind(paragraphGraphicFactoryProperty());
+        box.overlayFactoryProperty().bind(paragraphOverlayFactoryProperty());
         box.graphicOffset.bind(virtualFlow.breadthOffsetProperty());
 
         Val<Boolean> hasCaret = Val.combine(
