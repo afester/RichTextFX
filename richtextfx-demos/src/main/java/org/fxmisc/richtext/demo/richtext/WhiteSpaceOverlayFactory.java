@@ -4,18 +4,56 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.fxmisc.richtext.GenericStyledArea;
+import org.fxmisc.richtext.OverlayFactory;
+import org.fxmisc.richtext.TextFlowExt;
 import org.fxmisc.richtext.model.Paragraph;
 import org.fxmisc.richtext.model.StyledText;
 import org.reactfx.util.Either;
 
+import javafx.geometry.Rectangle2D;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.PathElement;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 
-public class WhiteSpaceOverlayFactory extends OverlayFactory {
 
+public class WhiteSpaceOverlayFactory extends OverlayFactory<ParStyle, Either<StyledText<TextStyle>, LinkedImage<TextStyle>>, TextStyle> {
+
+    public WhiteSpaceOverlayFactory(GenericStyledArea<ParStyle, Either<StyledText<TextStyle>, LinkedImage<TextStyle>>, TextStyle> area) {
+        this.area = area;
+    }
+    
+    
+    private GenericStyledArea<ParStyle, Either<StyledText<TextStyle>, LinkedImage<TextStyle>>, TextStyle> area;
+
+    
+
+    protected Rectangle2D getBounds(TextFlowExt textFlow, int start, int end) {
+        PathElement[] shape = textFlow.getRangeShape(start, end);
+        double minX = 0, minY = 0, maxX = 0, maxY = 0;
+        for (PathElement pathElement : shape) {
+            if (pathElement instanceof MoveTo) {
+                MoveTo moveTo = (MoveTo) pathElement;
+                minX = maxX = moveTo.getX();
+                minY = maxY = moveTo.getY();
+            } else if (pathElement instanceof LineTo) {
+                LineTo lineTo = (LineTo) pathElement;
+                double x = lineTo.getX();
+                double y = lineTo.getY();
+                minX = Math.min(minX, x);
+                minY = Math.min(minY, y);
+                maxX = Math.max(maxX, x);
+                maxY = Math.max(maxY, y);
+            }
+        }
+        return new Rectangle2D(minX, minY, maxX - minX, maxY - minY);
+    }
+    
+    
     private Text createTextNode(WhiteSpaceType type, TextStyle style, int start, int end) {
         WhiteSpaceNode t = new WhiteSpaceNode(type); // Text(text);
         t.setTextOrigin(VPos.TOP);
@@ -28,8 +66,8 @@ public class WhiteSpaceOverlayFactory extends OverlayFactory {
     }
 
 
-    // @Override
-    public List<Node> createOverlayNodes(GenericStyledArea<ParStyle, Either<StyledText<TextStyle>, LinkedImage<TextStyle>>, TextStyle> area,
+    @Override
+    public List<Node> createOverlayNodes(/*GenericStyledArea<ParStyle, Either<StyledText<TextStyle>, LinkedImage<TextStyle>>, TextStyle> area,*/
                                          int paragraphIndex) {
         List<Node> nodes = new ArrayList<>();
 
@@ -102,8 +140,43 @@ public class WhiteSpaceOverlayFactory extends OverlayFactory {
             return nodes;
     }
     
+
+    @Override
+    public void layoutOverlayNodes(TextFlowExt parent, double offset, List<? extends Node> nodes) { // int paragraphIndex, List<Node> nodes) {
+
+        nodes.forEach(node -> {
+            System.err.println("  OVERLAY:" + node);
+            WhiteSpaceNode wsn = (WhiteSpaceNode) node;
     
-//    @Override
-//    void layoutOverlayNodes(int paragraphIndex, List<Node> nodes) {
-//    }
+            System.err.println("  " + node);
+            Range range = (Range) node.getUserData();
+            System.err.println("  RANGE: " + range);
+            Rectangle2D bounds2 = getBounds(parent, range.start, range.end + 1);
+            System.err.println("  =>BOUNDS: " + bounds2);
+    
+            //if (eolNode.isVisible() != showEOL)
+            //    eolNode.setVisible(showEOL);
+    
+            System.err.println("WSN:" + wsn);
+    
+            //boolean showEOL = (paragraphIndex < getTextArea().getParagraphs().size() - 1);
+    
+            if (wsn.getType() == WhiteSpaceType.EOL) {
+    //        System.err.println(last);
+    //        if (last) {
+    //             wsn.setVisible(false);
+    //        } else {
+                wsn.setVisible(true);
+                node.setLayoutX(/* leftInsets + */ bounds2.getMaxX() + offset);
+                node.setLayoutY(/* topInsets + */ bounds2.getMinY());
+    //            }
+            } else if (wsn.getType() == WhiteSpaceType.TAB) {
+                node.setLayoutX(/* leftInsets + */ offset + (bounds2.getMinX())); //  + bounds2.getMaxX()) / 2);  // TODO: calculate properly
+                node.setLayoutY(/* topInsets + */ bounds2.getMinY());
+            } else {
+                node.setLayoutX(/* leftInsets + */ offset + bounds2.getMinX());
+                node.setLayoutY(/* topInsets + */ bounds2.getMinY());
+            }
+        });
+    }
 }

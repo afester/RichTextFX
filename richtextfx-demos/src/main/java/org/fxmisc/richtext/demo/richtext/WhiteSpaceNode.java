@@ -5,7 +5,7 @@ import javafx.scene.text.Text;
 public class WhiteSpaceNode extends Text {
     private WhiteSpaceType type;
 
-    WhiteSpaceNode(WhiteSpaceType type) {
+    public WhiteSpaceNode(WhiteSpaceType type) {
         super(type.getText());
         this.type = type;
     }

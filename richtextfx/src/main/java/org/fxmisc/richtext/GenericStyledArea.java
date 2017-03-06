@@ -283,10 +283,10 @@ public class GenericStyledArea<PS, SEG, S> extends Region
     /**
      * Defines a factory for nodes which should be displayed on top of paragraphs.
      */
-    private final ObjectProperty<IntFunction<? extends Node>> paragraphOverlayFactory = new SimpleObjectProperty<>(null);
-    public void setParagraphOverlayFactory(IntFunction<? extends Node> factory) { paragraphOverlayFactory.set(factory); }
-    public IntFunction<? extends Node> getParagraphOverlayFactory() { return paragraphOverlayFactory.get(); }
-    public ObjectProperty<IntFunction<? extends Node>> paragraphOverlayFactoryProperty() { return paragraphOverlayFactory; }
+    private final ObjectProperty<OverlayFactory<PS, SEG, S>> paragraphOverlayFactory = new SimpleObjectProperty<>(null);
+    public void setParagraphOverlayFactory(OverlayFactory<PS, SEG, S> factory) { paragraphOverlayFactory.set(factory); }
+    public OverlayFactory<PS, SEG, S> getParagraphOverlayFactory() { return paragraphOverlayFactory.get(); }
+    public ObjectProperty<OverlayFactory<PS, SEG, S>> paragraphOverlayFactoryProperty() { return paragraphOverlayFactory; }
 
     /** The {@link ContextMenu} for the area, which is by default null. */
     private ObjectProperty<ContextMenu> contextMenu = new SimpleObjectProperty<>(null);

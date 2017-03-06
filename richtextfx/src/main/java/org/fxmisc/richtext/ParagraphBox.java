@@ -3,6 +3,7 @@ package org.fxmisc.richtext;
 import static org.reactfx.util.Tuples.*;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.function.BiConsumer;
@@ -59,15 +60,15 @@ class ParagraphBox<PS, SEG, S> extends Region {
 
     private final Val<Node> graphic;
 
-    // A factory to produce a node which shall be rendered on top of the paragraph
-    private final ObjectProperty<IntFunction<? extends Node>> overlayFactory
+    // A factory to create and layout nodes which shall be rendered on top of a paragraph
+    private final ObjectProperty<OverlayFactory<PS, SEG, S>> overlayFactory
         = new SimpleObjectProperty<>(null);
-    public ObjectProperty<IntFunction<? extends Node>> overlayFactoryProperty() {
+    public ObjectProperty<OverlayFactory<PS, SEG, S>> overlayFactoryProperty() {
         return overlayFactory;
     }
 
     // an overlay node for the paragraph
-    private final Val<Node> overlay;
+    private final Val<List<? extends Node>> overlay;
 
     final DoubleProperty graphicOffset = new SimpleDoubleProperty(0.0);
 
@@ -109,13 +110,13 @@ class ParagraphBox<PS, SEG, S> extends Region {
         overlay = Val.combine(
                 overlayFactory,
                 this.index,
-                (f, i) -> f != null ? f.apply(i) : null);
+                (f, i) -> f != null ? f.createOverlayNodes(i) : null);
         overlay.addListener((obs, oldG, newG) -> {
             if(oldG != null) {
-                getChildren().remove(oldG);
+                getChildren().removeAll(oldG);
             }
             if(newG != null) {
-                getChildren().add(newG);
+                getChildren().addAll(newG);
             }
         });
 
@@ -238,8 +239,8 @@ class ParagraphBox<PS, SEG, S> extends Region {
         double graphicWidth = getGraphicPrefWidth();
 
         text.resizeRelocate(graphicWidth, 0, w - graphicWidth, h);
-        overlay.ifPresent(g -> g.relocate(graphicWidth, 0));
         graphic.ifPresent(g -> g.resizeRelocate(graphicOffset.get(), 0, graphicWidth, h));
+        overlay.ifPresent(g -> overlayFactory.get().layoutOverlayNodes(text, graphicWidth, g)); // g.forEach(node -> {
     }
 
     double getGraphicPrefWidth() {

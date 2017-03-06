@@ -88,19 +88,8 @@ public class RichText extends Application {
             return new HBox(new Rectangle(10, 10)); 
         } );
 
-        area.setParagraphOverlayFactory(para -> {
-            // create the nodes for each segment
-            // they will be layed out in a later step
-
-            System.err.println("  !! " + para + "/" + (area.getParagraphs().size()));
-            WhiteSpaceOverlayPane result = new WhiteSpaceOverlayPane(para >= area.getParagraphs().size() - 1);
-
-            WhiteSpaceOverlayFactory fac = new WhiteSpaceOverlayFactory();
-            List<Node> nodes = fac.createOverlayNodes(area, para);
-            result.getChildren().addAll(nodes);
-
-            return result;
-        });
+        // Factory to create and layout any number of overlay nodes for each paragraph
+        area.setParagraphOverlayFactory(new WhiteSpaceOverlayFactory(area));
     }
 
     private Stage mainStage;
