@@ -55,20 +55,18 @@ public class WhiteSpaceOverlayFactory extends OverlayFactory<ParStyle, Either<St
     
     
     private Text createTextNode(WhiteSpaceType type, TextStyle style, int start, int end) {
-        WhiteSpaceNode t = new WhiteSpaceNode(type); // Text(text);
+        WhiteSpaceNode t = new WhiteSpaceNode(type);
         t.setTextOrigin(VPos.TOP);
         t.getStyleClass().add("text");
-        t.setOpacity(0.7);
-        //t.getStyleClass().addAll(style.toCss());
-        t.setStyle(style.toCss());
+        t.setOpacity(0.3);
+        t.setStyle(style.toCss() + ";color=\"red\"");
         t.setUserData(new Range(start, end));
         return t;
     }
 
 
     @Override
-    public List<Node> createOverlayNodes(/*GenericStyledArea<ParStyle, Either<StyledText<TextStyle>, LinkedImage<TextStyle>>, TextStyle> area,*/
-                                         int paragraphIndex) {
+    public List<Node> createOverlayNodes(int paragraphIndex) {
         List<Node> nodes = new ArrayList<>();
 
         Paragraph<ParStyle, Either<StyledText<TextStyle>, LinkedImage<TextStyle>>, TextStyle> paragraph = 
@@ -143,7 +141,8 @@ public class WhiteSpaceOverlayFactory extends OverlayFactory<ParStyle, Either<St
 
     @Override
     public void layoutOverlayNodes(TextFlowExt parent, double offset, List<? extends Node> nodes) { // int paragraphIndex, List<Node> nodes) {
-
+        double leftInsets = parent.getInsets().getLeft();
+        double topInsets = parent.getInsets().getTop();
         nodes.forEach(node -> {
             System.err.println("  OVERLAY:" + node);
             WhiteSpaceNode wsn = (WhiteSpaceNode) node;
@@ -167,15 +166,15 @@ public class WhiteSpaceOverlayFactory extends OverlayFactory<ParStyle, Either<St
     //             wsn.setVisible(false);
     //        } else {
                 wsn.setVisible(true);
-                node.setLayoutX(/* leftInsets + */ bounds2.getMaxX() + offset);
-                node.setLayoutY(/* topInsets + */ bounds2.getMinY());
+                node.setLayoutX(leftInsets + bounds2.getMaxX() + offset);
+                node.setLayoutY(topInsets + bounds2.getMinY());
     //            }
             } else if (wsn.getType() == WhiteSpaceType.TAB) {
-                node.setLayoutX(/* leftInsets + */ offset + (bounds2.getMinX())); //  + bounds2.getMaxX()) / 2);  // TODO: calculate properly
-                node.setLayoutY(/* topInsets + */ bounds2.getMinY());
+                node.setLayoutX(leftInsets + offset + (bounds2.getMinX())); //  + bounds2.getMaxX()) / 2);  // TODO: calculate properly
+                node.setLayoutY(topInsets + bounds2.getMinY());
             } else {
-                node.setLayoutX(/* leftInsets + */ offset + bounds2.getMinX());
-                node.setLayoutY(/* topInsets + */ bounds2.getMinY());
+                node.setLayoutX(leftInsets + offset + bounds2.getMinX());
+                node.setLayoutY(topInsets + bounds2.getMinY());
             }
         });
     }
