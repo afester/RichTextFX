@@ -37,7 +37,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
@@ -84,10 +83,6 @@ public class RichText extends Application {
                 ParStyle.CODEC,
                 Codec.eitherCodec(StyledText.codec(TextStyle.CODEC), LinkedImage.codec(TextStyle.CODEC)));
 
-        area.setParagraphGraphicFactory(line -> { 
-            return new HBox(new Rectangle(10, 10)); 
-        } );
-
         // Factory to create and layout any number of overlay nodes for each paragraph
         area.setParagraphOverlayFactory(new WhiteSpaceOverlayFactory(area));
     }
@@ -105,6 +100,13 @@ public class RichText extends Application {
         CheckBox wrapToggle = new CheckBox("Wrap");
         wrapToggle.setSelected(true);
         area.wrapTextProperty().bind(wrapToggle.selectedProperty());
+
+        ToggleButton showWhitespaceBtn = new ToggleButton();
+        showWhitespaceBtn.getStyleClass().add("show-ws");
+        showWhitespaceBtn.setPrefWidth(20);
+        showWhitespaceBtn.setPrefHeight(20);
+        showWhitespaceBtn.selectedProperty().addListener((obs, o, n) ->toggleShowWhitespace(n));
+
         Button undoBtn = createButton("undo", area::undo);
         Button redoBtn = createButton("redo", area::redo);
         Button cutBtn = createButton("cut", area::cut);
@@ -274,7 +276,7 @@ public class RichText extends Application {
         HBox panel2 = new HBox(3.0);
         panel1.getChildren().addAll(
                 loadBtn, saveBtn,
-                wrapToggle, undoBtn, redoBtn, cutBtn, copyBtn, pasteBtn,
+                wrapToggle, showWhitespaceBtn, undoBtn, redoBtn, cutBtn, copyBtn, pasteBtn,
                 boldBtn, italicBtn, underlineBtn, strikeBtn,
                 alignLeftBtn, alignCenterBtn, alignRightBtn, alignJustifyBtn, insertImageBtn,
                 paragraphBackgroundPicker);
@@ -291,6 +293,20 @@ public class RichText extends Application {
         area.requestFocus();
         primaryStage.setTitle("Rich Text Demo");
         primaryStage.show();
+    }
+
+    private WhiteSpaceOverlayFactory whitespaceOverlayFactory;
+
+    private void toggleShowWhitespace(boolean showWhitespace) {
+        if (showWhitespace && whitespaceOverlayFactory == null) {
+            whitespaceOverlayFactory = new WhiteSpaceOverlayFactory(area);
+            // overlayGraphicFactory.addOverlayFactory(whitespaceOverlayFactory);
+            area.setParagraphOverlayFactory(whitespaceOverlayFactory);
+        } else if (!showWhitespace && whitespaceOverlayFactory != null) {
+            //overlayGraphicFactory.removeOverlayFactory(whitespaceOverlayFactory);
+            whitespaceOverlayFactory = null;
+            area.setParagraphOverlayFactory(null);
+        }
     }
 
 

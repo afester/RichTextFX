@@ -56,9 +56,9 @@ public class WhiteSpaceOverlayFactory extends OverlayFactory<ParStyle, Either<St
     
     private Text createTextNode(WhiteSpaceType type, TextStyle style, int start, int end) {
         WhiteSpaceNode t = new WhiteSpaceNode(type);
-        t.setTextOrigin(VPos.TOP);
+        t.setTextOrigin(VPos.BOTTOM);
         t.getStyleClass().add("text");
-        t.setOpacity(0.3);
+        t.setOpacity(0.7);
         t.setStyle(style.toCss() + ";color=\"red\"");
         t.setUserData(new Range(start, end));
         return t;
@@ -93,6 +93,8 @@ public class WhiteSpaceOverlayFactory extends OverlayFactory<ParStyle, Either<St
                                     seg.getLeft().getStyle(),segStart + i, segStart + i + 1)); 
                 }
                 segStart += textLength;
+            } else {
+                segStart++;
             }
         }
 
@@ -167,15 +169,45 @@ public class WhiteSpaceOverlayFactory extends OverlayFactory<ParStyle, Either<St
     //        } else {
                 wsn.setVisible(true);
                 node.setLayoutX(leftInsets + bounds2.getMaxX() + offset);
-                node.setLayoutY(topInsets + bounds2.getMinY());
     //            }
             } else if (wsn.getType() == WhiteSpaceType.TAB) {
                 node.setLayoutX(leftInsets + offset + (bounds2.getMinX())); //  + bounds2.getMaxX()) / 2);  // TODO: calculate properly
-                node.setLayoutY(topInsets + bounds2.getMinY());
             } else {
                 node.setLayoutX(leftInsets + offset + bounds2.getMinX());
-                node.setLayoutY(topInsets + bounds2.getMinY());
             }
+            node.setLayoutY(topInsets + bounds2.getMaxY());
         });
+    }
+    
+    
+    
+    private static class WhiteSpaceNode extends Text {
+        private WhiteSpaceType type;
+
+        public WhiteSpaceNode(WhiteSpaceType type) {
+            super(type.getText());
+            this.type = type;
+        }
+
+        public WhiteSpaceType getType() {
+            return type;
+        }
+    }
+
+
+    private static enum WhiteSpaceType {
+        SPACE("\u00B7"),
+        TAB("\u00BB"),   // "\u2192"; // would need addtl. computation to clip the arrow!
+        EOL("\u00B6");
+
+        final String character;
+
+        WhiteSpaceType(String character) {
+            this.character = character;
+        }
+
+        String getText() {
+            return character;
+        }
     }
 }
