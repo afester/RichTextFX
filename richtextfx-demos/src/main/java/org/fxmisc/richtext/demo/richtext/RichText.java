@@ -68,6 +68,7 @@ public class RichText extends Application {
 
     private final TextOps<StyledText<TextStyle>, TextStyle> styledTextOps = StyledText.textOps();
     private final LinkedImageOps<TextStyle> linkedImageOps = new LinkedImageOps<>();
+    private WhiteSpaceOverlayFactory whitespaceOverlayFactory;
 
     private final GenericStyledArea<ParStyle, Either<StyledText<TextStyle>, LinkedImage<TextStyle>>, TextStyle> area =
             new GenericStyledArea<>(
@@ -84,7 +85,9 @@ public class RichText extends Application {
                 Codec.eitherCodec(StyledText.codec(TextStyle.CODEC), LinkedImage.codec(TextStyle.CODEC)));
 
         // Factory to create and layout any number of overlay nodes for each paragraph
-        area.setParagraphOverlayFactory(new WhiteSpaceOverlayFactory(area));
+        //area.setParagraphOverlayFactory(new WhiteSpaceOverlayFactory(area));
+        whitespaceOverlayFactory = new WhiteSpaceOverlayFactory(area);
+        area.addParagraphOverlayFactory(whitespaceOverlayFactory);
     }
 
     private Stage mainStage;
@@ -295,17 +298,14 @@ public class RichText extends Application {
         primaryStage.show();
     }
 
-    private WhiteSpaceOverlayFactory whitespaceOverlayFactory;
 
     private void toggleShowWhitespace(boolean showWhitespace) {
         if (showWhitespace && whitespaceOverlayFactory == null) {
             whitespaceOverlayFactory = new WhiteSpaceOverlayFactory(area);
-            // overlayGraphicFactory.addOverlayFactory(whitespaceOverlayFactory);
-            area.setParagraphOverlayFactory(whitespaceOverlayFactory);
+            area.addParagraphOverlayFactory(whitespaceOverlayFactory);
         } else if (!showWhitespace && whitespaceOverlayFactory != null) {
-            //overlayGraphicFactory.removeOverlayFactory(whitespaceOverlayFactory);
+            area.removeParagraphOverlayFactory(whitespaceOverlayFactory);
             whitespaceOverlayFactory = null;
-            area.setParagraphOverlayFactory(null);
         }
     }
 

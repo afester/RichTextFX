@@ -3,7 +3,10 @@ package org.fxmisc.richtext;
 import static org.reactfx.util.Tuples.*;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.function.BiConsumer;
@@ -17,6 +20,10 @@ import javafx.beans.property.Property;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ListChangeListener.Change;
+import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
@@ -60,16 +67,32 @@ class ParagraphBox<PS, SEG, S> extends Region {
 
     private final Val<Node> graphic;
 
+    
+    
+    private final ObservableList<OverlayFactory<PS, SEG, S>> paragraphOverlayFactories = FXCollections.observableArrayList(); // SimpleObjectProperty<>(null);
+    // public void setParagraphOverlayFactory(OverlayFactory<PS, SEG, S> factory) { paragraphOverlayFactory.set(factory); }
+    // public OverlayFactory<PS, SEG, S> getParagraphOverlayFactory() { return paragraphOverlayFactory.get(); }
+    public ObservableList<OverlayFactory<PS, SEG, S>> overlayFactoriesProperty() { return paragraphOverlayFactories; }
+
+    
     // A factory to create and layout nodes which shall be rendered on top of a paragraph
-    private final ObjectProperty<OverlayFactory<PS, SEG, S>> overlayFactory
-        = new SimpleObjectProperty<>(null);
-    public ObjectProperty<OverlayFactory<PS, SEG, S>> overlayFactoryProperty() {
-        return overlayFactory;
-    }
+    private Map<OverlayFactory<PS, SEG, S>, OverlayFactory.ParagraphOverlay> paragraphOverlays = new HashMap<>();
+    
+//    private final Map<Val<OverlayFactory<PS, SEG, S>>, Val<List<? extends Node>>> overlayFactories
+//        = new HashMap<>(); //SimpleObjectProperty<>(null);
+//    public ObjectProperty<OverlayFactory<PS, SEG, S>> overlayFactoryProperty() {
+//        return overlayFactory;
+//    }
+
+    
+    private List<OverlayFactory.ParagraphOverlay> overlayFactories = new ArrayList<>();
 
     // an overlay node for the paragraph
-    private final Val<List<? extends Node>> overlay;
+    //private final Val<List<? extends Node>> overlay;
 
+    
+    
+    
     final DoubleProperty graphicOffset = new SimpleDoubleProperty(0.0);
 
     private final BooleanProperty wrapText = new SimpleBooleanProperty(false);
@@ -92,6 +115,7 @@ class ParagraphBox<PS, SEG, S> extends Region {
         getChildren().add(text);
 
         // setup graphic node to display in front of the paragraph
+        // note that the nodes are created at a later time, when the factory is set!!
         graphic = Val.combine(
                 graphicFactory,
                 this.index,
@@ -106,20 +130,61 @@ class ParagraphBox<PS, SEG, S> extends Region {
         });
         graphicOffset.addListener(obs -> requestLayout());
 
-        // setup overlay node to display on top of the paragraph
-        overlay = Val.combine(
-                overlayFactory,
-                this.index,
-                (f, i) -> f != null ? f.createOverlayNodes(i) : null);
-        overlay.addListener((obs, oldG, newG) -> {
-            if(oldG != null) {
-                getChildren().removeAll(oldG);
-            }
-            if(newG != null) {
-                getChildren().addAll(newG);
+
+        this.index.addListener((obs, n, old) -> {
+            paragraphOverlays.forEach((factory, ovl) -> {
+                System.err.printf("INDEX CHANGED: %s%n", this.index);
+                //System.err.printf("ParagraphBox: %s added at %s%n", fac, idx++);
+
+                getChildren().removeAll(ovl.nodes);
+                // OverlayFactory.ParagraphOverlay ovl = new OverlayFactory.ParagraphOverlay(fac);
+                ovl.createNodes(this.index.getValue());
+                // paragraphOverlays.put(fac, ovl);
+                System.err.println("CREATED:" + ovl.nodes);
+                getChildren().addAll(ovl.nodes);
+            });
+
+        });
+
+        paragraphOverlayFactories.addListener((ListChangeListener.Change<? extends OverlayFactory<PS, SEG, S>> change) -> {
+            while(change.next()) {
+                if (change.wasAdded()) {
+                    int idx = change.getFrom();
+                    for (OverlayFactory<PS, SEG, S> fac : change.getAddedSubList()) {
+                        System.err.printf("ParagraphBox: %s added at %s%n", fac, idx++);
+
+                        OverlayFactory.ParagraphOverlay ovl = new OverlayFactory.ParagraphOverlay(fac);
+                        ovl.createNodes(this.index.getValue());
+                        paragraphOverlays.put(fac, ovl);
+                        System.err.println("CREATED:" + ovl.nodes);
+                        getChildren().addAll(ovl.nodes);
+                    }
+                } else if (change.wasRemoved()) {
+                    System.err.printf("ParagraphBox: %s removed at %s%n", change.getRemoved(), change.getFrom());
+                } else {
+                    System.err.printf("ParagraphBox: UNSUPPORTED Change: %s%n", change);
+                }
             }
         });
 
+//        // setup overlay node to display on top of the paragraph
+//        overlayFactories.forEach((fac, nodes) -> {
+//            Val<List<? extends Node>> overlay = Val.combine(
+//                    fac,
+//                    this.index,
+//                    (f, i) -> f != null ? f.createOverlayNodes(i) : null);
+//
+//            overlayFactories.put(fac,  overlay);    // !!!!!!!!!!!!!!!!
+//
+//            overlay.addListener((obs, oldG, newG) -> {
+//                if(oldG != null) {
+//                    getChildren().removeAll(oldG);
+//                }
+//                if(newG != null) {
+//                    getChildren().addAll(newG);
+//                }
+//            });
+//        });
     }
 
     @Override
@@ -240,7 +305,10 @@ class ParagraphBox<PS, SEG, S> extends Region {
 
         text.resizeRelocate(graphicWidth, 0, w - graphicWidth, h);
         graphic.ifPresent(g -> g.resizeRelocate(graphicOffset.get(), 0, graphicWidth, h));
-        overlay.ifPresent(g -> overlayFactory.get().layoutOverlayNodes(text, graphicWidth, g)); // g.forEach(node -> {
+
+        //overlayFactories.forEach((factory, nodes) -> factory.getValue().layoutOverlayNodes(text, graphicWidth, nodes.getValue()));
+        paragraphOverlays.forEach((factory, paraOvl) -> paraOvl.layoutNodes(text, graphicWidth)); 
+        // overlay.ifPresent(g -> overlayFactory.get().layoutOverlayNodes(text, graphicWidth, g));
     }
 
     double getGraphicPrefWidth() {
@@ -269,5 +337,12 @@ class ParagraphBox<PS, SEG, S> extends Region {
      */
     CharacterHit hitText(CaretOffsetX x, double y) {
         return text.hit(x.value, y);
+    }
+    public void updateParagraphOverlayFactories(Change<? extends OverlayFactory<PS, SEG, S>> change) {
+        System.err.println(change);
+    }
+
+    public void addParagraphOverlayFactory(OverlayFactory<PS, SEG, S> f) {
+        paragraphOverlayFactories.add(f);
     }
 }
