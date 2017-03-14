@@ -339,7 +339,15 @@ class ParagraphBox<PS, SEG, S> extends Region {
         return text.hit(x.value, y);
     }
     public void updateParagraphOverlayFactories(Change<? extends OverlayFactory<PS, SEG, S>> change) {
-        System.err.println(change);
+        while(change.next()) {
+            if (change.wasAdded()) {
+                paragraphOverlayFactories.addAll(change.getFrom(), change.getAddedSubList());    
+            } else if (change.wasRemoved()) {
+                paragraphOverlayFactories.removeAll(change.getRemoved());
+            } else {
+                System.err.printf("**** %s NOT YET SUPPORTED!%n", change);
+            }
+        }
     }
 
     public void addParagraphOverlayFactory(OverlayFactory<PS, SEG, S> f) {

@@ -83,11 +83,6 @@ public class RichText extends Application {
         area.setStyleCodecs(
                 ParStyle.CODEC,
                 Codec.eitherCodec(StyledText.codec(TextStyle.CODEC), LinkedImage.codec(TextStyle.CODEC)));
-
-        // Factory to create and layout any number of overlay nodes for each paragraph
-        //area.setParagraphOverlayFactory(new WhiteSpaceOverlayFactory(area));
-        whitespaceOverlayFactory = new WhiteSpaceOverlayFactory(area);
-        area.addParagraphOverlayFactory(whitespaceOverlayFactory);
     }
 
     private Stage mainStage;
@@ -301,6 +296,7 @@ public class RichText extends Application {
 
     private void toggleShowWhitespace(boolean showWhitespace) {
         if (showWhitespace && whitespaceOverlayFactory == null) {
+            System.err.println("ENABLE WHITE SPACE OVERLAY");
             whitespaceOverlayFactory = new WhiteSpaceOverlayFactory(area);
             area.addParagraphOverlayFactory(whitespaceOverlayFactory);
         } else if (!showWhitespace && whitespaceOverlayFactory != null) {

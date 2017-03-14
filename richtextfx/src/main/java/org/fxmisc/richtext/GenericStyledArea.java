@@ -1299,8 +1299,7 @@ public class GenericStyledArea<PS, SEG, S> extends Region
         // note that bind() takes care of both initializing and updating the dependent value!
         paragraphOverlayFactoriesProperty().forEach(f -> box.addParagraphOverlayFactory(f));
         paragraphOverlayFactoriesProperty().addListener((ListChangeListener.Change<? extends OverlayFactory<PS, SEG, S>> change) -> {
-            //box.updateParagraphOverlayFactories(change);
-            System.err.printf("**** %s NOT YET SUPPORTED!%n", change);
+            box.updateParagraphOverlayFactories(change);
         });
 
         box.graphicOffset.bind(virtualFlow.breadthOffsetProperty());
