@@ -56,7 +56,8 @@ public class WhiteSpaceOverlayFactory extends OverlayFactory<ParStyle, Either<St
     
     private Text createTextNode(WhiteSpaceType type, TextStyle style, int start, int end) {
         WhiteSpaceNode t = new WhiteSpaceNode(type);
-        t.setTextOrigin(VPos.BOTTOM);
+        //t.setTextOrigin(VPos.BOTTOM);
+        t.setTextOrigin(VPos.TOP);
         t.getStyleClass().add("text");
         t.setOpacity(0.7);
         t.setStyle(style.toCss() + ";color=\"red\"");
@@ -175,7 +176,8 @@ public class WhiteSpaceOverlayFactory extends OverlayFactory<ParStyle, Either<St
             } else {
                 node.setLayoutX(leftInsets + offset + bounds2.getMinX());
             }
-            node.setLayoutY(topInsets + bounds2.getMaxY());
+            //node.setLayoutY(topInsets + bounds2.getMaxY());
+            node.setLayoutY(topInsets + bounds2.getMinY());
         });
     }
     
