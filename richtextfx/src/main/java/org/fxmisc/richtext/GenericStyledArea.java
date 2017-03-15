@@ -290,12 +290,17 @@ public class GenericStyledArea<PS, SEG, S> extends Region
 //    public OverlayFactory<PS, SEG, S> getParagraphOverlayFactory() { return paragraphOverlayFactory.get(); }
 //    public ObjectProperty<OverlayFactory<PS, SEG, S>> paragraphOverlayFactoryProperty1() { return paragraphOverlayFactory; }
 
-    private final ObservableList<OverlayFactory<PS, SEG, S>> paragraphOverlayFactories = FXCollections.observableArrayList(); // SimpleObjectProperty<>(null);
+    private final ObservableList<OverlayFactory<PS, SEG, S>> paragraphOverlayFactories2 = FXCollections.observableArrayList(); // SimpleObjectProperty<>(null);
     // public void setParagraphOverlayFactory(OverlayFactory<PS, SEG, S> factory) { paragraphOverlayFactory.set(factory); }
     // public OverlayFactory<PS, SEG, S> getParagraphOverlayFactory() { return paragraphOverlayFactory.get(); }
-    public ObservableList<OverlayFactory<PS, SEG, S>> paragraphOverlayFactoriesProperty() { return paragraphOverlayFactories; }
-    public void addParagraphOverlayFactory(OverlayFactory<PS, SEG, S> factory) { paragraphOverlayFactories.add(factory); }
-    public void removeParagraphOverlayFactory(OverlayFactory<PS, SEG, S> factory) { paragraphOverlayFactories.remove(factory); }
+//    public ObservableList<OverlayFactory<PS, SEG, S>> paragraphOverlayFactoriesProperty() { return paragraphOverlayFactories; }
+
+    public void addParagraphOverlayFactory(int i, OverlayFactory<PS, SEG, S> factory) { 
+        paragraphOverlayFactories2.add(factory); 
+    }
+    public void removeParagraphOverlayFactory(int i) { 
+        paragraphOverlayFactories2.remove(i); 
+    }
 
     /** The {@link ContextMenu} for the area, which is by default null. */
     private ObjectProperty<ContextMenu> contextMenu = new SimpleObjectProperty<>(null);

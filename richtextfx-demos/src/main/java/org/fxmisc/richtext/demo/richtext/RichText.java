@@ -44,6 +44,7 @@ import javafx.stage.Stage;
 
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.GenericStyledArea;
+import org.fxmisc.richtext.OverlayFactory;
 import org.fxmisc.richtext.StyledTextArea;
 import org.fxmisc.richtext.TextExt;
 import org.fxmisc.richtext.model.Codec;
@@ -68,7 +69,8 @@ public class RichText extends Application {
 
     private final TextOps<StyledText<TextStyle>, TextStyle> styledTextOps = StyledText.textOps();
     private final LinkedImageOps<TextStyle> linkedImageOps = new LinkedImageOps<>();
-    private WhiteSpaceOverlayFactory whitespaceOverlayFactory;
+    private OverlayFactory<ParStyle, Either<StyledText<TextStyle>, LinkedImage<TextStyle>>, TextStyle> whitespaceOverlayFactory;
+    private OverlayFactory<ParStyle, Either<StyledText<TextStyle>, LinkedImage<TextStyle>>, TextStyle> segmentsOverlayFactory;
 
     private final GenericStyledArea<ParStyle, Either<StyledText<TextStyle>, LinkedImage<TextStyle>>, TextStyle> area =
             new GenericStyledArea<>(
@@ -99,11 +101,16 @@ public class RichText extends Application {
         wrapToggle.setSelected(true);
         area.wrapTextProperty().bind(wrapToggle.selectedProperty());
 
-        ToggleButton showWhitespaceBtn = new ToggleButton();
+        ToggleButton showWhitespaceBtn = new ToggleButton("WS");
         showWhitespaceBtn.getStyleClass().add("show-ws");
         showWhitespaceBtn.setPrefWidth(20);
         showWhitespaceBtn.setPrefHeight(20);
-        showWhitespaceBtn.selectedProperty().addListener((obs, o, n) ->toggleShowWhitespace(n));
+        showWhitespaceBtn.selectedProperty().addListener((obs, o, n) -> toggleShowWhitespace(n));
+        ToggleButton showSegmentsBtn = new ToggleButton("S");
+        showSegmentsBtn.getStyleClass().add("show-ws");
+        showSegmentsBtn.setPrefWidth(20);
+        showSegmentsBtn.setPrefHeight(20);
+        showSegmentsBtn.selectedProperty().addListener((obs, o, n) -> toggleSegmentOverlay(n));
 
         Button undoBtn = createButton("undo", area::undo);
         Button redoBtn = createButton("redo", area::redo);
@@ -274,7 +281,7 @@ public class RichText extends Application {
         HBox panel2 = new HBox(3.0);
         panel1.getChildren().addAll(
                 loadBtn, saveBtn,
-                wrapToggle, showWhitespaceBtn, undoBtn, redoBtn, cutBtn, copyBtn, pasteBtn,
+                wrapToggle, showWhitespaceBtn, showSegmentsBtn, redoBtn, cutBtn, copyBtn, pasteBtn,
                 boldBtn, italicBtn, underlineBtn, strikeBtn,
                 alignLeftBtn, alignCenterBtn, alignRightBtn, alignJustifyBtn, insertImageBtn,
                 paragraphBackgroundPicker);
@@ -293,15 +300,24 @@ public class RichText extends Application {
         primaryStage.show();
     }
 
-
     private void toggleShowWhitespace(boolean showWhitespace) {
         if (showWhitespace && whitespaceOverlayFactory == null) {
-            System.err.println("ENABLE WHITE SPACE OVERLAY");
             whitespaceOverlayFactory = new WhiteSpaceOverlayFactory(area);
-            area.addParagraphOverlayFactory(whitespaceOverlayFactory);
+            area.addParagraphOverlayFactory(0, whitespaceOverlayFactory);
         } else if (!showWhitespace && whitespaceOverlayFactory != null) {
-            area.removeParagraphOverlayFactory(whitespaceOverlayFactory);
+            area.removeParagraphOverlayFactory(0); // whitespaceOverlayFactory);
             whitespaceOverlayFactory = null;
+        }
+    }
+
+
+    private void toggleSegmentOverlay(Boolean showSegments) {
+        if (showSegments && segmentsOverlayFactory == null) {
+            segmentsOverlayFactory = new SegmentsOverlayFactory(area);
+            area.addParagraphOverlayFactory(1, segmentsOverlayFactory);
+        } else if (!showSegments && segmentsOverlayFactory != null) {
+            area.removeParagraphOverlayFactory(1);
+            segmentsOverlayFactory = null;
         }
     }
 
