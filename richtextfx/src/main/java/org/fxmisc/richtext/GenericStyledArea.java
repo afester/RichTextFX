@@ -30,8 +30,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
 import javafx.css.CssMetaData;
 import javafx.css.PseudoClass;
@@ -79,6 +77,7 @@ import org.fxmisc.richtext.model.TwoLevelNavigator;
 import org.fxmisc.richtext.model.UndoActions;
 import org.fxmisc.undo.UndoManager;
 import org.fxmisc.undo.UndoManagerFactory;
+import org.reactfx.EventSource;
 import org.reactfx.EventStream;
 import org.reactfx.EventStreams;
 import org.reactfx.Guard;
@@ -290,16 +289,29 @@ public class GenericStyledArea<PS, SEG, S> extends Region
 //    public OverlayFactory<PS, SEG, S> getParagraphOverlayFactory() { return paragraphOverlayFactory.get(); }
 //    public ObjectProperty<OverlayFactory<PS, SEG, S>> paragraphOverlayFactoryProperty1() { return paragraphOverlayFactory; }
 
-    private final ObservableList<OverlayFactory<PS, SEG, S>> paragraphOverlayFactories2 = FXCollections.observableArrayList(); // SimpleObjectProperty<>(null);
+    // private final ObservableList<OverlayFactory<PS, SEG, S>> paragraphOverlayFactories2 = FXCollections.ob.observableArrayList(); // SimpleObjectProperty<>(null);
     // public void setParagraphOverlayFactory(OverlayFactory<PS, SEG, S> factory) { paragraphOverlayFactory.set(factory); }
     // public OverlayFactory<PS, SEG, S> getParagraphOverlayFactory() { return paragraphOverlayFactory.get(); }
 //    public ObservableList<OverlayFactory<PS, SEG, S>> paragraphOverlayFactoriesProperty() { return paragraphOverlayFactories; }
 
-    public void addParagraphOverlayFactory(int i, OverlayFactory<PS, SEG, S> factory) { 
-        paragraphOverlayFactories2.add(factory); 
+//    private EventSource<OverlayFactory<PS,SEG,S>> addOverlayFactory = new EventSource<>();
+//    private EventSource<OverlayFactory<PS,SEG,S>> removeOverlayFactory = new EventSource<>();
+    private EventSource<List<OverlayFactory<PS,SEG,S>>> updateOverlayFactory = new EventSource<>();
+
+    public void addParagraphOverlayFactory(/*int i, */ OverlayFactory<PS, SEG, S> factory) {
+//        new Throwable().printStackTrace(System.err);
+//        System.err.printf("ADDING %s%n", f);
+        overlayFactories.add(factory);
+        overlayFactories.sort((a, b) -> a.getLayer() - b.getLayer());
+
+        updateOverlayFactory.push(overlayFactories);
+        // paragraphOverlayFactories2.add(factory); 
     }
-    public void removeParagraphOverlayFactory(int i) { 
-        paragraphOverlayFactories2.remove(i); 
+
+    public void removeParagraphOverlayFactory(OverlayFactory<PS, SEG, S> factory) {
+        overlayFactories.remove(factory);
+        updateOverlayFactory.push(overlayFactories);
+        // paragraphOverlayFactories2.remove(i); 
     }
 
     /** The {@link ContextMenu} for the area, which is by default null. */
@@ -1288,6 +1300,7 @@ public class GenericStyledArea<PS, SEG, S> extends Region
      *                                                                        *
      * ********************************************************************** */
 
+    private List<OverlayFactory<PS, SEG, S>> overlayFactories = new ArrayList<>();
     private Cell<Paragraph<PS, SEG, S>, ParagraphBox<PS, SEG, S>> createCell(
             Paragraph<PS, SEG, S> paragraph,
             BiConsumer<TextFlow, PS> applyParagraphStyle,
@@ -1300,12 +1313,26 @@ public class GenericStyledArea<PS, SEG, S> extends Region
         box.wrapTextProperty().bind(wrapTextProperty());
         box.graphicFactoryProperty().bind(paragraphGraphicFactoryProperty());
 
-        // bind the list of paragraph overlay factories to the ParagraphBox
-        // note that bind() takes care of both initializing and updating the dependent value!
-        paragraphOverlayFactoriesProperty().forEach(f -> box.addParagraphOverlayFactory(f));
-        paragraphOverlayFactoriesProperty().addListener((ListChangeListener.Change<? extends OverlayFactory<PS, SEG, S>> change) -> {
-            box.updateParagraphOverlayFactories(change);
-        });
+        // set current overlay factories
+        box.updateParagraphOverlayFactories(overlayFactories);
+        
+        // track updates
+        final Consumer<List<OverlayFactory<PS,SEG,S>>> c1 = f -> /*{
+            new Throwable().printStackTrace(System.err);
+            System.err.printf("ADDING %s%n", f);
+            overlayFactories.add(f);
+            overlayFactories.sort((a, b) -> a.getLayer() - b.getLayer());*/
+            box.updateParagraphOverlayFactories(f);
+//        };
+//        addOverlayFactory.addObserver(c1);
+          updateOverlayFactory.addObserver(c1);
+
+//        // track removals
+//        final Consumer<OverlayFactory<PS,SEG,S>> c2 = f -> {
+//            overlayFactories.remove(f);
+//            box.updateParagraphOverlayFactories(overlayFactories);
+//        };
+//        removeOverlayFactory.addObserver(c2);
 
         box.graphicOffset.bind(virtualFlow.breadthOffsetProperty());
 
@@ -1368,6 +1395,10 @@ public class GenericStyledArea<PS, SEG, S> extends Region
 
                 box.selectionProperty().unbind();
                 cellSelection.dispose();
+
+                //addOverlayFactory.removeObserver(c1);
+                //removeOverlayFactory.removeObserver(c2);
+                updateOverlayFactory.removeObserver(c1);
             }
         };
     }

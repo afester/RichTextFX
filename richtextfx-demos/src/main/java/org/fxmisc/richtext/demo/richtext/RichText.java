@@ -303,9 +303,9 @@ public class RichText extends Application {
     private void toggleShowWhitespace(boolean showWhitespace) {
         if (showWhitespace && whitespaceOverlayFactory == null) {
             whitespaceOverlayFactory = new WhiteSpaceOverlayFactory(area);
-            area.addParagraphOverlayFactory(0, whitespaceOverlayFactory);
+            area.addParagraphOverlayFactory(/*0,*/ whitespaceOverlayFactory);
         } else if (!showWhitespace && whitespaceOverlayFactory != null) {
-            area.removeParagraphOverlayFactory(0); // whitespaceOverlayFactory);
+            area.removeParagraphOverlayFactory(whitespaceOverlayFactory);
             whitespaceOverlayFactory = null;
         }
     }
@@ -314,9 +314,9 @@ public class RichText extends Application {
     private void toggleSegmentOverlay(Boolean showSegments) {
         if (showSegments && segmentsOverlayFactory == null) {
             segmentsOverlayFactory = new SegmentsOverlayFactory(area);
-            area.addParagraphOverlayFactory(1, segmentsOverlayFactory);
+            area.addParagraphOverlayFactory(/*1,*/ segmentsOverlayFactory);
         } else if (!showSegments && segmentsOverlayFactory != null) {
-            area.removeParagraphOverlayFactory(1);
+            area.removeParagraphOverlayFactory(segmentsOverlayFactory);
             segmentsOverlayFactory = null;
         }
     }

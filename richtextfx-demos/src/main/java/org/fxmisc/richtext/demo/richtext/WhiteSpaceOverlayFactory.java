@@ -24,9 +24,10 @@ import javafx.scene.text.Text;
 public class WhiteSpaceOverlayFactory extends OverlayFactory<ParStyle, Either<StyledText<TextStyle>, LinkedImage<TextStyle>>, TextStyle> {
 
     public WhiteSpaceOverlayFactory(GenericStyledArea<ParStyle, Either<StyledText<TextStyle>, LinkedImage<TextStyle>>, TextStyle> area) {
+        super(0);
         this.area = area;
     }
-    
+
     
     private GenericStyledArea<ParStyle, Either<StyledText<TextStyle>, LinkedImage<TextStyle>>, TextStyle> area;
 

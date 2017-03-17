@@ -9,10 +9,19 @@ import javafx.scene.Node;
 //Layout positions the previously created nodes during the layout phase.
 public abstract class OverlayFactory<PS, SEG, S> {
 
+    private final int layer;
+
+    public OverlayFactory(int layer) {
+        this.layer = layer;
+    }
+
     public abstract List<? extends Node> createOverlayNodes(/*GenericStyledArea<PS, SEG, S> area, */int paragraphIndex);
     
     public abstract void layoutOverlayNodes(TextFlowExt parent, double offset, List<? extends Node> nodes); //  { // int paragraphIndex, List<Node> nodes) {
-    
+
+    public final int getLayer() {
+        return layer;
+    }
 
     static class ParagraphOverlay {
         public ParagraphOverlay(OverlayFactory /*<PS, SEG, S>*/ fac) {
@@ -30,5 +39,11 @@ public abstract class OverlayFactory<PS, SEG, S> {
             System.err.println("***Layouting...");
             factory.layoutOverlayNodes(parent, offset, nodes);
         }
+    }
+    
+    
+    @Override
+    public String toString() {
+        return String.format("OverlayFactory[layer=%s]", layer);
     }
 }

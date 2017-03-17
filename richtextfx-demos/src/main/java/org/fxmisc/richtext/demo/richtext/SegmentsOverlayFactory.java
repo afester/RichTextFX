@@ -24,6 +24,7 @@ import javafx.scene.text.Text;
 public class SegmentsOverlayFactory extends OverlayFactory<ParStyle, Either<StyledText<TextStyle>, LinkedImage<TextStyle>>, TextStyle> {
 
     public SegmentsOverlayFactory(GenericStyledArea<ParStyle, Either<StyledText<TextStyle>, LinkedImage<TextStyle>>, TextStyle> area) {
+        super(1);
         this.area = area;
     }
     
