@@ -86,10 +86,6 @@ public class WhiteSpaceOverlayFactory extends OverlayFactory<ParStyle, Either<St
                     if (ch != ' ' && ch != '\t')
                         continue;
 
-                    Rectangle rect = new Rectangle(10, 10);
-                    rect.setFill(null);
-                    rect.setStroke(Color.RED);
-                    rect.setUserData(new Range(segStart + i, segStart + i + 1));
                     nodes.add(createTextNode(
                             (ch == ' ') ? WhiteSpaceType.SPACE : WhiteSpaceType.TAB,
                                     seg.getLeft().getStyle(),segStart + i, segStart + i + 1)); 

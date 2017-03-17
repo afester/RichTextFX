@@ -4,9 +4,7 @@ import static org.reactfx.util.Tuples.*;
 
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.function.BiConsumer;
@@ -20,10 +18,6 @@ import javafx.beans.property.Property;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ListChangeListener.Change;
-import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
@@ -106,6 +100,16 @@ class ParagraphBox<PS, SEG, S> extends Region {
     public void setIndex(int index) { this.index.setValue(index); }
     public int getIndex() { return index.getValue(); }
 
+    private class NodeContainer {
+        public NodeContainer(OverlayFactory<PS, SEG, S> ovl2, List<? extends Node> createdNodes) {
+            this.ovl = ovl2;
+            this.nodes = createdNodes;
+        }
+        OverlayFactory<PS, SEG, S> ovl;
+        List<? extends Node> nodes;
+    }
+    private List<NodeContainer> overlayMap = new ArrayList<>();
+
     ParagraphBox(Paragraph<PS, SEG, S> par, BiConsumer<TextFlow, PS> applyParagraphStyle,
                  Function<SEG, Node> nodeFactory) {
         this.getStyleClass().add("paragraph-box");
@@ -135,12 +139,21 @@ class ParagraphBox<PS, SEG, S> extends Region {
                 this.index,
                 (p, i) -> {
                     List<Node> result = new ArrayList<>();
+                    overlayMap = new ArrayList<>();
                     for (OverlayFactory<PS, SEG, S> ovl : p) {
-                        result.addAll(ovl.createOverlayNodes(i));
-                    }
+                        
+                        
+                     // PENDING: We need to remember which factory has created which set of nodes!!!!!
+                     // Otherwise we can not let the factory layout the respective nodes later.
+                        List<? extends Node> createdNodes = ovl.createOverlayNodes(i);
 
-// PENDING: We need to remember which factory has created which set of nodes!!!!!
-// Otherwise we can not let the factory layout the respective nodes
+                        overlayMap.add(new NodeContainer(ovl, createdNodes));
+
+                        // ovl;
+                        // ovl.createOverlayNodes(i);
+
+                        result.addAll(createdNodes); // ovl.createOverlayNodes(i));
+                    }
 
                     // System.err.println("INDEX OR FACTORIES CHANGED!");
                     return result;
@@ -275,8 +288,7 @@ class ParagraphBox<PS, SEG, S> extends Region {
         text.resizeRelocate(graphicWidth, 0, w - graphicWidth, h);
         graphic.ifPresent(g -> g.resizeRelocate(graphicOffset.get(), 0, graphicWidth, h));
 
-        // PENDING: We need to remember which factory has created which set of nodes!!!!!
-        this.paragraphOverlayFactories.getValue().forEach(f -> f.layoutOverlayNodes(text, graphicWidth, nodes));
+        this.overlayMap.forEach(entry -> entry.ovl.layoutOverlayNodes(text, graphicWidth, entry.nodes));
     }
 
     double getGraphicPrefWidth() {
