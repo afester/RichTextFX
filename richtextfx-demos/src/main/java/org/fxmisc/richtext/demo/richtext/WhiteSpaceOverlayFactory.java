@@ -2,38 +2,46 @@ package org.fxmisc.richtext.demo.richtext;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiConsumer;
 
 import org.fxmisc.richtext.GenericStyledArea;
 import org.fxmisc.richtext.OverlayFactory;
 import org.fxmisc.richtext.TextFlowExt;
 import org.fxmisc.richtext.model.Paragraph;
-import org.fxmisc.richtext.model.StyledText;
-import org.reactfx.util.Either;
+import org.fxmisc.richtext.model.SegmentOps;
 
 import javafx.geometry.Rectangle2D;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.PathElement;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 
 
-public class WhiteSpaceOverlayFactory extends OverlayFactory<ParStyle, Either<StyledText<TextStyle>, LinkedImage<TextStyle>>, TextStyle> {
+public class WhiteSpaceOverlayFactory<PS, SEG, S> extends OverlayFactory<PS, SEG, S> {
 
-    public WhiteSpaceOverlayFactory(GenericStyledArea<ParStyle, Either<StyledText<TextStyle>, LinkedImage<TextStyle>>, TextStyle> area) {
-        super(0);
+    public WhiteSpaceOverlayFactory(GenericStyledArea<PS, SEG, S> area, BiConsumer<? super Node, S> applyStyle) {
+        super(0, applyStyle);
         this.area = area;
     }
 
-    
-    private GenericStyledArea<ParStyle, Either<StyledText<TextStyle>, LinkedImage<TextStyle>>, TextStyle> area;
+    private GenericStyledArea<PS, SEG, S> area;
 
-    
-
+    /**
+     * @param textFlow The text flow which contains the segment.
+     * @param start The start index of the text segment.
+     * @param end  The last index of the text segment. 
+     * @return The bounding box of the text segment. This also includes wrapped text segments which 
+     *         span more than one line.  
+     */
     protected Rectangle2D getBounds(TextFlowExt textFlow, int start, int end) {
+        
+        // special case for empty lines - there, getRangeShape() would not return a useful shape
+        if (start == -1) {
+            return new Rectangle2D(0, 0, 0, textFlow.getHeight() + 1);
+        }
+       
         PathElement[] shape = textFlow.getRangeShape(start, end);
         double minX = 0, minY = 0, maxX = 0, maxY = 0;
         for (PathElement pathElement : shape) {
@@ -51,17 +59,22 @@ public class WhiteSpaceOverlayFactory extends OverlayFactory<ParStyle, Either<St
                 maxY = Math.max(maxY, y);
             }
         }
+
         return new Rectangle2D(minX, minY, maxX - minX, maxY - minY);
     }
     
     
-    private Text createTextNode(WhiteSpaceType type, TextStyle style, int start, int end) {
+
+    private Text createTextNode(WhiteSpaceType type, S style, int start, int end) {
         WhiteSpaceNode t = new WhiteSpaceNode(type);
-        //t.setTextOrigin(VPos.BOTTOM);
-        t.setTextOrigin(VPos.TOP);
+        
+        // the base line is the bottom of the text - otherwise, lines which include images
+        // or other custom objects would not be properly rendered
+        t.setTextOrigin(VPos.BOTTOM);
+
         t.getStyleClass().add("text");
         t.setOpacity(0.7);
-        t.setStyle(style.toCss() + ";color=\"red\"");
+        applyStyle.accept(t, style);
         t.setUserData(new Range(start, end));
         return t;
     }
@@ -71,71 +84,37 @@ public class WhiteSpaceOverlayFactory extends OverlayFactory<ParStyle, Either<St
     public List<Node> createOverlayNodes(int paragraphIndex) {
         List<Node> nodes = new ArrayList<>();
 
-        Paragraph<ParStyle, Either<StyledText<TextStyle>, LinkedImage<TextStyle>>, TextStyle> paragraph = 
-                area.getParagraph(paragraphIndex);
+        Paragraph<PS, SEG, S> paragraph = area.getParagraph(paragraphIndex);
         int segStart = 0;
 
-        for (Either<StyledText<TextStyle>, LinkedImage<TextStyle>> seg : paragraph.getSegments()) {
-            if (seg.isLeft()) {
+        SegmentOps<SEG, S> segOps = area.getSegOps();
+        for (SEG seg : paragraph.getSegments()) {
 
 //Whitespace algorithm
-                final String text = seg.getLeft().getText();
-                final int textLength = text.length();
-                for (int i = 0; i < textLength; i++) {
-                    char ch = text.charAt(i);
-                    if (ch != ' ' && ch != '\t')
-                        continue;
+            final String text = area.getSegOps().getText(seg);
+            final int textLength = text.length();
+            for (int i = 0; i < textLength; i++) {
+                char ch = text.charAt(i);
+                if (ch != ' ' && ch != '\t')
+                    continue;
 
-                    nodes.add(createTextNode(
-                            (ch == ' ') ? WhiteSpaceType.SPACE : WhiteSpaceType.TAB,
-                                    seg.getLeft().getStyle(),segStart + i, segStart + i + 1)); 
-                }
-                segStart += textLength;
-            } else {
-                segStart++;
+                nodes.add(createTextNode(
+                        (ch == ' ') ? WhiteSpaceType.SPACE : WhiteSpaceType.TAB,
+                                segOps.getStyle(seg), segStart + i, segStart + i + 1)); 
             }
+
+            segStart += segOps.length(seg);
         }
 
         // System.err.printf("%s / %s%n", para, area.getParagraphs().size());
         // TODO: does not work yet for newly created empty lines!
        // if (para < area.getParagraphs().size() - 1) {
-            System.err.println("CREATING EOL NODE!");
-            nodes.add(createTextNode(WhiteSpaceType.EOL,
-                    paragraph.getStyleAtPosition(segStart),
-                    segStart - 1, segStart));
-        //}
-/*
-// Use case: border around each segment for debugging purposes.
-// Issue: needs a Path since the shape might be non rectangular if the segment is wrapped.
-// Means, we can not easily create the nodes here ....
-// the WhiteSpace usecase is simpler, since it is one character only (but, might be beneficial to 
-// combine more than one white space character into a single Text node)
+        System.err.println("CREATING EOL NODE!");
+        nodes.add(createTextNode(WhiteSpaceType.EOL,
+                paragraph.getStyleAtPosition(segStart),
+                segStart - 1, segStart));
 
-        for (Either<StyledText<TextStyle>, LinkedImage<TextStyle>> seg : paragraph.getSegments()) {
-            Rectangle rect = new Rectangle();
-            if (seg.isLeft()) {
-                rect.setFill(null);
-                rect.setStroke(Color.RED);
-                int length = seg.getLeft().getText().length();
-                int to = from + length - 1;
-                System.err.printf("%s - %s%n", from, to);
-                rect.setUserData(new Range(from, to));
-                from = from + length;
-            } else {
-                rect.setFill(Color.RED);
-                rect.setStroke(Color.BLUE);
-                int length = 1; // seg.getRight().g .getText().length();
-                int to = from + length - 1;
-                System.err.printf("%s - %s%n", from, to);
-                rect.setUserData(new Range(from, to));
-                from = from + length;
-            }
-            // todo: store children in a list so that they can be layouted later
-            // OR: create separate overlay pane which overrides layoutChildren()
-            result.getChildren().add(rect);
-        }
-*/
-            return nodes;
+        return nodes;
     }
     
 
@@ -144,19 +123,14 @@ public class WhiteSpaceOverlayFactory extends OverlayFactory<ParStyle, Either<St
         double leftInsets = parent.getInsets().getLeft();
         double topInsets = parent.getInsets().getTop();
         nodes.forEach(node -> {
-            System.err.println("  OVERLAY:" + node);
             WhiteSpaceNode wsn = (WhiteSpaceNode) node;
-    
-            System.err.println("  " + node);
             Range range = (Range) node.getUserData();
-            System.err.println("  RANGE: " + range);
+
             Rectangle2D bounds2 = getBounds(parent, range.start, range.end + 1);
-            System.err.println("  =>BOUNDS: " + bounds2);
     
+            System.err.println("H:" + parent.getHeight());
             //if (eolNode.isVisible() != showEOL)
             //    eolNode.setVisible(showEOL);
-    
-            System.err.println("WSN:" + wsn);
     
             //boolean showEOL = (paragraphIndex < getTextArea().getParagraphs().size() - 1);
     
@@ -174,7 +148,7 @@ public class WhiteSpaceOverlayFactory extends OverlayFactory<ParStyle, Either<St
                 node.setLayoutX(leftInsets + offset + bounds2.getMinX());
             }
             //node.setLayoutY(topInsets + bounds2.getMaxY());
-            node.setLayoutY(topInsets + bounds2.getMinY());
+            node.setLayoutY(topInsets + bounds2.getMaxY());
         });
     }
     

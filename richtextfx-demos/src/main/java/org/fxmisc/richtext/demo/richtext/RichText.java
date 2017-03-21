@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import javafx.application.Application;
@@ -100,18 +101,8 @@ public class RichText extends Application {
         CheckBox wrapToggle = new CheckBox("Wrap");
         wrapToggle.setSelected(true);
         area.wrapTextProperty().bind(wrapToggle.selectedProperty());
-
-        ToggleButton showWhitespaceBtn = new ToggleButton("WS");
-        showWhitespaceBtn.getStyleClass().add("show-ws");
-        showWhitespaceBtn.setPrefWidth(20);
-        showWhitespaceBtn.setPrefHeight(20);
-        showWhitespaceBtn.selectedProperty().addListener((obs, o, n) -> toggleShowWhitespace(n));
-        ToggleButton showSegmentsBtn = new ToggleButton("S");
-        showSegmentsBtn.getStyleClass().add("show-ws");
-        showSegmentsBtn.setPrefWidth(20);
-        showSegmentsBtn.setPrefHeight(20);
-        showSegmentsBtn.selectedProperty().addListener((obs, o, n) -> toggleSegmentOverlay(n));
-
+        ToggleButton showWhitespaceBtn = createToggleButton("show-ws", "", this::toggleShowWhitespace);
+        ToggleButton showSegmentsBtn = createToggleButton("show-seg", "", this::toggleSegmentOverlay);
         Button undoBtn = createButton("undo", area::undo);
         Button redoBtn = createButton("redo", area::redo);
         Button cutBtn = createButton("cut", area::cut);
@@ -300,25 +291,28 @@ public class RichText extends Application {
         primaryStage.show();
     }
 
+
     private void toggleShowWhitespace(boolean showWhitespace) {
         if (showWhitespace && whitespaceOverlayFactory == null) {
-            whitespaceOverlayFactory = new WhiteSpaceOverlayFactory(area);
-            area.addParagraphOverlayFactory(/*0,*/ whitespaceOverlayFactory);
+            whitespaceOverlayFactory = new WhiteSpaceOverlayFactory<>(area, (n, s) -> n.setStyle(s.toCss()));
+            area.addParagraphOverlayFactory(whitespaceOverlayFactory);
         } else if (!showWhitespace && whitespaceOverlayFactory != null) {
             area.removeParagraphOverlayFactory(whitespaceOverlayFactory);
             whitespaceOverlayFactory = null;
         }
+        area.requestFocus();
     }
 
 
     private void toggleSegmentOverlay(Boolean showSegments) {
         if (showSegments && segmentsOverlayFactory == null) {
             segmentsOverlayFactory = new SegmentsOverlayFactory(area);
-            area.addParagraphOverlayFactory(/*1,*/ segmentsOverlayFactory);
+            area.addParagraphOverlayFactory(segmentsOverlayFactory);
         } else if (!showSegments && segmentsOverlayFactory != null) {
             area.removeParagraphOverlayFactory(segmentsOverlayFactory);
             segmentsOverlayFactory = null;
         }
+        area.requestFocus();
     }
 
 
@@ -359,6 +353,16 @@ public class RichText extends Application {
             action.run();
             area.requestFocus();
         });
+        button.setPrefWidth(20);
+        button.setPrefHeight(20);
+        return button;
+    }
+
+    private ToggleButton createToggleButton(String styleClass, String toolTip, Consumer<Boolean> action) {
+        ToggleButton button = new ToggleButton();
+        button.getStyleClass().add(styleClass);
+        button.selectedProperty().addListener((obs, o, n) -> action.accept(n));
+        button.setTooltip(new Tooltip(toolTip));
         button.setPrefWidth(20);
         button.setPrefHeight(20);
         return button;

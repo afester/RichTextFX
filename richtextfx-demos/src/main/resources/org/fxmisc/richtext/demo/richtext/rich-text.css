@@ -7,6 +7,8 @@
 
 .button.loadfile { -fx-background-image: url(loadfile.png); }
 .button.savefile { -fx-background-image: url(savefile.png); }
+.toggle-button.show-ws { -fx-background-image: url(showws.png); }
+.toggle-button.show-seg { -fx-background-image: url(showseg.png); }
 .button.undo { -fx-background-image: url(undo.png); }
 .button.redo { -fx-background-image: url(redo.png); }
 .button.cut { -fx-background-image: url(cut.png); }
