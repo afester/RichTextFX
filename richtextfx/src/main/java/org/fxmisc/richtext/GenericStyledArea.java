@@ -1299,6 +1299,9 @@ public class GenericStyledArea<PS, SEG, S> extends Region
      * Private methods                                                        *
      *                                                                        *
      * ********************************************************************** */
+    private static String objId(Object obj) {
+        return String.format("0x%x (%s)",  System.identityHashCode(obj), obj.getClass().getName());
+    }
 
     private List<OverlayFactory<PS, SEG, S>> overlayFactories = new ArrayList<>();
     private Cell<Paragraph<PS, SEG, S>, ParagraphBox<PS, SEG, S>> createCell(
@@ -1306,7 +1309,10 @@ public class GenericStyledArea<PS, SEG, S> extends Region
             BiConsumer<TextFlow, PS> applyParagraphStyle,
             Function<SEG, Node> nodeFactory) {
 
+        System.err.printf("%n%s: createCell()%n", objId(this));
+
         ParagraphBox<PS, SEG, S> box = new ParagraphBox<>(paragraph, applyParagraphStyle, nodeFactory);
+        System.err.printf("   => box=%s%n", objId(box));
 
         box.highlightFillProperty().bind(highlightFill);
         box.highlightTextFillProperty().bind(highlightTextFill);
@@ -1315,7 +1321,7 @@ public class GenericStyledArea<PS, SEG, S> extends Region
 
         // set current overlay factories
         box.updateParagraphOverlayFactories(overlayFactories);
-        
+
         // track updates
         final Consumer<List<OverlayFactory<PS,SEG,S>>> c1 = f -> /*{
             new Throwable().printStackTrace(System.err);
@@ -1375,6 +1381,7 @@ public class GenericStyledArea<PS, SEG, S> extends Region
 
             @Override
             public void updateIndex(int index) {
+                System.err.printf("UPDATE INDEX: %s -> %d%n", objId(box), index);
                 box.setIndex(index);
             }
 

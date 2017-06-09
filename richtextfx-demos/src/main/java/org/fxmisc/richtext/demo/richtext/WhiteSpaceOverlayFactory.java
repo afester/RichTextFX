@@ -81,7 +81,7 @@ public class WhiteSpaceOverlayFactory<PS, SEG, S> extends OverlayFactory<PS, SEG
 
 
     @Override
-    public List<Node> createOverlayNodes(int paragraphIndex) {
+    public List<Node> createOverlayNodes(final int paragraphIndex) {
         List<Node> nodes = new ArrayList<>();
 
         Paragraph<PS, SEG, S> paragraph = area.getParagraph(paragraphIndex);
@@ -106,13 +106,18 @@ public class WhiteSpaceOverlayFactory<PS, SEG, S> extends OverlayFactory<PS, SEG
             segStart += segOps.length(seg);
         }
 
-        // System.err.printf("%s / %s%n", para, area.getParagraphs().size());
         // TODO: does not work yet for newly created empty lines!
-       // if (para < area.getParagraphs().size() - 1) {
-        System.err.println("CREATING EOL NODE!");
-        nodes.add(createTextNode(WhiteSpaceType.EOL,
-                paragraph.getStyleAtPosition(segStart),
-                segStart - 1, segStart));
+        // The reason is that not all paragraphs are re-layouted!
+        // only the paragraphs where the index or the contents has changed!
+        // How can we force an update in this case?
+        final int lastIndex = area.getParagraphs().size() - 1;
+        if (paragraphIndex < lastIndex) {
+            nodes.add(createTextNode(WhiteSpaceType.EOL,
+                    paragraph.getStyleAtPosition(segStart),
+                    segStart - 1, segStart));
+        }
+
+        System.err.printf("CREATED(%s): %s%n", paragraphIndex, nodes);
 
         return nodes;
     }
@@ -120,6 +125,8 @@ public class WhiteSpaceOverlayFactory<PS, SEG, S> extends OverlayFactory<PS, SEG
 
     @Override
     public void layoutOverlayNodes(TextFlowExt parent, double offset, List<? extends Node> nodes) { // int paragraphIndex, List<Node> nodes) {
+        System.err.println("LAYOUT: " + nodes);
+
         double leftInsets = parent.getInsets().getLeft();
         double topInsets = parent.getInsets().getTop();
         nodes.forEach(node -> {
@@ -127,8 +134,7 @@ public class WhiteSpaceOverlayFactory<PS, SEG, S> extends OverlayFactory<PS, SEG
             Range range = (Range) node.getUserData();
 
             Rectangle2D bounds2 = getBounds(parent, range.start, range.end + 1);
-    
-            System.err.println("H:" + parent.getHeight());
+
             //if (eolNode.isVisible() != showEOL)
             //    eolNode.setVisible(showEOL);
     
@@ -153,7 +159,7 @@ public class WhiteSpaceOverlayFactory<PS, SEG, S> extends OverlayFactory<PS, SEG
     }
     
     
-    
+
     private static class WhiteSpaceNode extends Text {
         private WhiteSpaceType type;
 

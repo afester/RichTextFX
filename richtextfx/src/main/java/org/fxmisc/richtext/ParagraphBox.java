@@ -22,6 +22,7 @@ import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.IndexRange;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Paint;
@@ -134,6 +135,7 @@ class ParagraphBox<PS, SEG, S> extends Region {
         });
         graphicOffset.addListener(obs -> requestLayout());
 
+        System.err.println("SETUP: " + objId(this));
         // create a combination of index and list of factories
         Val<List<Node>> res = Val.combine(paragraphOverlayFactories,
                 this.index,
@@ -159,17 +161,27 @@ class ParagraphBox<PS, SEG, S> extends Region {
                     return result;
                //     return "RES: " + p + "/" + i; 
                } );
+        
+
         res.addListener((obs, oldN, newN) -> {
             if(oldN != null) {
+            	System.err.printf("%s: REMOVING OLD CHILDREN! (%s)%n", objId(this), this.index.getValue());
                 getChildren().removeAll(oldN);
             }
             if(newN != null) {
+            	System.err.printf("%s: ADDING NEW CHILDREN! (%s): %s%n", objId(this), this.index.getValue(), newN);
                 getChildren().addAll(newN);
+                // ((Parent) getParent()).setNeedsLayout(true);
+                //setNeedsLayout(true);
+                //requestLayout();
             }
         System.err.printf("  %s -> %s%n", oldN, newN); });
     }
 
-    @Override
+    private static String objId(Object obj) {
+    	return String.format("0x%x (%s)",  System.identityHashCode(obj), obj.getClass().getName());
+	}
+	@Override
     public String toString() {
         return graphic.isPresent()
                 ? "[#|" + text.getParagraph() + "]"
@@ -280,6 +292,8 @@ class ParagraphBox<PS, SEG, S> extends Region {
     @Override
     protected
     void layoutChildren() {
+        System.err.printf("%s: ParagraphBox.layoutChildren(%s)!!!!!!!!!%n", objId(this), this.index.getValue());
+
         Bounds bounds = getLayoutBounds();
         double w = bounds.getWidth();
         double h = bounds.getHeight();
@@ -321,7 +335,8 @@ class ParagraphBox<PS, SEG, S> extends Region {
 
     public void updateParagraphOverlayFactories(List<OverlayFactory<PS, SEG, S>> overlayFactories) {
         List<OverlayFactory<PS, SEG, S>> cloned = new ArrayList<>(overlayFactories);
-        System.err.println("OVERLAY FACTORIES NOW:" + cloned);
+        System.err.printf("%s: OVERLAY FACTORIES NOW: %s%n", objId(this), cloned);
         paragraphOverlayFactories.setValue(cloned);
+        // setNeedsLayout(true);
     }
 }
