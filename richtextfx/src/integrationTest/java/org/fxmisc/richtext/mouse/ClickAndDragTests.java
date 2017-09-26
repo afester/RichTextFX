@@ -1,6 +1,8 @@
 package org.fxmisc.richtext.mouse;
 
 import com.nitorcreations.junit.runners.NestedRunner;
+
+import javafx.geometry.Point2D;
 import javafx.stage.Stage;
 import org.fxmisc.richtext.InlineCssTextAreaAppTest;
 import org.junit.Test;
@@ -263,7 +265,8 @@ public class ClickAndDragTests {
 
                 String selText = area.getSelectedText();
 
-                moveTo(firstLineOfArea())
+                Point2D pq = firstLineOfArea().query();
+                moveTo(pq.add(0, 1))
                         .press(PRIMARY)
                         .dropBy(0, 22);
 
