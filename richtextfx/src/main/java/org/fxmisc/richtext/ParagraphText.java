@@ -336,6 +336,7 @@ class ParagraphText<PS, SEG, S> extends TextFlowExt {
                 borderShapeHelper.updateSharedShapeRange(border, start, end);
             }
 
+            System.err.println(text);
             UnderlineAttributes underline = new UnderlineAttributes(text);
             if (!underline.isNullValue()) {
                 underlineShapeHelper.updateSharedShapeRange(underline, start, end);
@@ -368,6 +369,13 @@ class ParagraphText<PS, SEG, S> extends TextFlowExt {
         private final Consumer<Path> addToChildren;
         private final Consumer<Collection<Path>> clearUnusedShapes;
 
+        /**
+         * 
+         * @param createShape       Factory function to create a shape
+         * @param configureShape    Function to configure the shape
+         * @param addToChildren     Function which adds the shape
+         * @param clearUnusedShapes Function which clears unused shapes
+         */
         CustomCssShapeHelper(Supplier<Path> createShape, BiConsumer<Path, Tuple2<T, IndexRange>> configureShape,
                              Consumer<Path> addToChildren, Consumer<Collection<Path>> clearUnusedShapes) {
             this.createShape = createShape;
@@ -381,22 +389,35 @@ class ParagraphText<PS, SEG, S> extends TextFlowExt {
          * consecutive {@link TextExt} nodes
          */
         private void updateSharedShapeRange(T value, int start, int end) {
+            System.err.printf("Add: [%d..%d] to Ranges: %s\n", start, end, ranges);
+
             Runnable addNewValueRange = () -> ranges.add(Tuples.t(value, new IndexRange(start, end)));
 
             if (ranges.isEmpty()) {
                 addNewValueRange.run();;
             } else {
+                System.err.printf("   Ranges: %s\n", ranges);
+
                 int lastIndex = ranges.size() - 1;
                 Tuple2<T, IndexRange> lastShapeValueRange = ranges.get(lastIndex);
                 T lastShapeValue = lastShapeValueRange._1;
-                if (lastShapeValue.equals(value)) {
+
+                int prevEndNext = lastShapeValueRange.get2().getEnd() + 1;  // smallest possible position which is consecutive to the given start position
+
+                System.err.printf("  OLD: %d, NEW: %d\n", prevEndNext, start);
+
+                if (start <= prevEndNext &&         // Consecutive? 
+                    lastShapeValue.equals(value)) { // Same style?
                     IndexRange lastRange = lastShapeValueRange._2;
                     IndexRange extendedRange = new IndexRange(lastRange.getStart(), end);
                     ranges.set(lastIndex, Tuples.t(lastShapeValue, extendedRange));
                 } else {
                     addNewValueRange.run();
                 }
+
+                System.err.printf("   Ranges: %s\n", ranges);
             }
+            System.err.println("Result: " + ranges);
         }
 
         /**
@@ -404,6 +425,8 @@ class ParagraphText<PS, SEG, S> extends TextFlowExt {
          * via {@code configureShape}.
          */
         private void updateSharedShapes() {
+            //System.err.println("RANGES" + ranges);
+
             // remove or add shapes, depending on what's needed
             int neededNumber = ranges.size();
             int availableNumber = shapes.size();
