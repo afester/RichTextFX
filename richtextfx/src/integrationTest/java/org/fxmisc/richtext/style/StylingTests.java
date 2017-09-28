@@ -13,6 +13,7 @@ import org.junit.runner.RunWith;
 
 import com.nitorcreations.junit.runners.NestedRunner;
 
+import javafx.scene.Node;
 import javafx.scene.layout.Region;
 import javafx.scene.shape.Path;
 import javafx.scene.text.Text;
@@ -34,8 +35,9 @@ public class StylingTests extends InlineCssTextAreaAppTest {
      * @return The paragraph box for the paragraph at the specified index
      */
     private Region getParagraphBox(int index) {
-        VirtualFlow flow = (VirtualFlow) area.getChildrenUnmodifiable().get(index);
-        Cell gsa = (Cell) flow.getCell(0);
+        @SuppressWarnings("unchecked")
+        VirtualFlow<String, Cell<String, Node>> flow = (VirtualFlow<String, Cell<String, Node>>) area.getChildrenUnmodifiable().get(index);
+        Cell<String, Node> gsa = flow.getCell(0);
 
         // get the ParagraphBox (protected subclass of Region) 
         return (Region) gsa.getNode();
@@ -129,7 +131,6 @@ public class StylingTests extends InlineCssTextAreaAppTest {
 
             final int start2 = end1 + moreText.length();
             final int end2 = start2 + styledWord2.length();
-            System.err.printf("%d / %d\n", start2, end2);
             area.setStyle(start2, end2,
                           "-rtfx-underline-color: red; -rtfx-underline-dash-array: 2 2; -rtfx-underline-width: 1; -rtfx-underline-cap: butt;");
 
