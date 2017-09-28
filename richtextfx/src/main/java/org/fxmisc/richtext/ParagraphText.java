@@ -389,7 +389,12 @@ class ParagraphText<PS, SEG, S> extends TextFlowExt {
                 int lastIndex = ranges.size() - 1;
                 Tuple2<T, IndexRange> lastShapeValueRange = ranges.get(lastIndex);
                 T lastShapeValue = lastShapeValueRange._1;
-                if (lastShapeValue.equals(value)) {
+
+                // calculate smallest possible position which is consecutive to the given start position
+                final int prevEndNext = lastShapeValueRange.get2().getEnd() + 1;  
+                if (start <= prevEndNext &&         // Consecutive? 
+                    lastShapeValue.equals(value)) { // Same style?
+
                     IndexRange lastRange = lastShapeValueRange._2;
                     IndexRange extendedRange = new IndexRange(lastRange.getStart(), end);
                     ranges.set(lastIndex, Tuples.t(lastShapeValue, extendedRange));
