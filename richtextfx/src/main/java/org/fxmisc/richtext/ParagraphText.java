@@ -71,6 +71,9 @@ class ParagraphText<PS, SEG, S> extends TextFlowExt {
         caretShape.visibleProperty().bind(caretVisible);
     }
 
+    private final class UnderlinePath extends Path{
+    }
+
     ParagraphText(Paragraph<PS, SEG, S> par, Function<StyledSegment<SEG, S>, Node> nodeFactory) {
         this.paragraph = par;
 
@@ -116,7 +119,7 @@ class ParagraphText<PS, SEG, S> extends TextFlowExt {
 
         // set up custom css shape helpers
         Supplier<Path> createShape = () -> {
-            Path shape = new Path();
+            Path shape = new UnderlinePath();
             shape.setManaged(false);
             shape.layoutXProperty().bind(leftInset);
             shape.layoutYProperty().bind(topInset);
