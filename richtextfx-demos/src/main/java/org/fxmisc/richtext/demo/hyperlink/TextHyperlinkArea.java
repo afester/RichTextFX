@@ -65,7 +65,7 @@ public class TextHyperlinkArea extends GenericStyledArea<Void, Either<String, Hy
 
         // XXX: binding selectionFill to textFill,
         // see the note at highlightTextFill
-        t.impl_selectionFillProperty().bind(t.fillProperty());
+        t.getSelectionFillProperty().bind(t.fillProperty());
         return t;
     }
 }

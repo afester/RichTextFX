@@ -54,9 +54,9 @@ public class SpellChecking extends Application {
         InputStream input2 = getClass().getResourceAsStream("spellchecking.txt");
         try(java.util.Scanner s = new java.util.Scanner(input2)) { 
             String document = s.useDelimiter("\\A").hasNext() ? s.next() : "";
-            textArea.replaceText(0, 0, document);
+        	  textArea.replaceText(0, 0, document); 
         }
-
+        
         Scene scene = new Scene(new StackPane(new VirtualizedScrollPane<>(textArea)), 600, 400);
         scene.getStylesheets().add(getClass().getResource("spellchecking.css").toExternalForm());
         primaryStage.setScene(scene);
