@@ -11,13 +11,38 @@ import javafx.scene.paint.Color;
 
 import org.reactfx.util.Either;
 
+/**
+ * @param <T> The type to encode and decode.
+ */
 public interface Codec<T> {
 
+	/**
+	 * @return The name of the codec. Examples are "string", "color", "styled-segment".
+	 */
     String getName();
+
+    /**
+     * Encode an object into an output stream.
+     *
+     * @param os The destination output stream.
+     * @param t The object to encode.
+     * @throws IOException if an error occurs during encoding.
+     */
     void encode(DataOutputStream os, T t) throws IOException;
+
+    /**
+     * Decode an object from an input stream.
+     *
+     * @param is The source input stream.
+     * @return The decoded object.
+     * @throws IOException if an error occurs during decoding.
+     */
     T decode(DataInputStream is) throws IOException;
 
 
+    /**
+     * A codec to encode/decode Strings.
+     */
     static final Codec<String> STRING_CODEC = new Codec<String>() {
 
         @Override
@@ -36,6 +61,10 @@ public interface Codec<T> {
         }
     };
 
+
+    /**
+     * A codec to encode/decode colors.
+     */
     static final Codec<Color> COLOR_CODEC = new Codec<Color>() {
 
         @Override
@@ -63,6 +92,14 @@ public interface Codec<T> {
 
     };
 
+    
+    /**
+     * A codec which allows serialization of styled segments to/from a data stream.
+     * 
+     * @param segCodec
+     * @param styleCodec
+     * @return
+     */
     static <SEG, S> Codec<StyledSegment<SEG, S>> styledSegmentCodec(Codec<SEG> segCodec, Codec<S> styleCodec) {
         return new Codec<StyledSegment<SEG, S>>() {
             @Override
@@ -85,8 +122,9 @@ public interface Codec<T> {
         };
     }
 
+
     /**
-     * A codec which allows serialisation of this class to/from a data stream.
+     * A codec which allows serialization of this class to/from a data stream.
      *
      * Because S may be any type, you must pass a codec for it.  If your style
      * is String or Color, you can use {@link Codec#STRING_CODEC}/{@link Codec#COLOR_CODEC} respectively.
@@ -114,14 +152,34 @@ public interface Codec<T> {
         };
     }
 
+    
+    /**
+     * A codec which allows serialization of lists to/from a data stream.
+     *
+	 * @param elemCodec
+	 * @return
+	 */
     static <T> Codec<List<T>> listCodec(Codec<T> elemCodec) {
         return SuperCodec.collectionListCodec(elemCodec);
     }
 
+    /**
+     * A codec which allows serialization of colections to/from a data stream.
+     *
+	 * @param elemCodec
+	 * @return
+	 */
     static <T> Codec<Collection<T>> collectionCodec(Codec<T> elemCodec) {
         return SuperCodec.upCast(SuperCodec.collectionListCodec(elemCodec));
     }
 
+
+    /**
+     * A codec which allows serialization of optional values to/from a data stream.
+     *
+	 * @param elemCodec
+	 * @return
+	 */
     static <T> Codec<Optional<T>> optionalCodec(Codec<T> elemCodec) {
         return new Codec<Optional<T>>() {
 
@@ -150,6 +208,11 @@ public interface Codec<T> {
         };
     }
 
+    
+    /**
+     * A codec which allows serialization of enum values to/from a data stream.
+     *
+     */
     static <E extends Enum<E>> Codec<E> enumCodec(Class<E> enumType) {
         return new Codec<E>() {
 
@@ -172,6 +235,11 @@ public interface Codec<T> {
         };
     }
 
+
+    /**
+     * A codec which allows serialization of either/or values to/from a data stream.
+     *
+     */
     static <L, R> Codec<Either<L, R>> eitherCodec(Codec<L> lCodec, Codec<R> rCodec) {
         return new Codec<Either<L, R>>() {
 

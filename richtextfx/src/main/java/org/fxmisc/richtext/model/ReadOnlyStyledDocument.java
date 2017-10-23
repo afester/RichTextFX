@@ -102,6 +102,17 @@ public final class ReadOnlyStyledDocument<PS, SEG, S> implements StyledDocument<
     }
 
 
+    
+    
+    
+    
+    /**
+     * @param pCodec
+     * @param segCodec
+     * @param segmentOps
+     *
+     * @return A codec which allows to serialize the complete styled document to/from a data stream. 
+     */
     public static <PS, SEG, S> Codec<StyledDocument<PS, SEG, S>> codec(Codec<PS> pCodec, Codec<StyledSegment<SEG, S>> segCodec,
                                                                        SegmentOps<SEG, S> segmentOps) {
         return new Codec<StyledDocument<PS, SEG, S>>() {
@@ -127,6 +138,14 @@ public final class ReadOnlyStyledDocument<PS, SEG, S> implements StyledDocument<
         };
     }
 
+
+    /**
+     * @param pCodec
+     * @param segCodec
+     * @param segmentOps
+     *
+     * @return A coded which allows to serialize one paragraph to/from a data stream.
+     */
     private static <PS, SEG, S> Codec<Paragraph<PS, SEG, S>> paragraphCodec(Codec<PS> pCodec,
                                                                             Codec<StyledSegment<SEG, S>> segCodec,
                                                                             SegmentOps<SEG, S> segmentOps) {

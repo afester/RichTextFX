@@ -11,7 +11,6 @@ import org.fxmisc.richtext.model.SimpleEditableStyledDocument;
 import org.fxmisc.richtext.util.UndoUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.testfx.framework.junit.ApplicationTest;
 
 import static org.junit.Assert.assertEquals;
 

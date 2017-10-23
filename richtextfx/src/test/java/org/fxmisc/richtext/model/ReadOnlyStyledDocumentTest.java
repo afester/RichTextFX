@@ -43,7 +43,7 @@ public class ReadOnlyStyledDocumentTest {
             List<? extends Paragraph<Void, String, Void>> removed = pch.getRemoved();
             List<? extends Paragraph<Void, String, Void>> added = pch.getAdded();
             assertEquals(2, removed.size());
-            Paragraph<Void, String, Void> p = new Paragraph<>(NULL, segOps, segOps.create("som"), NULL);
+            //Paragraph<Void, String, Void> p = new Paragraph<>(NULL, segOps, segOps.create("som"), NULL);
             assertEquals(new Paragraph<>(NULL, segOps, "Foo", NULL), removed.get(0));
             assertEquals(new Paragraph<>(NULL, segOps, "Bar", NULL), removed.get(1));
             assertEquals(1, added.size());
